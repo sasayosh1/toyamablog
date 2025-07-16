@@ -1,49 +1,8 @@
-import { createClient } from '@sanity/client'
+import { createClient } from 'next-sanity'
 
 export const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION!,
-  useCdn: false,
+  projectId: 'aoxze287',
+  dataset: 'production',
+  apiVersion: '2024-07-15',
+  useCdn: true,
 })
-
-export interface Post {
-  _id: string
-  title: string
-  slug: {
-    current: string
-  }
-  publishedAt: string
-  body: unknown[]
-  categories?: string[]
-  youtubeId?: string
-  excerpt?: string
-}
-
-export async function getAllPosts(): Promise<Post[]> {
-  const query = `*[_type == "post" && defined(publishedAt)] | order(publishedAt desc) {
-    _id,
-    title,
-    slug,
-    publishedAt,
-    body,
-    categories,
-    "youtubeId": body[0].children[0].text
-  }`
-  
-  return client.fetch(query)
-}
-
-export async function getPostBySlug(slug: string): Promise<Post | null> {
-  const query = `*[_type == "post" && slug.current == $slug][0] {
-    _id,
-    title,
-    slug,
-    publishedAt,
-    body,
-    categories,
-    "youtubeId": body[0].children[0].text
-  }`
-  
-  return client.fetch(query, { slug })
-}
