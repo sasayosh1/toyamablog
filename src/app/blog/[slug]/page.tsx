@@ -18,10 +18,11 @@ interface Post {
   // 他のフィールドも必要に応じて追加
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   const post = await client.fetch<Post>(
     `*[_type == "post" && slug.current == $slug][0]`,
-    { slug: params.slug }
+    { slug }
   )
 
   if (!post) {
