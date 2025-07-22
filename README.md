@@ -1,8 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TOYAMA BLOG
 
-## Getting Started
+富山をテーマにしたブログサイト。Next.js 15 + Sanity CMS + Vercelで構築。
 
-First, run the development server:
+## 技術スタック
+
+- **フレームワーク**: Next.js 15 (App Router)
+- **言語**: TypeScript
+- **スタイリング**: Tailwind CSS v4
+- **CMS**: Sanity
+- **デプロイ**: Vercel
+- **Node.js**: 20+
+
+## 環境構築
+
+### 1. 依存関係インストール
+
+```bash
+npm install
+```
+
+### 2. 環境変数設定
+
+`.env.example`を参考に`.env.local`を作成：
+
+```bash
+cp .env.example .env.local
+```
+
+### 3. 開発サーバー起動
 
 ```bash
 npm run dev
@@ -33,4 +58,51 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Sanity Studio
+
+Sanity Studioは別途起動します：
+
+```bash
+# Sanity Studio開発サーバー
+npx sanity dev
+```
+
+Studio URL: http://localhost:3333/
+
+## Vercelデプロイ
+
+### 1. GitHubにプッシュ
+
+```bash
+git add .
+git commit -m "Setup Vercel deployment"
+git push origin main
+```
+
+### 2. Vercelでプロジェクト作成
+
+1. [Vercel Dashboard](https://vercel.com/dashboard)にアクセス
+2. "New Project"をクリック  
+3. GitHubリポジトリを選択
+4. 環境変数を設定：
+   - `NEXT_PUBLIC_SANITY_PROJECT_ID`: aoxze287
+   - `NEXT_PUBLIC_SANITY_DATASET`: production
+   - `SANITY_API_TOKEN`: (Sanityから取得)
+
+### 3. 自動デプロイ
+
+以降、`main`ブランチにプッシュすると自動デプロイされます。
+
+## プロジェクト構造
+
+```
+toyama-blog/
+├── src/
+│   ├── app/                 # Next.js App Router
+│   └── lib/                 # ユーティリティ関数
+├── schemaTypes/             # Sanityスキーマ定義
+├── public/                  # 静的ファイル
+├── vercel.json             # Vercel設定
+├── next.config.ts          # Next.js設定
+└── sanity.config.ts        # Sanity設定
+```
