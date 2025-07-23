@@ -34,5 +34,15 @@
       "source": "/api/sanity/(.*)",
       "destination": "https://aoxze287.api.sanity.io/v1/data/query/production?query=$1"
     }
+  ],
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "status": 404,
+      "dest": "/not-found"
+    }
   ]
 }

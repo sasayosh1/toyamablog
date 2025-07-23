@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Vercel最適化設定
-  output: 'standalone',
-  
   // 画像最適化設定
   images: {
     domains: ['cdn.sanity.io'],
@@ -19,7 +16,7 @@ const nextConfig: NextConfig = {
   
   // 静的生成最適化
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Vercelデプロイエラー回避のため一時的にコメントアウト
   },
   
   // セキュリティヘッダー
