@@ -10,6 +10,74 @@
       "maxDuration": 10
     }
   },
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.sasakiyoshimasa.com"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "toyamablog.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.toyamablog.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "toyamablog-git-main-sasayoshis-projects.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "toyamablog-*-sasayoshis-projects.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "toyamablog-*.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

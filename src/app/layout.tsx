@@ -15,6 +15,23 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "富山ブログ",
   description: "富山の魅力を発信するブログサイトです",
+  metadataBase: new URL('https://sasakiyoshimasa.com'),
+  alternates: {
+    canonical: 'https://sasakiyoshimasa.com',
+  },
+  openGraph: {
+    title: "富山ブログ",
+    description: "富山の魅力を発信するブログサイトです",
+    url: 'https://sasakiyoshimasa.com',
+    siteName: '富山ブログ',
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "富山ブログ",
+    description: "富山の魅力を発信するブログサイトです",
+  },
   verification: {
     google: "NocI3MMwDMlZ9xW66Er1NNBu4KIfUhL71SWYQpGysfE",
   },
