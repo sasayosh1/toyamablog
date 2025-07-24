@@ -4,7 +4,7 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "outputDirectory": ".next",
-  "regions": ["nrt1"],
+  "regions": ["hnd1"],
   "functions": {
     "src/app/**/*.tsx": {
       "maxDuration": 10
@@ -33,16 +33,6 @@
     {
       "source": "/api/sanity/(.*)",
       "destination": "https://aoxze287.api.sanity.io/v1/data/query/production?query=$1"
-    }
-  ],
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "status": 404,
-      "dest": "/not-found"
     }
   ]
 }
