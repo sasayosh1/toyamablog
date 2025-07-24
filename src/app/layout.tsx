@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "富山ブログ",
   description: "富山の魅力を発信するブログサイトです",
+  verification: {
+    google: "NocI3MMwDMlZ9xW66Er1NNBu4KIfUhL71SWYQpGysfE",
+  },
 };
 
 export default function RootLayout({
@@ -24,9 +27,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <head>
-        <meta name="google-site-verification" content="NocI3MMwDMlZ9xW66Er1NNBu4KIfUhL71SWYQpGysfE" />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
