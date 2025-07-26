@@ -1,5 +1,5 @@
 import type {StructureResolver} from 'sanity/structure'
-import PostPreview from '../components/PostPreview'
+import SimplePreview from '../components/SimplePreview'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
@@ -18,11 +18,11 @@ export const structure: StructureResolver = (S) =>
                 .views([
                   S.view.form(),
                   S.view
-                    .component(PostPreview)
+                    .component(SimplePreview)
                     .title('Preview')
                 ])
             )
         ),
-      S.documentTypeListItem('author'),
-      S.documentTypeListItem('category'),
+      S.documentTypeListItem('author').title('Authors'),
+      S.documentTypeListItem('category').title('Categories'),
     ])
