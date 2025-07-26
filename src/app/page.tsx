@@ -1,10 +1,8 @@
-import { getAllPosts } from '@/lib/sanity'
-import { format } from 'date-fns'
-import { ja } from 'date-fns/locale'
+import { getAllPosts, type Post } from '@/lib/sanity'
 import Link from 'next/link'
 
 export default async function Home() {
-  const posts = await getAllPosts()
+  const posts: Post[] = await getAllPosts()
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -42,7 +40,11 @@ export default async function Home() {
                 )}
 
                 <p className="text-gray-600 text-sm mb-4">
-                  {format(new Date(post.publishedAt), 'yyyy年MM月dd日', { locale: ja })}
+                  {new Date(post.publishedAt).toLocaleDateString('ja-JP', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
                 </p>
 
                 {post.excerpt && (
@@ -52,7 +54,7 @@ export default async function Home() {
                 )}
 
                 <Link
-                  href={`/posts/${post.slug.current}`}
+                  href={`/blog/${post.slug.current}`}
                   className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
                 >
                   続きを読む
