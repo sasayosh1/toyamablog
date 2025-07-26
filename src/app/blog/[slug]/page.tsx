@@ -23,22 +23,12 @@ interface Post {
   // 他のフィールドも必要に応じて追加
 }
 
-export default async function PostPage({ 
-  params, 
-  searchParams 
-}: { 
-  params: Promise<{ slug: string }>
-  searchParams: Promise<{ preview?: string }>
-}) {
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const { preview } = await searchParams
-  
-  // プレビューモードの場合はドラフトも含めて取得
-  const query = preview === 'true' 
-    ? `*[_type == "post" && slug.current == $slug][0]{ title, body, publishedAt, "author": author->name }`
-    : `*[_type == "post" && slug.current == $slug && defined(publishedAt)][0]{ title, body, publishedAt, "author": author->name }`
-  
-  const post = await client.fetch<Post>(query, { slug })
+  const post = await client.fetch<Post>(
+    `*[_type == "post" && slug.current == $slug && defined(publishedAt)][0]{ title, body, publishedAt, "author": author->name }`,
+    { slug }
+  )
 
   if (!post) {
     notFound()
@@ -46,17 +36,6 @@ export default async function PostPage({
 
   return (
     <article style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-      {preview === 'true' && (
-        <div style={{ 
-          background: '#f0f0f0', 
-          padding: '1rem', 
-          marginBottom: '2rem',
-          borderRadius: '4px',
-          textAlign: 'center'
-        }}>
-          <strong>プレビューモード</strong> - 公開前の内容が表示されています
-        </div>
-      )}
       <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>{post.title}</h1>
       {post.author && (
         <p style={{ color: '#666', marginBottom: '1rem' }}>著者: {post.author}</p>
