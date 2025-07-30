@@ -1,0 +1,223 @@
+---
+import YouTubeShorts from './YouTubeShorts.astro';
+
+interface Props {
+  content: Array<{
+    _type: string;
+    _key: string;
+    [key: string]: any;
+  }>;
+}
+
+const { content } = Astro.props;
+
+// ポータブルテキストの各ブロックをレンダリング
+function renderBlock(block: any) {
+  switch (block._type) {
+    case 'block':
+      return renderTextBlock(block);
+    case 'image':
+      return renderImage(block);
+    case 'youtubeShorts':
+      return { 
+        type: 'youtube', 
+        props: {
+          url: block.url,
+          title: block.title,
+          autoplay: block.autoplay,
+          showControls: block.showControls
+        }
+      };
+    default:
+      console.warn('Unknown block type:', block._type);
+      return null;
+  }
+}
+
+function renderTextBlock(block: any) {
+  const style = block.style || 'normal';
+  const children = block.children || [];
+  
+  const text = children.map((child: any) => {
+    let content = child.text || '';
+    
+    // マークアップを適用
+    if (child.marks && child.marks.length > 0) {
+      child.marks.forEach((mark: string) => {
+        switch (mark) {
+          case 'strong':
+            content = `<strong>${content}</strong>`;
+            break;
+          case 'em':
+            content = `<em>${content}</em>`;
+            break;
+          case 'code':
+            content = `<code>${content}</code>`;
+            break;
+          case 'underline':
+            content = `<u>${content}</u>`;
+            break;
+        }
+      });
+    }
+    
+    return content;
+  }).join('');
+  
+  return { type: 'text', style, content: text };
+}
+
+function renderImage(block: any) {
+  if (!block.asset) return null;
+  
+  return {
+    type: 'image',
+    props: {
+      src: block.asset.url,
+      alt: block.alt || '',
+      caption: block.caption
+    }
+  };
+}
+
+const renderedBlocks = content.map(renderBlock).filter(Boolean);
+
+// サーバーサイドでタグを決定する関数
+function getTagFromStyle(style: string): string {
+  switch (style) {
+    case 'h1': return 'h1';
+    case 'h2': return 'h2';
+    case 'h3': return 'h3';
+    case 'h4': return 'h4';
+    case 'h5': return 'h5';
+    case 'h6': return 'h6';
+    case 'blockquote': return 'blockquote';
+    case 'normal':
+    default:
+      return 'p';
+  }
+}
+---
+
+<div class="portable-text">
+  {renderedBlocks.map((block) => {
+    if (!block) return null;
+    
+    if (block.type === 'text') {
+      const Tag = getTagFromStyle(block.style);
+      return (
+        <Tag set:html={block.content} />
+      );
+    }
+    
+    if (block.type === 'youtube') {
+      return (
+        <YouTubeShorts {...block.props} />
+      );
+    }
+    
+    if (block.type === 'image') {
+      return (
+        <figure class="image-figure">
+          <img 
+            src={block.props.src} 
+            alt={block.props.alt}
+            loading="lazy"
+          />
+          {block.props.caption && (
+            <figcaption>{block.props.caption}</figcaption>
+          )}
+        </figure>
+      );
+    }
+    
+    return null;
+  })}
+</div>
+
+
+<style>
+  .portable-text {
+    line-height: 1.7;
+    color: #374151;
+  }
+  
+  .portable-text h1,
+  .portable-text h2,
+  .portable-text h3,
+  .portable-text h4,
+  .portable-text h5,
+  .portable-text h6 {
+    margin: 2rem 0 1rem 0;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #1f2937;
+  }
+  
+  .portable-text h1 {
+    font-size: 2.5rem;
+  }
+  
+  .portable-text h2 {
+    font-size: 2rem;
+  }
+  
+  .portable-text h3 {
+    font-size: 1.5rem;
+  }
+  
+  .portable-text h4 {
+    font-size: 1.25rem;
+  }
+  
+  .portable-text p {
+    margin: 1rem 0;
+  }
+  
+  .portable-text blockquote {
+    margin: 2rem 0;
+    padding: 1rem 1.5rem;
+    border-left: 4px solid #e5e7eb;
+    background: #f9fafb;
+    font-style: italic;
+  }
+  
+  .portable-text strong {
+    font-weight: 700;
+  }
+  
+  .portable-text em {
+    font-style: italic;
+  }
+  
+  .portable-text code {
+    background: #f3f4f6;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+  }
+  
+  .portable-text u {
+    text-decoration: underline;
+  }
+  
+  .image-figure {
+    margin: 2rem 0;
+    text-align: center;
+  }
+  
+  .image-figure img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .image-figure figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #6b7280;
+    font-style: italic;
+  }
+</style>

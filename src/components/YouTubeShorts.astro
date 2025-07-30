@@ -1,0 +1,118 @@
+---
+import { extractYouTubeVideoId, getYouTubeEmbedUrl } from '../lib/sanity';
+
+interface Props {
+  url: string;
+  title?: string;
+  autoplay?: boolean;
+  showControls?: boolean;
+  class?: string;
+}
+
+const { 
+  url, 
+  title, 
+  autoplay = false, 
+  showControls = true,
+  class: className = ''
+} = Astro.props;
+
+// URLからビデオIDを抽出
+const videoId = extractYouTubeVideoId(url);
+
+if (!videoId) {
+  console.error('Invalid YouTube URL:', url);
+}
+
+const embedUrl = videoId ? getYouTubeEmbedUrl(videoId, autoplay, showControls) : '';
+---
+
+{videoId ? (
+  <div class={`youtube-shorts-container ${className}`}>
+    {title && <h3 class="youtube-title">{title}</h3>}
+    <div class="youtube-embed-wrapper">
+      <iframe
+        src={embedUrl}
+        title={title || 'YouTube Shorts'}
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen
+        loading="lazy"
+        class="youtube-iframe"
+      ></iframe>
+    </div>
+  </div>
+) : (
+  <div class="youtube-error">
+    <p>⚠️ YouTube URLが無効です: {url}</p>
+  </div>
+)}
+
+<style>
+  .youtube-shorts-container {
+    margin: 2rem 0;
+    max-width: 100%;
+  }
+  
+  .youtube-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1a1a1a;
+  }
+  
+  .youtube-embed-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 400px; /* Shorts用の縦長サイズ */
+    margin: 0 auto;
+    aspect-ratio: 9 / 16; /* Shorts用のアスペクト比 */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #000;
+  }
+  
+  .youtube-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+  .youtube-error {
+    padding: 1rem;
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 8px;
+    color: #c33;
+    text-align: center;
+    margin: 2rem 0;
+  }
+  
+  /* レスポンシブ対応 */
+  @media (max-width: 768px) {
+    .youtube-embed-wrapper {
+      max-width: 280px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .youtube-embed-wrapper {
+      max-width: 240px;
+    }
+    
+    .youtube-title {
+      font-size: 1.1rem;
+    }
+  }
+  
+  /* 通常のYouTube動画の場合は横長にする */
+  .youtube-embed-wrapper.regular-video {
+    max-width: 560px;
+    aspect-ratio: 16 / 9;
+  }
+</style>

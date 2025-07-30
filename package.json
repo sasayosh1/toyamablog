@@ -1,0 +1,19 @@
+{
+  "name": "sasakiyoshimasa-blog",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@sanity/astro": "^3.2.10",
+    "@sanity/client": "^7.8.1",
+    "@sanity/vision": "^4.2.0",
+    "astro": "^5.12.3",
+    "sanity": "^4.2.0",
+    "styled-components": "^6.1.19"
+  }
+}
