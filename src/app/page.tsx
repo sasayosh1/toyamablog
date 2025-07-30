@@ -39,13 +39,29 @@ export default async function Home() {
                   </div>
                 )}
 
-                <p className="text-gray-600 text-sm mb-4">
-                  {new Date(post.publishedAt).toLocaleDateString('ja-JP', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </p>
+                <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
+                  <div className="flex items-center space-x-2">
+                    {post.author?.image?.asset?.url ? (
+                      <img 
+                        src={post.author.image.asset.url}
+                        alt={post.author.name}
+                        className="w-6 h-6 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                        {post.author?.name?.charAt(0) || 'U'}
+                      </div>
+                    )}
+                    <span className="font-medium">{post.author?.name || 'Unknown'}</span>
+                  </div>
+                  <time dateTime={post.publishedAt}>
+                    {new Date(post.publishedAt).toLocaleDateString('ja-JP', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </time>
+                </div>
 
                 {post.excerpt && (
                   <p className="text-gray-700 mb-4 line-clamp-3">

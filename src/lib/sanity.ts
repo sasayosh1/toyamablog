@@ -7,7 +7,22 @@ export const client = createClient({
   useCdn: true,
 });
 
-export interface BlogPost {
+export interface Author {
+  _id: string;
+  name: string;
+  slug: {
+    current: string;
+  };
+  bio?: string;
+  image?: {
+    asset: {
+      _ref: string;
+      url: string;
+    };
+  };
+}
+
+export interface Post {
   _id: string;
   title: string;
   slug: {
@@ -16,7 +31,73 @@ export interface BlogPost {
   description?: string;
   tags?: string[];
   category?: string;
+  categories?: string[];
   publishedAt: string;
   body?: any;
   youtubeUrl?: string;
+  author?: Author;
+  excerpt?: string;
+}
+
+export interface BlogPost extends Post {}
+
+export async function getAllPosts(): Promise<Post[]> {
+  const posts = await client.fetch(`
+    *[_type == "post"] | order(publishedAt desc) {
+      _id,
+      title,
+      slug,
+      description,
+      tags,
+      category,
+      publishedAt,
+      youtubeUrl,
+      author->{
+        _id,
+        name,
+        slug,
+        bio,
+        image{
+          asset->{
+            _ref,
+            url
+          }
+        }
+      },
+      "excerpt": description,
+      "categories": [category]
+    }
+  `);
+  
+  return posts;
+}
+
+export async function getPost(slug: string): Promise<Post | null> {
+  const post = await client.fetch(`
+    *[_type == "post" && slug.current == $slug][0] {
+      _id,
+      title,
+      slug,
+      description,
+      tags,
+      category,
+      publishedAt,
+      body,
+      youtubeUrl,
+      author->{
+        _id,
+        name,
+        slug,
+        bio,
+        image{
+          asset->{
+            _ref,
+            url
+          }
+        }
+      }
+    }
+  `, { slug });
+  
+  return post;
 }
