@@ -1,0 +1,106 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "regions": ["hnd1"],
+  "functions": {
+    "src/app/**/*.tsx": {
+      "maxDuration": 10
+    }
+  },
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.sasakiyoshimasa.com"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "toyamablog.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.toyamablog.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "toyamablog-git-main-sasayoshis-projects.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "toyamablog-*-sasayoshis-projects.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "toyamablog-*.vercel.app"
+        }
+      ],
+      "destination": "https://sasakiyoshimasa.com/:path*",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/sanity/(.*)",
+      "destination": "https://aoxze287.api.sanity.io/v1/data/query/production?query=$1"
+    }
+  ]
+}

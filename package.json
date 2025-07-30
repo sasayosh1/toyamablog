@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "sasakiyoshimasa-blog",
   "type": "module",
   "version": "0.0.1",
@@ -15,5 +16,45 @@
     "astro": "^5.12.3",
     "sanity": "^4.2.0",
     "styled-components": "^6.1.19"
+=======
+  "name": "toyamablog-2025",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "env:setup": "node scripts/setup-env.js",
+    "env:dev": "node scripts/env-manager.js dev",
+    "env:prod": "node scripts/env-manager.js prod",
+    "env:backup": "node scripts/env-manager.js backup",
+    "env:restore": "node scripts/env-manager.js restore"
+  },
+  "dependencies": {
+    "@portabletext/react": "^3.2.1",
+    "@sanity/client": "^7.6.0",
+    "@sanity/image-url": "^1.1.0",
+    "@sanity/ui": "^3.0.1",
+    "@sanity/vision": "^4.0.1",
+    "autoprefixer": "^10.4.21",
+    "next": "15.4.1",
+    "next-sanity": "^9.12.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-is": "^19.1.0",
+    "styled-components": "^6.1.19"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.1",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5"
+>>>>>>> 31044119437df01edc0123087c142c7163545891
   }
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { defineConfig } from 'sanity'
 import { deskTool } from 'sanity/desk'
 import { visionTool } from '@sanity/vision'
@@ -171,3 +172,23 @@ export default defineConfig({
     types: [existingPost]
   }
 })
+=======
+import {defineConfig} from 'sanity'
+import {structureTool} from 'sanity/structure'
+import {visionTool} from '@sanity/vision'
+import {schemaTypes} from './schemaTypes'
+
+export default defineConfig({
+  name: 'default',
+  title: 'TOYAMA BLOG',
+
+  projectId: 'aoxze287',
+  dataset: 'production',
+
+  plugins: [structureTool(), visionTool()],
+
+  schema: {
+    types: schemaTypes,
+  },
+})
+>>>>>>> 31044119437df01edc0123087c142c7163545891
