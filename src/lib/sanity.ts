@@ -33,13 +33,13 @@ export interface Post {
   category?: string;
   categories?: string[];
   publishedAt: string;
-  body?: any;
+  body?: unknown;
   youtubeUrl?: string;
   author?: Author;
   excerpt?: string;
 }
 
-export interface BlogPost extends Post {}
+export type BlogPost = Post;
 
 export async function getAllPosts(): Promise<Post[]> {
   const posts = await client.fetch(`

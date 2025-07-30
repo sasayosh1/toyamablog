@@ -87,11 +87,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </div>
       )}
 
-      {post.body && (
+      {post.body ? (
         <div style={{ lineHeight: '1.7', fontSize: '1.125rem' }}>
-          <PortableText value={post.body} />
+          <PortableText value={post.body as unknown} />
         </div>
-      )}
+      ) : null}
     </article>
   )
 }

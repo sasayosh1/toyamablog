@@ -1,4 +1,4 @@
-import { getPostBySlug, getAllPosts } from '@/lib/sanity'
+import { getPost, getAllPosts } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
@@ -17,7 +17,7 @@ interface PostPageProps {
 
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
-  const post = await getPostBySlug(slug)
+  const post = await getPost(slug)
 
   if (!post) {
     notFound()
@@ -55,7 +55,7 @@ export default async function PostPage({ params }: PostPageProps) {
           )}
           
           <div className="prose prose-lg max-w-none">
-            {post.body && post.body.map((block, index: number) => {
+            {post.body && Array.isArray(post.body) ? post.body.map((block, index: number) => {
               const typedBlock = block as { children?: { text: string }[] }
               return (
                 <div key={index}>
@@ -66,7 +66,7 @@ export default async function PostPage({ params }: PostPageProps) {
                   ))}
                 </div>
               )
-            })}
+            }) : null}
           </div>
         </article>
       </div>
