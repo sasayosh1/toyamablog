@@ -52,7 +52,8 @@ export async function POST(request: NextRequest) {
       revalidateTag('posts')
       
       if (slug) {
-        revalidateTag(`post-${slug}`)
+        const shortSlug = slug.substring(0, 50) // タグ長制限対応
+        revalidateTag(`post-${shortSlug}`)
         revalidatePath(`/blog/${slug}`)
         console.log(`[Revalidate] Post: ${slug}`)
       }

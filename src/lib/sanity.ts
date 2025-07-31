@@ -105,7 +105,7 @@ export async function getPost(slug: string): Promise<Post | null> {
     }
   `, { slug }, { 
     next: { 
-      tags: ['posts', `post-${slug}`], 
+      tags: ['posts', `post-${slug.substring(0, 50)}`], // タグ長制限対応
       revalidate: 60 // 1分
     } 
   });
