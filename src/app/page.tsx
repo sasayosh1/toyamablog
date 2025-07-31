@@ -35,65 +35,38 @@ export default async function Home() {
       <div className="max-w-7xl mx-auto py-8 md:py-12 px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {posts.map((post) => (
-            <article key={post._id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
-              <div className="p-5 md:p-6">
-                <h2 className="text-lg md:text-xl font-semibold mb-3 text-gray-800 line-clamp-2 leading-tight">
-                  {post.title}
-                </h2>
-                
-                {post.categories && (
-                  <div className="flex flex-wrap gap-1.5 mb-3">
-                    {post.categories.slice(0, 2).map((category) => (
-                      <span
-                        key={category}
-                        className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md"
-                      >
-                        {category}
-                      </span>
-                    ))}
-                  </div>
-                )}
+            <Link 
+              key={post._id} 
+              href={`/blog/${post.slug.current}`}
+              className="block"
+            >
+              <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer">
+                <div className="p-5 md:p-6">
+                  <h2 className="text-lg md:text-xl font-semibold mb-3 text-gray-800 line-clamp-2 leading-tight">
+                    {post.title}
+                  </h2>
+                  
+                  {post.categories && (
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {post.categories.slice(0, 2).map((category) => (
+                        <span
+                          key={category}
+                          className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md"
+                        >
+                          {category}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
-                <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                  <div className="flex items-center space-x-2">
-                    {post.author?.image?.asset?.url ? (
-                      <img 
-                        src={post.author.image.asset.url}
-                        alt={post.author.name}
-                        className="w-5 h-5 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
-                        {post.author?.name?.charAt(0) || 'U'}
-                      </div>
-                    )}
-                    <span className="font-medium">{post.author?.name || 'Unknown'}</span>
-                  </div>
-                  <time dateTime={post.publishedAt}>
-                    {new Date(post.publishedAt).toLocaleDateString('ja-JP', {
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </time>
+                  {post.excerpt && (
+                    <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
+                      {post.excerpt}
+                    </p>
+                  )}
                 </div>
-
-                {post.excerpt && (
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
-                    {post.excerpt}
-                  </p>
-                )}
-
-                <Link
-                  href={`/blog/${post.slug.current}`}
-                  className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors"
-                >
-                  続きを読む
-                  <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              </div>
-            </article>
+              </article>
+            </Link>
           ))}
         </div>
 
