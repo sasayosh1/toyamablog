@@ -2,6 +2,9 @@ import { getPost, type Post, client } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import PortableText from '@/components/PortableText'
 
+// ISR: 1分間隔で再検証
+export const revalidate = 60
+
 interface SanityPost {
   slug: string;
 }

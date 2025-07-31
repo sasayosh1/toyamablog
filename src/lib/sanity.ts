@@ -4,7 +4,8 @@ export const client = createClient({
   projectId: 'aoxze287',
   dataset: 'production',
   apiVersion: '2024-01-01',
-  useCdn: true,
+  useCdn: false, // 即時反映のため無効化
+  perspective: 'published', // publishedコンテンツのみ
 });
 
 export interface Author {
@@ -67,7 +68,12 @@ export async function getAllPosts(): Promise<Post[]> {
       "excerpt": description,
       "categories": [category]
     }
-  `);
+  `, {}, { 
+    next: { 
+      tags: ['posts'], 
+      revalidate: 300 // 5分
+    } 
+  });
   
   return posts;
 }
@@ -97,7 +103,12 @@ export async function getPost(slug: string): Promise<Post | null> {
         }
       }
     }
-  `, { slug });
+  `, { slug }, { 
+    next: { 
+      tags: ['posts', `post-${slug}`], 
+      revalidate: 60 // 1分
+    } 
+  });
   
   return post;
 }

@@ -1,6 +1,9 @@
 import { getAllPosts, type Post } from '@/lib/sanity'
 import Link from 'next/link'
 
+// ISR: 5分間隔で再検証（一覧ページ）
+export const revalidate = 300
+
 export default async function Home() {
   const posts: Post[] = await getAllPosts()
 
