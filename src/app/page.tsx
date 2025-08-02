@@ -37,7 +37,7 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto py-8 md:py-12 px-4">
+      <div className="max-w-7xl mx-auto py-8 md:py-12 px-4 relative z-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {posts.map((post) => (
             <Link 
@@ -45,7 +45,7 @@ export default async function Home() {
               href={`/blog/${post.slug.current}`}
               className="block"
             >
-              <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer">
+              <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer relative z-[1]">
                 {post.youtubeUrl && getYouTubeThumbnailWithFallback(post.youtubeUrl) && (
                   <div className="relative h-48 overflow-hidden">
                     <Image
