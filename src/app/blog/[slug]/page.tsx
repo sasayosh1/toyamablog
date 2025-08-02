@@ -83,26 +83,36 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         )}
 
         {post.body ? (
-          <div className="prose prose-lg max-w-none text-gray-900">
+          <div className="prose prose-lg max-w-none">
             <style jsx global>{`
               .prose h2 {
-                color: #1f2937 !important;
-                font-weight: 700 !important;
+                color: #000000 !important;
+                font-weight: 800 !important;
                 font-size: 1.875rem !important;
                 margin-top: 2rem !important;
                 margin-bottom: 1rem !important;
+                border-bottom: 2px solid #e5e7eb !important;
+                padding-bottom: 0.5rem !important;
               }
               .prose h3 {
-                color: #374151 !important;
-                font-weight: 600 !important;
+                color: #111827 !important;
+                font-weight: 700 !important;
                 font-size: 1.5rem !important;
                 margin-top: 1.5rem !important;
                 margin-bottom: 0.75rem !important;
               }
               .prose p {
-                color: #374151 !important;
+                color: #111827 !important;
                 line-height: 1.8 !important;
                 margin-bottom: 1.25rem !important;
+                font-size: 1.125rem !important;
+                font-weight: 400 !important;
+              }
+              .prose {
+                color: #111827 !important;
+              }
+              .prose * {
+                color: inherit !important;
               }
             `}</style>
             <PortableText value={post.body as unknown} />
