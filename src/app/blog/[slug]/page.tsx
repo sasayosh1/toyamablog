@@ -60,30 +60,15 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         )}
 
         {post.category && (
-          <div className="mb-4">
+          <div className="mb-6">
             <span className="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-md">
               {post.category}
             </span>
           </div>
         )}
 
-        {post.tags && post.tags.length > 0 && (
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
         {post.body ? (
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-lg max-w-none mb-12">
             <style jsx global>{`
               .prose h2 {
                 color: #000000 !important;
@@ -118,6 +103,22 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <PortableText value={post.body as unknown} />
           </div>
         ) : null}
+
+        {post.tags && post.tags.length > 0 && (
+          <div className="border-t border-gray-200 pt-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">タグ</h3>
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full hover:bg-blue-200 transition-colors"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </article>
     </div>
   )
