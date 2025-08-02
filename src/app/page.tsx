@@ -2,7 +2,7 @@ import { getAllPosts, type Post } from '@/lib/sanity'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 import Link from 'next/link'
 import Image from 'next/image'
-import AdvancedSearchBox from '@/components/AdvancedSearchBox'
+import GlobalHeader from '@/components/GlobalHeader'
 
 // ISR: 5分間隔で再検証（一覧ページ）
 export const revalidate = 300
@@ -12,6 +12,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <GlobalHeader posts={posts} />
       <div className="relative h-64 md:h-80 lg:h-96 overflow-hidden">
         <Image
           src="/images/toyama-hero.png"
@@ -30,9 +31,6 @@ export default async function Home() {
             <p className="text-base md:text-lg lg:text-xl text-gray-100 drop-shadow-md mb-6 md:mb-8">
               富山の美しい風景と魅力を発信
             </p>
-            <div className="max-w-md mx-auto">
-              <AdvancedSearchBox posts={posts} />
-            </div>
           </div>
         </div>
       </div>
