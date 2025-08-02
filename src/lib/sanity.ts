@@ -116,36 +116,88 @@ export async function getPost(slug: string): Promise<Post | null> {
 export async function searchPosts(searchTerm: string): Promise<Post[]> {
   if (!searchTerm.trim()) return [];
   
-  const groqQuery = `*[_type == "post" && (
-    title match "*" + "${searchTerm}" + "*" ||
-    description match "*" + "${searchTerm}" + "*" ||
-    category match "*" + "${searchTerm}" + "*"
-  )] | order(publishedAt desc) [0...20] {
-    _id,
-    title,
-    slug,
-    description,
-    tags,
-    category,
-    publishedAt,
-    youtubeUrl,
-    author->{
-      _id,
-      name,
-      slug,
-      bio,
-      image{
-        asset->{
-          _ref,
-          url
-        }
+  try {
+    // より安全で効果的な検索クエリ
+    const posts = await client.fetch<Post[]>(`
+      *[_type == "post" && (
+        title match "*" + $searchTerm + "*" ||
+        description match "*" + $searchTerm + "*" ||
+        category match "*" + $searchTerm + "*" ||
+        pt::text(body) match "*" + $searchTerm + "*"
+      )] | order(publishedAt desc) [0...20] {
+        _id,
+        title,
+        slug,
+        description,
+        tags,
+        category,
+        publishedAt,
+        youtubeUrl,
+        author->{
+          _id,
+          name,
+          slug,
+          bio,
+          image{
+            asset->{
+              _ref,
+              url
+            }
+          }
+        },
+        "excerpt": description,
+        "categories": [category]
       }
-    },
-    "excerpt": description,
-    "categories": [category]
-  }`;
-  
-  const posts = await client.fetch<Post[]>(groqQuery);
-  
-  return posts;
+    `, { searchTerm });
+    
+    console.log(`Search for "${searchTerm}" returned ${posts.length} results`);
+    return posts;
+    
+  } catch (error) {
+    console.error('Search error:', error);
+    
+    // フォールバック: シンプルな検索
+    try {
+      const fallbackPosts = await client.fetch<Post[]>(`
+        *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...20] {
+          _id,
+          title,
+          slug,
+          description,
+          tags,
+          category,
+          publishedAt,
+          youtubeUrl,
+          author->{
+            _id,
+            name,
+            slug,
+            bio,
+            image{
+              asset->{
+                _ref,
+                url
+              }
+            }
+          },
+          "excerpt": description,
+          "categories": [category]
+        }
+      `);
+      
+      // クライアントサイドフィルタリング
+      const filtered = fallbackPosts.filter(post => 
+        post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      
+      console.log(`Fallback search for "${searchTerm}" returned ${filtered.length} results`);
+      return filtered;
+      
+    } catch (fallbackError) {
+      console.error('Fallback search error:', fallbackError);
+      return [];
+    }
+  }
 }

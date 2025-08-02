@@ -54,12 +54,26 @@ export default function AdvancedSearchBox({ posts }: AdvancedSearchBoxProps) {
       
       // サーバーサイド検索（より詳細な結果用）
       if (query.length >= 2) {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
-        if (response.ok) {
-          const data = await response.json()
-          const mergedResults = mergeSearchResults(clientFiltered, data.posts || [])
-          setFilteredPosts(mergedResults.slice(0, 10))
-          setIsOpen(mergedResults.length > 0)
+        try {
+          const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
+          console.log('Search API response status:', response.status)
+          
+          if (response.ok) {
+            const data = await response.json()
+            console.log('Search API data:', data)
+            
+            if (data.posts && Array.isArray(data.posts)) {
+              const mergedResults = mergeSearchResults(clientFiltered, data.posts)
+              setFilteredPosts(mergedResults.slice(0, 10))
+              setIsOpen(mergedResults.length > 0)
+              console.log(`Merged results: ${mergedResults.length} items`)
+            }
+          } else {
+            console.error('Search API error:', response.status, response.statusText)
+          }
+        } catch (fetchError) {
+          console.error('Search API fetch error:', fetchError)
+          // API失敗時はクライアントサイドの結果のみ使用
         }
       }
     } catch (error) {
