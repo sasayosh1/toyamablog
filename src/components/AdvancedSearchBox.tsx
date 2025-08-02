@@ -179,7 +179,7 @@ export default function AdvancedSearchBox({ posts }: AdvancedSearchBoxProps) {
       {isOpen && filteredPosts.length > 0 && (
         <div 
           ref={resultsRef}
-          className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-[10001] max-h-96 overflow-y-auto"
+          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-[10001] max-h-96 overflow-y-auto w-screen max-w-7xl"
         >
           {filteredPosts.map((post, index) => (
             <Link
@@ -240,7 +240,7 @@ export default function AdvancedSearchBox({ posts }: AdvancedSearchBoxProps) {
       )}
 
       {isOpen && filteredPosts.length === 0 && searchQuery.trim() && !isLoading && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-[10001] p-4 text-center text-gray-500">
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-[10001] p-4 text-center text-gray-500 w-screen max-w-7xl">
           「{searchQuery}」に関する記事が見つかりませんでした
         </div>
       )}
