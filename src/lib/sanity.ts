@@ -112,3 +112,40 @@ export async function getPost(slug: string): Promise<Post | null> {
   
   return post;
 }
+
+export async function searchPosts(searchTerm: string): Promise<Post[]> {
+  if (!searchTerm.trim()) return [];
+  
+  const groqQuery = `*[_type == "post" && (
+    title match "*" + "${searchTerm}" + "*" ||
+    description match "*" + "${searchTerm}" + "*" ||
+    category match "*" + "${searchTerm}" + "*"
+  )] | order(publishedAt desc) [0...20] {
+    _id,
+    title,
+    slug,
+    description,
+    tags,
+    category,
+    publishedAt,
+    youtubeUrl,
+    author->{
+      _id,
+      name,
+      slug,
+      bio,
+      image{
+        asset->{
+          _ref,
+          url
+        }
+      }
+    },
+    "excerpt": description,
+    "categories": [category]
+  }`;
+  
+  const posts = await client.fetch<Post[]>(groqQuery);
+  
+  return posts;
+}

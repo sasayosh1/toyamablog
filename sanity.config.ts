@@ -16,4 +16,20 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
   },
+
+  cors: {
+    origin: ['http://localhost:3000', 'https://sasakiyoshimasa.com', 'https://sasakiyoshimasa.sanity.studio'],
+    credentials: true
+  },
+
+  studio: {
+    components: {
+      layout: (props) => {
+        if (typeof window !== 'undefined') {
+          document.cookie = 'SameSite=None; Secure'
+        }
+        return props.renderDefault(props)
+      }
+    }
+  }
 })
