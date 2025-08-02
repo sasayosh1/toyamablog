@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation'
 import PortableText from '@/components/PortableText'
 import GlobalHeader from '@/components/GlobalHeader'
 
-// ISR: キャッシュ無効化（一時的）
-export const revalidate = 0
+// ISR: 1分間隔で再検証
+export const revalidate = 60
 
 interface SanityPost {
   slug: string;
