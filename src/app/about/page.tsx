@@ -2,7 +2,8 @@ import GlobalHeader from '@/components/GlobalHeader'
 import { client, type Post } from '@/lib/sanity'
 import { Metadata } from 'next'
 
-// ISR: 1時間間隔で再検証
+// 静的生成を強制
+export const dynamic = 'force-static'
 export const revalidate = 3600
 
 export const metadata: Metadata = {
