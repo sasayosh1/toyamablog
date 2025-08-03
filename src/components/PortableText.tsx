@@ -59,7 +59,7 @@ const components = {
             <p style={{
               textAlign: 'center',
               fontSize: '0.875rem',
-              color: '#666',
+              color: '#111827',
               marginTop: '0.5rem',
               fontStyle: 'italic'
             }}>
@@ -198,7 +198,7 @@ const components = {
         paddingLeft: '1rem',
         margin: '1.5rem 0',
         fontStyle: 'italic',
-        color: '#666'
+        color: '#111827'
       }}>
         {children}
       </blockquote>

@@ -86,7 +86,7 @@ export default async function Home() {
                   )}
 
                   {post.excerpt && (
-                    <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
+                    <p className="text-gray-800 text-sm line-clamp-2 leading-relaxed">
                       {post.excerpt}
                     </p>
                   )}
@@ -98,7 +98,7 @@ export default async function Home() {
 
         {posts.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">まだ投稿がありません</p>
+            <p className="text-gray-800 text-lg">まだ投稿がありません</p>
           </div>
         )}
       </div>

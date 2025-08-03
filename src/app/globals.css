@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #000000;
+  --foreground: #111827;
 }
 
 @theme inline {
@@ -22,7 +22,7 @@
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: #111827;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -33,7 +33,72 @@ body {
 
 /* 記事コンテンツの文字色を確実に濃くする */
 .prose, .prose * {
-  color: #000000 !important;
+  color: #111827 !important;
+}
+
+/* 追加のコントラスト改善 */
+.prose blockquote {
+  color: #111827 !important;
+}
+
+.prose figcaption, .prose .caption {
+  color: #111827 !important;
+}
+
+/* ブログコンテンツの詳細スタイル */
+.blog-content.prose h1, .blog-content.prose h2, .blog-content.prose h3, .blog-content.prose h4, .blog-content.prose h5, .blog-content.prose h6 {
+  color: #111827 !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.blog-content.prose h2 {
+  font-size: 1.875rem !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+  border-bottom: 2px solid #e5e7eb !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.blog-content.prose h3 {
+  font-size: 1.5rem !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+  font-weight: 700 !important;
+}
+
+.blog-content.prose p, .blog-content.prose span, .blog-content.prose div, .blog-content.prose li, .blog-content.prose td, .blog-content.prose th {
+  color: #111827 !important;
+  line-height: 1.8 !important;
+  font-size: 1.125rem !important;
+  font-weight: 500 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.blog-content.prose p {
+  margin-bottom: 1.25rem !important;
+}
+
+.blog-content.prose [data-sanity-span], .blog-content.prose [data-sanity-block] {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+.blog-content.prose a {
+  color: #2563eb !important;
+  font-weight: 600 !important;
+}
+
+.blog-content.prose strong {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+.blog-content.prose em {
+  color: #111827 !important;
+  font-style: italic !important;
 }
 
 /* Line clamps for text truncation */

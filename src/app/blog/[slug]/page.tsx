@@ -69,72 +69,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         )}
 
         {post.body ? (
-          <div className="prose prose-lg max-w-none mb-12" style={{color: '#000000'}}>
-            <style jsx global>{`
-              /* 最強の文字色設定 - すべてのproseコンテンツに適用 */
-              .prose, .prose * {
-                color: #000000 !important;
-                text-shadow: none !important;
-                opacity: 1 !important;
-              }
-              
-              .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-                color: #000000 !important;
-                font-weight: 800 !important;
-                text-shadow: none !important;
-                opacity: 1 !important;
-              }
-              
-              .prose h2 {
-                font-size: 1.875rem !important;
-                margin-top: 2rem !important;
-                margin-bottom: 1rem !important;
-                border-bottom: 2px solid #e5e7eb !important;
-                padding-bottom: 0.5rem !important;
-              }
-              
-              .prose h3 {
-                font-size: 1.5rem !important;
-                margin-top: 1.5rem !important;
-                margin-bottom: 0.75rem !important;
-                font-weight: 700 !important;
-              }
-              
-              .prose p, .prose span, .prose div, .prose li, .prose td, .prose th {
-                color: #000000 !important;
-                line-height: 1.8 !important;
-                font-size: 1.125rem !important;
-                font-weight: 500 !important;
-                text-shadow: none !important;
-                opacity: 1 !important;
-              }
-              
-              .prose p {
-                margin-bottom: 1.25rem !important;
-              }
-              
-              /* PortableTextの特定要素にも強制適用 */
-              .prose [data-sanity-span], .prose [data-sanity-block] {
-                color: #000000 !important;
-                opacity: 1 !important;
-              }
-              
-              /* リンクや他の要素も濃くする */
-              .prose a {
-                color: #1d4ed8 !important;
-                font-weight: 600 !important;
-              }
-              
-              .prose strong {
-                color: #000000 !important;
-                font-weight: 700 !important;
-              }
-              
-              .prose em {
-                color: #000000 !important;
-                font-style: italic !important;
-              }
-            `}</style>
+          <div className="prose prose-lg max-w-none mb-12 blog-content">
             <PortableText value={post.body as unknown} />
           </div>
         ) : null}

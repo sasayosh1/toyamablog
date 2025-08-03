@@ -42,7 +42,7 @@ export default async function AboutPage() {
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             TOYAMA BLOG
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-800 max-w-2xl mx-auto">
             富山県の魅力を動画で発信するローカルブロガー
           </p>
         </div>
@@ -116,7 +116,7 @@ export default async function AboutPage() {
                 </div>
               ))}
             </div>
-            <p className="text-gray-600 mt-4 text-center">
+            <p className="text-gray-800 mt-4 text-center">
               富山県内全域での取材を行っています
             </p>
           </section>
@@ -199,7 +199,7 @@ export default async function AboutPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             お問い合わせ・取材依頼
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-800 mb-6">
             取材のご依頼やご質問がございましたら、お気軽にお声がけください
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

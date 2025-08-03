@@ -60,7 +60,7 @@ export default async function PostPage({ params }: PostPageProps) {
               return (
                 <div key={index}>
                   {typedBlock.children && typedBlock.children.map((child: { text: string }, childIndex: number) => (
-                    <p key={childIndex} className="mb-4 text-gray-700 leading-relaxed">
+                    <p key={childIndex} className="mb-4 text-gray-900 leading-relaxed">
                       {child.text}
                     </p>
                   ))}
