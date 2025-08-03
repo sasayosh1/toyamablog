@@ -78,12 +78,14 @@ export default async function Home() {
                   {post.categories && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {post.categories.slice(0, 2).map((category) => (
-                        <span
+                        <Link
                           key={category}
-                          className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md"
+                          href={`/category/${encodeURIComponent(category)}`}
+                          className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md hover:bg-blue-100 transition-colors"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           {category}
-                        </span>
+                        </Link>
                       ))}
                     </div>
                   )}

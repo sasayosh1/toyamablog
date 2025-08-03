@@ -55,22 +55,45 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
       <GlobalHeader posts={allPosts} categories={categories} />
       
       <div className="max-w-7xl mx-auto py-8 md:py-12 px-4">
-        {/* ページヘッダー */}
-        <div className="mb-8">
-          <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
-            <Link href="/" className="hover:text-blue-600 transition-colors">
+        {/* パンくずナビゲーション */}
+        <nav className="mb-6" aria-label="パンくず">
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Link href="/" className="hover:text-blue-600 transition-colors flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
               ホーム
             </Link>
-            <span>/</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
+            <Link href="/categories" className="hover:text-blue-600 transition-colors">
+              カテゴリー
+            </Link>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
             <span className="text-gray-900 font-medium">{decodedCategory}</span>
           </div>
-          
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            {decodedCategory}
-          </h1>
-          <p className="text-gray-600 text-lg">
-            {decodedCategory}に関する記事 {categoryPosts.length}件
-          </p>
+        </nav>
+
+        {/* ページヘッダー */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-xl p-8 mb-8">
+          <div className="flex items-center mb-4">
+            <div className="bg-white/20 rounded-lg p-2 mr-4">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                {decodedCategory}
+              </h1>
+              <p className="text-blue-100 text-lg">
+                {categoryPosts.length}件の記事があります
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* 記事一覧 */}
@@ -133,31 +156,71 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
           ))}
         </div>
 
+        {/* ナビゲーションボタン */}
+        <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/categories"
+            className="inline-flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium shadow-sm"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            カテゴリー一覧に戻る
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            ホームに戻る
+          </Link>
+        </div>
+
         {/* 他のカテゴリーへのリンク */}
         {categories.length > 1 && (
           <div className="mt-16 border-t border-gray-200 pt-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              他のカテゴリー
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              他のカテゴリーも見る
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {categories
                 .filter(cat => cat !== decodedCategory)
+                .slice(0, 8)
                 .map((otherCategory) => {
                   const count = allPosts.filter(post => post.category === otherCategory).length
                   return (
                     <Link
                       key={otherCategory}
                       href={`/category/${encodeURIComponent(otherCategory)}`}
-                      className="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+                      className="group block p-4 bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-blue-50 transition-all border border-gray-100 hover:border-blue-200"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-900">{otherCategory}</span>
-                        <span className="text-sm text-gray-500">{count}件</span>
+                        <span className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-1">
+                          {otherCategory}
+                        </span>
+                        <span className="text-sm text-gray-500 group-hover:text-blue-600 transition-colors">
+                          {count}
+                        </span>
                       </div>
                     </Link>
                   )
                 })}
             </div>
+            {categories.length > 9 && (
+              <div className="text-center mt-6">
+                <Link
+                  href="/categories"
+                  className="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors"
+                >
+                  すべてのカテゴリーを見る
+                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>
