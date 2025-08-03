@@ -213,7 +213,7 @@ export default async function AboutPage() {
               メールでお問い合わせ
             </a>
             <a
-              href="https://twitter.com/toyamablog"
+              href="https://x.com/sasayoshi_tym"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
