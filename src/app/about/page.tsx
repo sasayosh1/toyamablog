@@ -2,9 +2,9 @@ import GlobalHeader from '@/components/GlobalHeader'
 import { client, type Post } from '@/lib/sanity'
 import { Metadata } from 'next'
 
-// 静的生成を強制
-export const dynamic = 'force-static'
-export const revalidate = 3600
+// キャッシュ無効化: 常に最新を表示
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: 'About - TOYAMA BLOG',

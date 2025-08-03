@@ -4,8 +4,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import GlobalHeader from '@/components/GlobalHeader'
 
-// ISR: 5分間隔で再検証（一覧ページ）
-export const revalidate = 300
+// キャッシュ無効化: 常に最新を表示
+export const revalidate = 0
+export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   const posts: Post[] = await getAllPosts()

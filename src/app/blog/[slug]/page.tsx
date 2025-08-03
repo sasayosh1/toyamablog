@@ -3,8 +3,9 @@ import { notFound } from 'next/navigation'
 import PortableText from '@/components/PortableText'
 import GlobalHeader from '@/components/GlobalHeader'
 
-// ISR: 1分間隔で再検証
-export const revalidate = 60
+// キャッシュ無効化: 常に最新を表示
+export const revalidate = 0
+export const dynamic = 'force-dynamic'
 
 interface SanityPost {
   slug: string;
