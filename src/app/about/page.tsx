@@ -10,9 +10,10 @@ export const metadata: Metadata = {
   title: 'About - TOYAMA BLOG',
   description: '富山県の魅力を動画で発信するローカルブロガーのプロフィールページ。YouTube Shortsで富山県内の観光スポット、グルメ、文化を紹介しています。',
   openGraph: {
-    title: 'About - TOYAMA BLOG',
+    title: 'About - TOYAMA BLOG', 
     description: '富山県の魅力を動画で発信するローカルブロガーのプロフィールページ',
     type: 'website',
+    url: 'https://sasakiyoshimasa.com/about',
   },
 }
 
