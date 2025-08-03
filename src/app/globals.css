@@ -36,6 +36,15 @@ body {
   color: #111827 !important;
 }
 
+/* ヒーローセクションの文字色を白色に固定 */
+.text-white, .text-white * {
+  color: white !important;
+}
+
+.text-gray-100 {
+  color: #f3f4f6 !important;
+}
+
 /* 追加のコントラスト改善 */
 .prose blockquote {
   color: #111827 !important;
