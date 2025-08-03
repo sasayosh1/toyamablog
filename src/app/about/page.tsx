@@ -2,7 +2,7 @@ import GlobalHeader from '@/components/GlobalHeader'
 import { client, type Post } from '@/lib/sanity'
 import { Metadata } from 'next'
 
-// キャッシュ無効化: 常に最新を表示
+// キャッシュ無効化: 常に最新を表示 - 強制デプロイ
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
