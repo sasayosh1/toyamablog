@@ -1,4 +1,4 @@
-import { getPost, type Post, client } from '@/lib/sanity'
+import { getPost, getAllCategories, type Post, client } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import PortableText from '@/components/PortableText'
 import GlobalHeader from '@/components/GlobalHeader'
@@ -27,18 +27,21 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     notFound()
   }
 
-  // 記事一覧を取得（検索用）
-  const posts = await client.fetch<Post[]>(`
-    *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...100] {
-      _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
-      author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
-      "excerpt": description, "categories": [category]
-    }
-  `)
+  // 記事一覧とカテゴリーを取得（検索用）
+  const [posts, categories] = await Promise.all([
+    client.fetch<Post[]>(`
+      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...100] {
+        _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
+        author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
+        "excerpt": description, "categories": [category]
+      }
+    `),
+    getAllCategories()
+  ])
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <GlobalHeader posts={posts} />
+      <GlobalHeader posts={posts} categories={categories} />
       <article className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 text-gray-900 leading-tight">
           {post.title}

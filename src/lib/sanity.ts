@@ -113,6 +113,23 @@ export async function getPost(slug: string): Promise<Post | null> {
   return post;
 }
 
+export async function getAllCategories(): Promise<string[]> {
+  try {
+    const categories = await client.fetch<{category: string}[]>(`
+      *[_type == "post" && defined(category)] {
+        category
+      } | order(category asc)
+    `);
+    
+    // ユニークなカテゴリーのみを抽出
+    const uniqueCategories = [...new Set(categories.map(item => item.category))];
+    return uniqueCategories.filter(Boolean);
+  } catch (error) {
+    console.error('Categories fetch error:', error);
+    return [];
+  }
+}
+
 export async function searchPosts(searchTerm: string): Promise<Post[]> {
   if (!searchTerm.trim()) return [];
   

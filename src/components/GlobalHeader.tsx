@@ -8,9 +8,10 @@ import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 
 interface GlobalHeaderProps {
   posts: Post[]
+  categories?: string[]
 }
 
-export default function GlobalHeader({ posts }: GlobalHeaderProps) {
+export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([])
@@ -285,6 +286,28 @@ export default function GlobalHeader({ posts }: GlobalHeaderProps) {
                 </svg>
                 About
               </Link>
+              
+              {/* カテゴリーメニュー */}
+              {categories.length > 0 && (
+                <div className="border-t border-gray-200 mt-3 pt-3">
+                  <h3 className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    カテゴリー
+                  </h3>
+                  {categories.map((category) => (
+                    <Link
+                      key={category}
+                      href={`/category/${encodeURIComponent(category)}`}
+                      className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                      </svg>
+                      {category}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </nav>
         </div>
