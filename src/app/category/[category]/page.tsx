@@ -1,4 +1,4 @@
-import { getAllPosts, getAllCategories, type Post } from '@/lib/sanity'
+import { getAllPosts, getAllCategories } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
