@@ -280,6 +280,7 @@ export default function PortableText({ value }: PortableTextProps) {
   const firstH2Index = valueArray.findIndex((block: { style?: string }) => block.style === 'h2') || -1
   
   if (!hasHeadings || firstH2Index === -1) {
+    console.log('PortableText: No headings detected, showing ReadingTime')
     return (
       <div>
         <ReadingTime content={valueArray} />
@@ -293,6 +294,7 @@ export default function PortableText({ value }: PortableTextProps) {
   // 最初のH2以降のコンテンツ
   const afterToc = valueArray.slice(firstH2Index)
 
+  console.log('PortableText: Headings detected, showing ReadingTime with TOC')
   return (
     <div>
       {beforeToc.length > 0 && (

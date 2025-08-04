@@ -8,6 +8,13 @@ interface ReadingTimeProps {
 export default function ReadingTime({ content, className = '' }: ReadingTimeProps) {
   const readingTime = calculateReadingTimeFromPortableText(content)
   
+  // デバッグログ
+  console.log('ReadingTime Debug:', {
+    contentLength: content?.length,
+    readingTime,
+    hasContent: !!content
+  })
+  
   return (
     <div className={`flex items-center text-sm text-gray-600 mb-4 ${className}`}>
       <svg 
