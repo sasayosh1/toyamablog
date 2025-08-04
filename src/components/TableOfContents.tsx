@@ -104,8 +104,16 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
                     `}
                   >
                     <div className="flex items-start">
-                      <span className={`mr-2 mt-0.5 ${item.level === 2 ? 'text-blue-600' : 'text-gray-400'}`}>
-                        {item.level === 2 ? '📖' : '▸'}
+                      <span className={`mr-3 mt-1 ${item.level === 2 ? 'text-blue-600' : 'text-gray-400'}`}>
+                        {item.level === 2 ? (
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ) : (
+                          <svg className="w-2 h-2 mt-1" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"/>
+                          </svg>
+                        )}
                       </span>
                       <span className="leading-relaxed line-clamp-2 group-hover:text-blue-700 transition-colors">
                         {item.text}
