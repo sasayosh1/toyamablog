@@ -62,9 +62,17 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     return null
   }
 
-  // 初期状態では項目を非表示にする
+  // 初期状態では項目を非表示にする（キャッシュ対策）
   const displayItems = isExpanded ? tocItems : []
   const hasItems = tocItems.length > 0
+  
+  // デバッグログ
+  console.log('TableOfContents State:', {
+    isExpanded,
+    tocItemsCount: tocItems.length,
+    displayItemsCount: displayItems.length,
+    hasItems
+  })
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-3 md:p-4 mb-4 md:mb-6 shadow-sm">
