@@ -48,17 +48,22 @@ export const calculateReadingTime = (text: string): number => {
 }
 
 // PortableTextコンテンツから読了時間を計算
-export const calculateReadingTimeFromPortableText = (content: any[]): number => {
+export const calculateReadingTimeFromPortableText = (content: Array<{
+  _type?: string
+  style?: string
+  children?: Array<{ text: string }>
+  html?: string
+}>): number => {
   if (!Array.isArray(content)) return 1
   
   let totalText = ''
   
-  const extractText = (blocks: any[]): void => {
+  const extractText = (blocks: typeof content): void => {
     blocks.forEach((block) => {
       if (block._type === 'block') {
         // テキストブロックから文字を抽出
         if (block.children) {
-          block.children.forEach((child: any) => {
+          block.children.forEach((child) => {
             if (child.text) {
               totalText += child.text + ' '
             }

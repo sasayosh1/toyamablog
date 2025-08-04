@@ -1,7 +1,12 @@
 import { calculateReadingTimeFromPortableText } from '@/lib/utils'
 
 interface ReadingTimeProps {
-  content: any[]
+  content: Array<{
+    _type?: string
+    style?: string
+    children?: Array<{ text: string }>
+    html?: string
+  }>
   className?: string
 }
 
@@ -30,7 +35,7 @@ export default function ReadingTime({ content, className = '' }: ReadingTimeProp
           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" 
         />
       </svg>
-      <span>この記事は約 <strong className="text-gray-800">{readingTime}分</strong> で読めます</span>
+      <span>📖 この記事は約 <strong className="text-gray-800">{readingTime}分</strong> で読めます</span>
     </div>
   )
 }
