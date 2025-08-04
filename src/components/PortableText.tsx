@@ -1,13 +1,9 @@
 import React from 'react'
 import { PortableText as BasePortableText } from '@portabletext/react'
 import { urlForImage } from '@/sanity/lib/image'
+import { extractYouTubeId, generateHeadingId } from '@/lib/utils'
 import TableOfContents from './TableOfContents'
-
-// YouTube URLからIDを抽出する関数
-function extractYouTubeId(url: string): string | null {
-  const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)
-  return match ? match[1] : null
-}
+import ReadingTime from './ui/ReadingTime'
 
 // HTMLコンテンツをパースして処理する関数
 function processTextContent(text: string): React.ReactNode {
@@ -157,7 +153,7 @@ const components = {
     ),
     h2: ({ children, value }: { children: React.ReactNode; value?: { children?: { text: string }[] } }) => {
       const text = value?.children?.map((child) => child.text).join('') || ''
-      const id = `heading-h2-${text.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`
+      const id = generateHeadingId(text, 'h2')
       
       return (
         <h2 
@@ -174,7 +170,7 @@ const components = {
     },
     h3: ({ children, value }: { children: React.ReactNode; value?: { children?: { text: string }[] } }) => {
       const text = value?.children?.map((child) => child.text).join('') || ''
-      const id = `heading-h3-${text.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`
+      const id = generateHeadingId(text, 'h3')
       
       return (
         <h3 
@@ -284,7 +280,12 @@ export default function PortableText({ value }: PortableTextProps) {
   const firstH2Index = valueArray.findIndex((block: { style?: string }) => block.style === 'h2') || -1
   
   if (!hasHeadings || firstH2Index === -1) {
-    return <BasePortableText value={value as never} components={components as never} />
+    return (
+      <div>
+        <ReadingTime content={valueArray} />
+        <BasePortableText value={value as never} components={components as never} />
+      </div>
+    )
   }
 
   // 最初のH2の前までのコンテンツ
@@ -298,6 +299,7 @@ export default function PortableText({ value }: PortableTextProps) {
         <BasePortableText value={beforeToc as never} components={components as never} />
       )}
       
+      <ReadingTime content={valueArray} />
       <TableOfContents content={valueArray as Array<{ style?: string; children?: Array<{ text: string }> }>} />
       
       <BasePortableText value={afterToc as never} components={components as never} />

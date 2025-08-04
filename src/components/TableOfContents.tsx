@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { generateHeadingId } from '@/lib/utils'
 
 interface TocItem {
   id: string
@@ -8,11 +9,37 @@ interface TocItem {
   level: number
 }
 
+interface ContentBlock {
+  style?: string
+  children?: Array<{ text: string }>
+}
+
 interface TableOfContentsProps {
-  content: Array<{
-    style?: string
-    children?: Array<{ text: string }>
-  }>
+  content: Array<ContentBlock>
+}
+
+const INITIAL_DISPLAY_COUNT = 2
+
+// ヘルパー関数: コンテンツからTOC項目を抽出
+const extractTocItems = (content: Array<ContentBlock>): TocItem[] => {
+  const items: TocItem[] = []
+  
+  content?.forEach((block) => {
+    if (block.style === 'h2' || block.style === 'h3') {
+      const text = block.children?.map((child) => child.text).join('') || ''
+      if (text.trim()) {
+        const cleanText = text.trim()
+        const id = generateHeadingId(cleanText, block.style)
+        items.push({
+          id,
+          text: cleanText,
+          level: block.style === 'h2' ? 2 : 3
+        })
+      }
+    }
+  })
+  
+  return items
 }
 
 export default function TableOfContents({ content }: TableOfContentsProps) {
@@ -20,40 +47,22 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
-    // contentからH2とH3を抽出
-    const items: TocItem[] = []
-    
-    content?.forEach((block) => {
-      if (block.style === 'h2' || block.style === 'h3') {
-        const text = block.children?.map((child) => child.text).join('') || ''
-        if (text.trim()) {
-          const cleanText = text.trim()
-          const id = `heading-${block.style}-${cleanText.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`
-          items.push({
-            id,
-            text: cleanText,
-            level: block.style === 'h2' ? 2 : 3
-          })
-        }
-      }
-    })
-    
+    const items = extractTocItems(content)
     setTocItems(items)
   }, [content])
+
+  const handleScrollTo = useCallback((id: string) => {
+    const element = document.getElementById(id)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [])
 
   if (tocItems.length === 0) {
     return null
   }
 
-  const handleScrollTo = (id: string) => {
-    const element = document.getElementById(id)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }
-
-  // 表示する項目数の制御（初期表示は2項目のみ）
-  const INITIAL_DISPLAY_COUNT = 2
+  // 表示する項目数の制御
   const displayItems = isExpanded ? tocItems : tocItems.slice(0, INITIAL_DISPLAY_COUNT)
   const hasMoreItems = tocItems.length > INITIAL_DISPLAY_COUNT
 
