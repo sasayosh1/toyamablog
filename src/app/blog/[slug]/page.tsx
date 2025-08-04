@@ -4,6 +4,7 @@ import Link from 'next/link'
 import PortableText from '@/components/PortableText'
 import GlobalHeader from '@/components/GlobalHeader'
 import Breadcrumb from '@/components/ui/Breadcrumb'
+import ReadingTime from '@/components/ui/ReadingTime'
 
 // キャッシュ無効化: 常に最新を表示
 export const revalidate = 0
@@ -68,10 +69,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         />
 
         <article className="bg-white rounded-xl shadow-sm p-8 md:p-12">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 text-gray-900 leading-tight">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-gray-900 leading-tight">
             {post.title}
           </h1>
-      
+          
+          {post.body && (
+            <ReadingTime content={post.body as Array<{
+              _type?: string
+              style?: string
+              children?: Array<{ text: string }>
+              html?: string
+            }>} />
+          )}
 
         {post.youtubeUrl && (
           <div className="mb-8">

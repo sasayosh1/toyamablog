@@ -3,7 +3,6 @@ import { PortableText as BasePortableText } from '@portabletext/react'
 import { urlForImage } from '@/sanity/lib/image'
 import { extractYouTubeId, generateHeadingId } from '@/lib/utils'
 import TableOfContents from './TableOfContents'
-import ReadingTime from './ui/ReadingTime'
 
 // HTMLコンテンツをパースして処理する関数
 function processTextContent(text: string): React.ReactNode {
@@ -280,13 +279,8 @@ export default function PortableText({ value }: PortableTextProps) {
   const firstH2Index = valueArray.findIndex((block: { style?: string }) => block.style === 'h2') || -1
   
   if (!hasHeadings || firstH2Index === -1) {
-    console.log('PortableText: No headings detected, showing ReadingTime')
-    return (
-      <div>
-        <ReadingTime content={valueArray} />
-        <BasePortableText value={value as never} components={components as never} />
-      </div>
-    )
+    console.log('PortableText: No headings detected')
+    return <BasePortableText value={value as never} components={components as never} />
   }
 
   // 最初のH2の前までのコンテンツ
@@ -294,14 +288,13 @@ export default function PortableText({ value }: PortableTextProps) {
   // 最初のH2以降のコンテンツ
   const afterToc = valueArray.slice(firstH2Index)
 
-  console.log('PortableText: Headings detected, showing ReadingTime with TOC')
+  console.log('PortableText: Headings detected, showing TOC')
   return (
     <div>
       {beforeToc.length > 0 && (
         <BasePortableText value={beforeToc as never} components={components as never} />
       )}
       
-      <ReadingTime content={valueArray} />
       <TableOfContents content={valueArray as Array<{ style?: string; children?: Array<{ text: string }> }>} />
       
       <BasePortableText value={afterToc as never} components={components as never} />
