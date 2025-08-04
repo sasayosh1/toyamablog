@@ -52,10 +52,18 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     }
   }
 
-  // 表示する項目数の制御
+  // 表示する項目数の制御（初期表示は2項目のみ）
   const INITIAL_DISPLAY_COUNT = 2
   const displayItems = isExpanded ? tocItems : tocItems.slice(0, INITIAL_DISPLAY_COUNT)
   const hasMoreItems = tocItems.length > INITIAL_DISPLAY_COUNT
+  
+  // デバッグ用ログ
+  console.log('TableOfContents Debug:', {
+    totalItems: tocItems.length,
+    displayItems: displayItems.length,
+    isExpanded,
+    hasMoreItems
+  })
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6 shadow-sm">
