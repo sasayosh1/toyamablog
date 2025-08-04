@@ -45,6 +45,23 @@ body {
   color: #f3f4f6 !important;
 }
 
+/* ブログページ内のリンクのアンダーラインを削除（スコープ限定） */
+/* ナビゲーション、カードコンポーネント、ボタン類のリンク */
+.blog-page .bg-white a,
+.blog-page .bg-blue-600 a,
+.blog-page .bg-green-600 a,
+.blog-page .bg-gray-600 a,
+.categories-page a,
+.category-page a {
+  text-decoration: none;
+}
+
+/* PostCard内のリンク */
+.blog-page article a,
+.blog-page .bg-white a {
+  text-decoration: none;
+}
+
 /* 追加のコントラスト改善 */
 .prose blockquote {
   color: #111827 !important;
@@ -98,6 +115,7 @@ body {
 .blog-content.prose a {
   color: #2563eb !important;
   font-weight: 600 !important;
+  text-decoration: none !important;
 }
 
 .blog-content.prose strong {

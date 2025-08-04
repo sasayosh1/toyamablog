@@ -6,6 +6,46 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 
+// SearchResultLink コンポーネント（Client Component）
+interface SearchResultLinkProps {
+  href: string
+  className: string
+  onResultClick: () => void
+  children: React.ReactNode
+}
+
+function SearchResultLink({ href, className, onResultClick, children }: SearchResultLinkProps) {
+  return (
+    <Link
+      href={href}
+      className={className}
+      onClick={onResultClick}
+    >
+      {children}
+    </Link>
+  )
+}
+
+// MenuLink コンポーネント（Client Component）
+interface MenuLinkProps {
+  href: string
+  className: string
+  onMenuClick: () => void
+  children: React.ReactNode
+}
+
+function MenuLink({ href, className, onMenuClick, children }: MenuLinkProps) {
+  return (
+    <Link
+      href={href}
+      className={className}
+      onClick={onMenuClick}
+    >
+      {children}
+    </Link>
+  )
+}
+
 interface GlobalHeaderProps {
   posts: Post[]
   categories?: string[]
@@ -192,13 +232,13 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
                 className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto"
               >
                 {filteredPosts.map((post, index) => (
-                  <Link
+                  <SearchResultLink
                     key={post._id}
                     href={`/blog/${post.slug.current}`}
                     className={`block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors ${
                       index === selectedIndex ? 'bg-blue-50' : ''
                     }`}
-                    onClick={() => {
+                    onResultClick={() => {
                       setIsSearchOpen(false)
                       setSelectedIndex(-1)
                     }}
@@ -238,7 +278,7 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
                         )}
                       </div>
                     </div>
-                  </Link>
+                  </SearchResultLink>
                 ))}
                 
                 {filteredPosts.length >= 8 && (
@@ -266,58 +306,37 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
         <div className="bg-white border-t border-gray-200 shadow-lg">
           <nav className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex flex-col space-y-3">
-              <Link
+              <MenuLink
                 href="/"
                 className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
-                onClick={() => setIsMenuOpen(false)}
+                onMenuClick={() => setIsMenuOpen(false)}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 ホーム
-              </Link>
-              <Link
+              </MenuLink>
+              <MenuLink
                 href="/categories"
                 className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
-                onClick={() => setIsMenuOpen(false)}
+                onMenuClick={() => setIsMenuOpen(false)}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                 </svg>
-                カテゴリー
-              </Link>
-              <Link
+                地域別カテゴリー
+              </MenuLink>
+              <MenuLink
                 href="/about"
                 className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
-                onClick={() => setIsMenuOpen(false)}
+                onMenuClick={() => setIsMenuOpen(false)}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                About
-              </Link>
+                サイトについて
+              </MenuLink>
               
-              {/* カテゴリーメニュー */}
-              {categories.length > 0 && (
-                <div className="border-t border-gray-200 mt-3 pt-3">
-                  <h3 className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    カテゴリー
-                  </h3>
-                  {categories.map((category) => (
-                    <Link
-                      key={category}
-                      href={`/category/${encodeURIComponent(category)}`}
-                      className="flex items-center px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                      </svg>
-                      {category}
-                    </Link>
-                  ))}
-                </div>
-              )}
             </div>
           </nav>
         </div>

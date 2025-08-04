@@ -24,7 +24,7 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 blog-page">
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8">
         <div className="max-w-4xl mx-auto px-4">
           <Link href="/" className="text-blue-200 hover:text-white mb-4 inline-block">

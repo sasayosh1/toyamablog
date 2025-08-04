@@ -1,6 +1,7 @@
 import React from 'react'
 import { PortableText as BasePortableText } from '@portabletext/react'
 import { urlForImage } from '@/sanity/lib/image'
+import TableOfContents from './TableOfContents'
 
 // YouTube URLからIDを抽出する関数
 function extractYouTubeId(url: string): string | null {
@@ -23,7 +24,7 @@ function processTextContent(text: string): React.ReactNode {
   const urlRegex = /(https?:\/\/[^\s<]+)/g
   if (urlRegex.test(text)) {
     const parts = text.split(urlRegex)
-    return parts.map((part, _index) => {
+    return parts.map((part) => {
       if (urlRegex.test(part)) {
         return `🔗 ${part}`
       }
@@ -113,6 +114,18 @@ const components = {
         </div>
       )
     },
+    html: ({ value }: { value: { html: string } }) => {
+      if (!value?.html) {
+        return null
+      }
+      
+      return (
+        <div 
+          dangerouslySetInnerHTML={{ __html: value.html }}
+          style={{ margin: '1rem 0' }}
+        />
+      )
+    },
   },
   marks: {
     link: ({ children, value }: { children: React.ReactNode; value: { href: string } }) => {
@@ -123,7 +136,7 @@ const components = {
           rel={rel}
           style={{
             color: '#0070f3',
-            textDecoration: 'underline',
+            textDecoration: 'none',
           }}
         >
           {children}
@@ -142,26 +155,51 @@ const components = {
         {children}
       </h1>
     ),
-    h2: ({ children }: { children: React.ReactNode }) => (
-      <h2 style={{ 
-        fontSize: '2rem', 
-        fontWeight: 'bold', 
-        margin: '1.5rem 0 1rem 0',
-        lineHeight: '1.3'
-      }}>
-        {children}
-      </h2>
-    ),
-    h3: ({ children }: { children: React.ReactNode }) => (
-      <h3 style={{ 
-        fontSize: '1.5rem', 
-        fontWeight: 'bold', 
-        margin: '1.5rem 0 0.5rem 0',
-        lineHeight: '1.4'
-      }}>
-        {children}
-      </h3>
-    ),
+    h2: ({ children, value }: { children: React.ReactNode; value?: { children?: { text: string }[] } }) => {
+      const text = value?.children?.map((child) => child.text).join('') || ''
+      const id = `heading-h2-${text.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`
+      
+      return (
+        <h2 
+          id={id}
+          style={{ 
+            fontSize: '1.75rem', 
+            fontWeight: '700', 
+            color: '#1f2937',
+            lineHeight: '1.3',
+            borderLeft: '4px solid #3b82f6',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+            padding: '1rem 1.5rem',
+            borderRadius: '8px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            margin: '2.5rem 0 1.5rem 0',
+            scrollMarginTop: '80px'
+          }}
+        >
+          {children}
+        </h2>
+      )
+    },
+    h3: ({ children, value }: { children: React.ReactNode; value?: { children?: { text: string }[] } }) => {
+      const text = value?.children?.map((child) => child.text).join('') || ''
+      const id = `heading-h3-${text.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`
+      
+      return (
+        <h3 
+          id={id}
+          style={{ 
+            fontSize: '1.375rem', 
+            fontWeight: '600', 
+            color: '#374151',
+            lineHeight: '1.4',
+            margin: '2rem 0 1rem 0',
+            scrollMarginTop: '80px'
+          }}
+        >
+          {children}
+        </h3>
+      )
+    },
     normal: ({ children }: { children: React.ReactNode }) => {
       // 子要素がテキストの場合、HTMLコンテンツを処理
       const processedChildren = React.Children.map(children, (child) => {
@@ -247,5 +285,33 @@ interface PortableTextProps {
 }
 
 export default function PortableText({ value }: PortableTextProps) {
-  return <BasePortableText value={value as never} components={components as never} />
+  // H2見出しがある場合のみ目次を表示
+  const valueArray = Array.isArray(value) ? value : []
+  const hasHeadings = valueArray.some((block: { style?: string }) => 
+    block.style === 'h2' || block.style === 'h3'
+  ) || false
+
+  // 最初のH2の位置を見つける
+  const firstH2Index = valueArray.findIndex((block: { style?: string }) => block.style === 'h2') || -1
+  
+  if (!hasHeadings || firstH2Index === -1) {
+    return <BasePortableText value={value as never} components={components as never} />
+  }
+
+  // 最初のH2の前までのコンテンツ
+  const beforeToc = valueArray.slice(0, firstH2Index)
+  // 最初のH2以降のコンテンツ
+  const afterToc = valueArray.slice(firstH2Index)
+
+  return (
+    <div>
+      {beforeToc.length > 0 && (
+        <BasePortableText value={beforeToc as never} components={components as never} />
+      )}
+      
+      <TableOfContents content={valueArray as Array<{ style?: string; children?: Array<{ text: string }> }>} />
+      
+      <BasePortableText value={afterToc as never} components={components as never} />
+    </div>
+  )
 }

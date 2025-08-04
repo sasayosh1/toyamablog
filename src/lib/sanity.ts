@@ -1,11 +1,12 @@
 import { createClient } from '@sanity/client';
 
 export const client = createClient({
-  projectId: 'aoxze287',
-  dataset: 'production',
-  apiVersion: '2024-01-01',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'aoxze287',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
   useCdn: false, // 即時反映のため無効化
   perspective: 'published', // publishedコンテンツのみ
+  token: process.env.SANITY_API_TOKEN, // サーバーサイドトークン追加
 });
 
 export interface Author {
