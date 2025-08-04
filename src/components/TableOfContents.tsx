@@ -56,35 +56,27 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   const INITIAL_DISPLAY_COUNT = 2
   const displayItems = isExpanded ? tocItems : tocItems.slice(0, INITIAL_DISPLAY_COUNT)
   const hasMoreItems = tocItems.length > INITIAL_DISPLAY_COUNT
-  
-  // デバッグ用ログ
-  console.log('TableOfContents Debug:', {
-    totalItems: tocItems.length,
-    displayItems: displayItems.length,
-    isExpanded,
-    hasMoreItems
-  })
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-white border border-gray-200 rounded-lg p-3 md:p-4 mb-4 md:mb-6 shadow-sm">
+      <div className="flex items-center justify-between mb-2 md:mb-3">
         <div className="flex items-center">
-          <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3 h-3 md:w-4 md:h-4 text-blue-600 mr-1.5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
           </svg>
-          <h3 className="text-base font-medium text-gray-800">📋 もくじ</h3>
+          <h3 className="text-sm md:text-base font-medium text-gray-800">📋 もくじ</h3>
         </div>
         <span className="text-xs text-gray-500">{tocItems.length}項目</span>
       </div>
       
       <nav>
-        <ul className="space-y-1">
+        <ul className="space-y-0.5 md:space-y-1">
           {displayItems.map((item) => (
-            <li key={item.id} className={item.level === 3 ? 'ml-3' : ''}>
+            <li key={item.id} className={item.level === 3 ? 'ml-2 md:ml-3' : ''}>
               <button
                 onClick={() => handleScrollTo(item.id)}
                 className={`
-                  text-left w-full py-1.5 px-2 rounded text-sm hover:bg-gray-50 transition-colors duration-150
+                  text-left w-full py-1 md:py-1.5 px-1.5 md:px-2 rounded text-xs md:text-sm hover:bg-gray-50 transition-colors duration-150
                   ${item.level === 2 
                     ? 'text-gray-800 font-medium hover:text-blue-700' 
                     : 'text-gray-600 hover:text-blue-600'
@@ -92,7 +84,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
                 `}
               >
                 <span className="flex items-start leading-tight">
-                  <span className={`w-1.5 h-1.5 rounded-full mt-1.5 mr-2 flex-shrink-0 ${
+                  <span className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full mt-1 md:mt-1.5 mr-1.5 md:mr-2 flex-shrink-0 ${
                     item.level === 2 ? 'bg-blue-500' : 'bg-gray-400'
                   }`}></span>
                   <span className="line-clamp-2">{item.text}</span>
@@ -103,10 +95,10 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
         </ul>
         
         {hasMoreItems && (
-          <div className="mt-3 pt-3 border-t border-gray-100">
+          <div className="mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-100">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="w-full text-center py-1.5 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors duration-150 font-medium"
+              className="w-full text-center py-1 md:py-1.5 text-xs md:text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors duration-150 font-medium"
             >
               {isExpanded ? (
                 <span className="flex items-center justify-center">

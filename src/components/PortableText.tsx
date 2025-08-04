@@ -162,17 +162,9 @@ const components = {
       return (
         <h2 
           id={id}
+          className="text-lg md:text-xl font-semibold text-gray-800 border-l-3 border-blue-500 pl-3 md:pl-4 my-4 md:my-6"
           style={{ 
-            fontSize: '1.75rem', 
-            fontWeight: '700', 
-            color: '#1f2937',
-            lineHeight: '1.3',
-            borderLeft: '4px solid #3b82f6',
-            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-            padding: '1rem 1.5rem',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            margin: '2.5rem 0 1.5rem 0',
+            lineHeight: '1.4',
             scrollMarginTop: '80px'
           }}
         >
@@ -187,12 +179,9 @@ const components = {
       return (
         <h3 
           id={id}
+          className="text-base md:text-lg font-medium text-gray-700 my-3 md:my-4"
           style={{ 
-            fontSize: '1.375rem', 
-            fontWeight: '600', 
-            color: '#374151',
             lineHeight: '1.4',
-            margin: '2rem 0 1rem 0',
             scrollMarginTop: '80px'
           }}
         >
