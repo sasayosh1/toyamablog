@@ -76,24 +76,23 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
       </div>
       
       <nav>
-        <ul className="space-y-0.5 md:space-y-1">
+        <ul className="space-y-1 md:space-y-2">
           {displayItems.map((item) => (
-            <li key={item.id} className={item.level === 3 ? 'ml-2 md:ml-3' : ''}>
+            <li key={item.id}>
               <button
                 onClick={() => handleScrollTo(item.id)}
                 className={`
-                  text-left w-full py-1 md:py-1.5 px-1.5 md:px-2 rounded text-xs md:text-sm hover:bg-gray-50 transition-colors duration-150
+                  text-left w-full py-2 md:py-2.5 px-2 md:px-3 rounded-md hover:bg-blue-50 transition-colors duration-200 border-l-2 hover:border-l-blue-400
                   ${item.level === 2 
-                    ? 'text-gray-800 font-medium hover:text-blue-700' 
-                    : 'text-gray-600 hover:text-blue-600'
+                    ? 'text-gray-800 font-semibold text-sm md:text-base border-l-blue-300 hover:text-blue-800' 
+                    : 'text-gray-600 font-medium text-xs md:text-sm border-l-gray-200 hover:text-blue-700 ml-3 md:ml-4'
                   }
                 `}
               >
-                <span className="flex items-start leading-tight">
-                  <span className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full mt-1 md:mt-1.5 mr-1.5 md:mr-2 flex-shrink-0 ${
-                    item.level === 2 ? 'bg-blue-500' : 'bg-gray-400'
-                  }`}></span>
-                  <span className="line-clamp-2">{item.text}</span>
+                <span className="block leading-relaxed line-clamp-2">
+                  {item.level === 2 && <span className="text-blue-600 mr-2 font-bold">▍</span>}
+                  {item.level === 3 && <span className="text-gray-400 mr-2">▸</span>}
+                  {item.text}
                 </span>
               </button>
             </li>
