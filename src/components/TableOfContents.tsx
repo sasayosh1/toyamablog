@@ -46,11 +46,13 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   const [tocItems, setTocItems] = useState<TocItem[]>([])
   const [isExpanded, setIsExpanded] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [forceKey, setForceKey] = useState(0)
 
   useEffect(() => {
     setIsMounted(true)
     const items = extractTocItems(content)
     setTocItems(items)
+    setForceKey(Date.now()) // 強制更新用
   }, [content])
 
   const handleScrollTo = useCallback((id: string) => {
@@ -64,17 +66,29 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     return null
   }
 
-  // クライアントサイドでのみ項目を表示（SSR対策）
-  const displayItems = isMounted && isExpanded ? tocItems : []
+  // 完全に項目を非表示にする（強制）
+  const shouldShowItems = isMounted && isExpanded && tocItems.length > 0
+  const displayItems = shouldShowItems ? tocItems : []
   const hasItems = tocItems.length > 0
   
   // SSRの場合は何も表示しない
   if (!isMounted) {
     return null
   }
+  
+  // デバッグ用コンソールログ
+  if (typeof window !== 'undefined') {
+    console.log('TOC Debug:', {
+      isMounted,
+      isExpanded,
+      tocItemsLength: tocItems.length,
+      shouldShowItems,
+      displayItemsLength: displayItems.length
+    })
+  }
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-4 md:p-5 mb-6 md:mb-8 shadow-md hover:shadow-lg transition-shadow duration-300">
+    <div key={`toc-${forceKey}`} className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-4 md:p-5 mb-6 md:mb-8 shadow-md hover:shadow-lg transition-shadow duration-300">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center">
           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
@@ -86,7 +100,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
         </div>
       </div>
       
-      {displayItems.length > 0 && (
+      {shouldShowItems && displayItems.length > 0 && (
         <nav className="mt-4">
           <div className="bg-white rounded-lg p-3 shadow-inner">
             <ul className="space-y-2">
