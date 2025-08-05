@@ -52,6 +52,15 @@ export default function TableOfContents({ content }: Props) {
     return headings
   }, [content])
 
+  // デバッグログ
+  console.log('TableOfContents Debug:', {
+    isMounted,
+    itemsLength: items.length,
+    contentType: typeof content,
+    isArray: Array.isArray(content),
+    shouldRender: isMounted && items.length > 0
+  })
+
   // 見出しが無ければ表示しない
   if (!isMounted || items.length === 0) return null
 
