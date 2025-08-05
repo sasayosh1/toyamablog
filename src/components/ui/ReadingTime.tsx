@@ -1,21 +1,21 @@
 import { calculateReadingTimeFromPortableText } from '@/lib/utils'
 
 interface ReadingTimeProps {
-  content: Array<{
-    _type?: string
-    style?: string
-    children?: Array<{ text: string }>
-    html?: string
-  }>
+  content: unknown
   className?: string
 }
 
 export default function ReadingTime({ content, className = '' }: ReadingTimeProps) {
-  const readingTime = calculateReadingTimeFromPortableText(content)
+  const readingTime = calculateReadingTimeFromPortableText(content as Array<{
+    _type?: string
+    style?: string
+    children?: Array<{ text: string }>
+    html?: string
+  }>)
   
   // デバッグログ
   console.log('ReadingTime Debug:', {
-    contentLength: content?.length,
+    contentLength: Array.isArray(content) ? content.length : 0,
     readingTime,
     hasContent: !!content
   })

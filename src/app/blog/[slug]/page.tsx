@@ -74,13 +74,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             {post.title}
           </h1>
           
-          {post.body && Array.isArray(post.body) && (
-            <ReadingTime content={post.body as Array<{
-              _type?: string
-              style?: string
-              children?: Array<{ text: string }>
-              html?: string
-            }>} />
+          {Array.isArray(post.body) && post.body.length > 0 && (
+            <ReadingTime content={post.body} />
           )}
 
         {post.youtubeUrl && (
