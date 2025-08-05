@@ -62,13 +62,8 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     }
   }, [])
 
-  // デバッグ用：空でも表示
   if (tocItems.length === 0) {
-    return (
-      <div className="bg-yellow-100 border border-yellow-300 rounded-xl p-4 mb-6" data-debug="no-items">
-        <h3 className="text-yellow-800">🔍 TOC: No headings found (tocItems.length = 0)</h3>
-      </div>
-    )
+    return null
   }
 
   // 完全に項目を非表示にする（強制）
@@ -76,25 +71,8 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   const displayItems = shouldShowItems ? tocItems : []
   const hasItems = tocItems.length > 0
   
-  // 一時的に常に表示（デバッグ用）
   if (!isMounted) {
-    return (
-      <div className="bg-red-100 border border-red-300 rounded-xl p-4 mb-6" data-debug="not-mounted">
-        <h3 className="text-red-800">🔍 TOC Loading... (Not Mounted Yet)</h3>
-      </div>
-    )
-  }
-  
-  // デバッグ用コンソールログ（強制表示）
-  if (typeof window !== 'undefined') {
-    console.log('🔍 TOC Debug State:', {
-      isMounted,
-      isExpanded,
-      tocItemsLength: tocItems.length,
-      shouldShowItems,
-      displayItemsLength: displayItems.length,
-      timestamp: new Date().toISOString()
-    })
+    return null
   }
 
   return (
@@ -106,7 +84,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
             </svg>
           </div>
-          <h3 className="text-base md:text-lg font-semibold text-gray-800">📑 もくじ (TOC Active)</h3>
+          <h3 className="text-base md:text-lg font-semibold text-gray-800">もくじ</h3>
         </div>
       </div>
       

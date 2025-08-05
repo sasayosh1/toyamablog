@@ -109,40 +109,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-        {/* 無条件テスト */}
-        <div className="bg-orange-100 border border-orange-300 rounded-xl p-4 mb-6" data-test="unconditional">
-          <h3 className="text-orange-800">🚀 UNCONDITIONAL TEST: This should always show</h3>
-          <p className="text-orange-700">post.body exists: {post.body ? 'YES' : 'NO'}</p>
-          <p className="text-orange-700">post.body length: {post.body ? Array.isArray(post.body) ? post.body.length : 'not array' : 'null'}</p>
-        </div>
-
         {post.body ? (
           <>
-            {/* 強制テストメッセージ */}
-            <div className="bg-purple-100 border border-purple-300 rounded-xl p-4 mb-6" data-test="force-visible">
-              <h3 className="text-purple-800">🚀 TEST: Page is rendering, TOC should appear below</h3>
-            </div>
-            
             <TableOfContents content={post.body as Array<{
               _type?: string
               style?: string
               children?: Array<{ text: string }>
             }>} />
-            
-            {/* 別のテストメッセージ */}
-            <div className="bg-green-100 border border-green-300 rounded-xl p-4 mb-6" data-test="after-toc">
-              <h3 className="text-green-800">🚀 TEST: After TOC component</h3>
-            </div>
-            
             <div className="prose prose-lg max-w-none mb-12 blog-content">
               <PortableText value={post.body as unknown} />
             </div>
           </>
-        ) : (
-          <div className="bg-red-100 border border-red-300 rounded-xl p-4 mb-6" data-test="no-body">
-            <h3 className="text-red-800">🚨 ERROR: post.body is null or undefined</h3>
-          </div>
-        )}
+        ) : null}
 
           {post.tags && post.tags.length > 0 && (
             <div className="border-t border-gray-200 pt-8 mb-8">
