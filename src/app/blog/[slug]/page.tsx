@@ -5,7 +5,13 @@ import PortableText from '@/components/PortableText'
 import GlobalHeader from '@/components/GlobalHeader'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import ReadingTime from '@/components/ui/ReadingTime'
-import NewTableOfContents from '@/components/NewTableOfContents'
+import TableOfContents from '@/components/TableOfContents'
+
+type Block = {
+  _type?: string
+  style?: string
+  children?: Array<{ text: string }>
+}
 
 // キャッシュ無効化: 常に最新を表示
 export const revalidate = 0
@@ -111,26 +117,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         {post.body ? (
           <>
-            {/* 強制表示テスト用TOC */}
-            <div className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-4 md:p-5 mb-6 md:mb-8 shadow-md">
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                  </svg>
-                </div>
-                <h3 className="text-base md:text-lg font-semibold text-gray-800">もくじ</h3>
-              </div>
-              <button className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition-all duration-200 font-medium shadow-sm">
-                <span className="flex items-center justify-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                  もくじを表示
-                </span>
-              </button>
-            </div>
-            
+            <TableOfContents content={post.body as Block[] | unknown} />
             <div className="prose prose-lg max-w-none mb-12 blog-content">
               <PortableText value={post.body as unknown} />
             </div>
