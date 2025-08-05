@@ -2,7 +2,6 @@ import React from 'react'
 import { PortableText as BasePortableText } from '@portabletext/react'
 import { urlForImage } from '@/sanity/lib/image'
 import { extractYouTubeId, generateHeadingId } from '@/lib/utils'
-import TableOfContents from './TableOfContents'
 
 // HTMLコンテンツをパースして処理する関数
 function processTextContent(text: string): React.ReactNode {
@@ -269,35 +268,5 @@ interface PortableTextProps {
 }
 
 export default function PortableText({ value }: PortableTextProps) {
-  // H2見出しがある場合のみ目次を表示
-  const valueArray = Array.isArray(value) ? value : []
-  const hasHeadings = valueArray.some((block: { style?: string }) => 
-    block.style === 'h2' || block.style === 'h3'
-  ) || false
-
-  // 最初のH2の位置を見つける
-  const firstH2Index = valueArray.findIndex((block: { style?: string }) => block.style === 'h2') || -1
-  
-  if (!hasHeadings || firstH2Index === -1) {
-    console.log('PortableText: No headings detected')
-    return <BasePortableText value={value as never} components={components as never} />
-  }
-
-  // 最初のH2の前までのコンテンツ
-  const beforeToc = valueArray.slice(0, firstH2Index)
-  // 最初のH2以降のコンテンツ
-  const afterToc = valueArray.slice(firstH2Index)
-
-  console.log('PortableText: Headings detected, showing TOC')
-  return (
-    <div>
-      {beforeToc.length > 0 && (
-        <BasePortableText value={beforeToc as never} components={components as never} />
-      )}
-      
-      <TableOfContents content={valueArray as Array<{ style?: string; children?: Array<{ text: string }> }>} />
-      
-      <BasePortableText value={afterToc as never} components={components as never} />
-    </div>
-  )
+  return <BasePortableText value={value as never} components={components as never} />
 }
