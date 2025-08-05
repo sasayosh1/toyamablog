@@ -61,8 +61,17 @@ export default function TableOfContents({ content }: Props) {
     shouldRender: isMounted && items.length > 0
   })
 
-  // 見出しが無ければ表示しない
-  if (!isMounted || items.length === 0) return null
+  // 見出しが無ければ表示しない - デバッグ用に一時的にコメントアウト
+  // if (!isMounted || items.length === 0) return null
+  
+  // デバッグ: 強制表示テスト
+  if (!isMounted) {
+    return <div className="p-4 bg-red-200 text-red-800">TOC: まだマウントされていません</div>
+  }
+  
+  if (items.length === 0) {
+    return <div className="p-4 bg-orange-200 text-orange-800">TOC: 見出しが見つかりません（items.length = 0）</div>
+  }
 
   return (
     <section
