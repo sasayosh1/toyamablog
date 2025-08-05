@@ -7,12 +7,6 @@ import Breadcrumb from '@/components/ui/Breadcrumb'
 import ReadingTime from '@/components/ui/ReadingTime'
 import TableOfContents from '@/components/TableOfContents'
 
-type Block = {
-  _type?: string
-  style?: string
-  children?: Array<{ text: string }>
-}
-
 // キャッシュ無効化: 常に最新を表示
 export const revalidate = 0
 export const dynamic = 'force-dynamic'
@@ -80,7 +74,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             {post.title}
           </h1>
           
-          {post.body && (
+          {post.body && Array.isArray(post.body) && (
             <ReadingTime content={post.body as Array<{
               _type?: string
               style?: string
@@ -115,11 +109,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-        {post.body ? (
+        {post.body && Array.isArray(post.body) ? (
           <>
-            <TableOfContents content={post.body as Block[] | unknown} />
+            <TableOfContents content={post.body} />
             <div className="prose prose-lg max-w-none mb-12 blog-content">
-              <PortableText value={post.body as unknown} />
+              <PortableText value={post.body} />
             </div>
           </>
         ) : null}
