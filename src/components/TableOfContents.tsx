@@ -54,18 +54,11 @@ export default function TableOfContents({ content }: Props) {
     return headings
   }, [content])
 
-  // デバッグ: 一時的に強制表示
-  console.log('TOC Debug:', { isMounted, itemsLength: items.length, contentType: typeof content })
-  
   // SSR/ハイドレーション安全性のため、マウント後のみ表示
-  if (!isMounted) {
-    return <div style={{padding: '16px', background: '#fee', border: '1px solid #fcc'}}>TOC: Not mounted yet</div>
-  }
+  if (!isMounted) return null
   
   // 見出しが無い場合は非表示
-  if (items.length === 0) {
-    return <div style={{padding: '16px', background: '#ffe', border: '1px solid #ffcc00'}}>TOC: No headings found ({typeof content}, {Array.isArray(content) ? content.length + ' items' : 'not array'})</div>
-  }
+  if (items.length === 0) return null
 
   return (
     <section
