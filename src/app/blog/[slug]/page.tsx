@@ -5,7 +5,7 @@ import PortableText from '@/components/PortableText'
 import GlobalHeader from '@/components/GlobalHeader'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import ReadingTime from '@/components/ui/ReadingTime'
-import TableOfContents from '@/components/TableOfContents'
+import NewTableOfContents from '@/components/NewTableOfContents'
 
 // キャッシュ無効化: 常に最新を表示
 export const revalidate = 0
@@ -111,8 +111,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         {post.body ? (
           <>
-            <TableOfContents content={post.body as Array<{
-              _type?: string
+            <NewTableOfContents content={post.body as Array<{
               style?: string
               children?: Array<{ text: string }>
             }>} />
