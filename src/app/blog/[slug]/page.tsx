@@ -106,12 +106,20 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         {post.body && Array.isArray(post.body) ? (
           <>
+            {/* デバッグ情報 */}
+            <div className="mb-4 p-2 bg-yellow-100 text-xs">
+              Debug: body length = {post.body.length}, isArray = {Array.isArray(post.body) ? 'true' : 'false'}
+            </div>
             <TableOfContents content={post.body} />
             <div className="prose prose-lg max-w-none mb-12 blog-content">
               <PortableText value={post.body} />
             </div>
           </>
-        ) : null}
+        ) : (
+          <div className="mb-4 p-2 bg-red-100 text-xs">
+            Debug: No body or not array - body = {post.body ? 'exists' : 'null'}, isArray = {Array.isArray(post.body) ? 'true' : 'false'}
+          </div>
+        )}
 
           {post.tags && post.tags.length > 0 && (
             <div className="border-t border-gray-200 pt-8 mb-8">
