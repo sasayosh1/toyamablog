@@ -45,8 +45,10 @@ const extractTocItems = (content: Array<ContentBlock>): TocItem[] => {
 export default function TableOfContents({ content }: TableOfContentsProps) {
   const [tocItems, setTocItems] = useState<TocItem[]>([])
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     const items = extractTocItems(content)
     setTocItems(items)
   }, [content])
@@ -62,17 +64,14 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     return null
   }
 
-  // 初期状態では項目を非表示にする（キャッシュ対策）
-  const displayItems = isExpanded ? tocItems : []
+  // クライアントサイドでのみ項目を表示（SSR対策）
+  const displayItems = isMounted && isExpanded ? tocItems : []
   const hasItems = tocItems.length > 0
   
-  // デバッグログ
-  console.log('TableOfContents State:', {
-    isExpanded,
-    tocItemsCount: tocItems.length,
-    displayItemsCount: displayItems.length,
-    hasItems
-  })
+  // SSRの場合は何も表示しない
+  if (!isMounted) {
+    return null
+  }
 
   return (
     <div className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-4 md:p-5 mb-6 md:mb-8 shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -87,7 +86,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
         </div>
       </div>
       
-      {isExpanded && (
+      {displayItems.length > 0 && (
         <nav className="mt-4">
           <div className="bg-white rounded-lg p-3 shadow-inner">
             <ul className="space-y-2">
