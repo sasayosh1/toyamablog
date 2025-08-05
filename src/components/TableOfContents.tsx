@@ -23,7 +23,10 @@ export default function TableOfContents({ content }: Props) {
   const [isMounted, setIsMounted] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
 
-  useEffect(() => setIsMounted(true), [])
+  useEffect(() => {
+    setIsMounted(true)
+    console.log('TableOfContents mounted!')
+  }, [])
 
   const items = useMemo<TocItem[]>(() => {
     const blocks = Array.isArray(content) ? (content as Block[]) : []
@@ -52,22 +55,17 @@ export default function TableOfContents({ content }: Props) {
     return headings
   }, [content])
 
-  // デバッグ: 常に表示して問題を特定
+  // SSR/ハイドレーション安全性のため、マウント後のみ表示
   if (!isMounted) {
     return (
-      <div className="p-4 bg-red-100 border border-red-300 rounded mb-4">
-        <p className="text-red-800">TOC: まだマウントされていません</p>
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded mb-4">
+        <p className="text-blue-800">もくじを読み込み中...</p>
       </div>
     )
   }
   
-  if (items.length === 0) {
-    return (
-      <div className="p-4 bg-orange-100 border border-orange-300 rounded mb-4">
-        <p className="text-orange-800">TOC: 見出しが見つかりません（データ: {Array.isArray(content) ? `配列${content.length}個` : typeof content}）</p>
-      </div>
-    )
-  }
+  // 見出しが無い場合は非表示
+  if (items.length === 0) return null
 
   return (
     <section
