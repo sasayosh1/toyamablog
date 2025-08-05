@@ -76,19 +76,20 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     return null
   }
   
-  // デバッグ用コンソールログ
+  // デバッグ用コンソールログ（強制表示）
   if (typeof window !== 'undefined') {
-    console.log('TOC Debug:', {
+    console.log('🔍 TOC Debug State:', {
       isMounted,
       isExpanded,
       tocItemsLength: tocItems.length,
       shouldShowItems,
-      displayItemsLength: displayItems.length
+      displayItemsLength: displayItems.length,
+      timestamp: new Date().toISOString()
     })
   }
 
   return (
-    <div key={`toc-${forceKey}`} className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-4 md:p-5 mb-6 md:mb-8 shadow-md hover:shadow-lg transition-shadow duration-300">
+    <div key={`toc-${forceKey}`} className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-4 md:p-5 mb-6 md:mb-8 shadow-md hover:shadow-lg transition-shadow duration-300" data-version="v2.0">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center">
           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
@@ -96,7 +97,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
             </svg>
           </div>
-          <h3 className="text-base md:text-lg font-semibold text-gray-800">もくじ</h3>
+          <h3 className="text-base md:text-lg font-semibold text-gray-800">📑 もくじ (TOC Active)</h3>
         </div>
       </div>
       
