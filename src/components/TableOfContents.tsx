@@ -62,8 +62,13 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     }
   }, [])
 
+  // デバッグ用：空でも表示
   if (tocItems.length === 0) {
-    return null
+    return (
+      <div className="bg-yellow-100 border border-yellow-300 rounded-xl p-4 mb-6" data-debug="no-items">
+        <h3 className="text-yellow-800">🔍 TOC: No headings found (tocItems.length = 0)</h3>
+      </div>
+    )
   }
 
   // 完全に項目を非表示にする（強制）
@@ -71,9 +76,13 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   const displayItems = shouldShowItems ? tocItems : []
   const hasItems = tocItems.length > 0
   
-  // SSRの場合は何も表示しない
+  // 一時的に常に表示（デバッグ用）
   if (!isMounted) {
-    return null
+    return (
+      <div className="bg-red-100 border border-red-300 rounded-xl p-4 mb-6" data-debug="not-mounted">
+        <h3 className="text-red-800">🔍 TOC Loading... (Not Mounted Yet)</h3>
+      </div>
+    )
   }
   
   // デバッグ用コンソールログ（強制表示）
