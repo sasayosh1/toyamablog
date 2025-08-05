@@ -52,8 +52,22 @@ export default function TableOfContents({ content }: Props) {
     return headings
   }, [content])
 
-  // 見出しが無ければ表示しない
-  if (!isMounted || items.length === 0) return null
+  // デバッグ: 常に表示して問題を特定
+  if (!isMounted) {
+    return (
+      <div className="p-4 bg-red-100 border border-red-300 rounded mb-4">
+        <p className="text-red-800">TOC: まだマウントされていません</p>
+      </div>
+    )
+  }
+  
+  if (items.length === 0) {
+    return (
+      <div className="p-4 bg-orange-100 border border-orange-300 rounded mb-4">
+        <p className="text-orange-800">TOC: 見出しが見つかりません（データ: {Array.isArray(content) ? `配列${content.length}個` : typeof content}）</p>
+      </div>
+    )
+  }
 
   return (
     <section
