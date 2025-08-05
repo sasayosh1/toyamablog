@@ -24,8 +24,12 @@ export default function TableOfContents({ content }: Props) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
-    setIsMounted(true)
-    console.log('TableOfContents mounted!')
+    // 短い遅延を追加してハイドレーションを確実にする
+    const timer = setTimeout(() => {
+      setIsMounted(true)
+    }, 100)
+    
+    return () => clearTimeout(timer)
   }, [])
 
   const items = useMemo<TocItem[]>(() => {
@@ -56,13 +60,7 @@ export default function TableOfContents({ content }: Props) {
   }, [content])
 
   // SSR/ハイドレーション安全性のため、マウント後のみ表示
-  if (!isMounted) {
-    return (
-      <div className="p-4 bg-blue-50 border border-blue-200 rounded mb-4">
-        <p className="text-blue-800">もくじを読み込み中...</p>
-      </div>
-    )
-  }
+  if (!isMounted) return null
   
   // 見出しが無い場合は非表示
   if (items.length === 0) return null
