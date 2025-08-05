@@ -111,11 +111,22 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         {post.body ? (
           <>
+            {/* 強制テストメッセージ */}
+            <div className="bg-purple-100 border border-purple-300 rounded-xl p-4 mb-6" data-test="force-visible">
+              <h3 className="text-purple-800">🚀 TEST: Page is rendering, TOC should appear below</h3>
+            </div>
+            
             <TableOfContents content={post.body as Array<{
               _type?: string
               style?: string
               children?: Array<{ text: string }>
             }>} />
+            
+            {/* 別のテストメッセージ */}
+            <div className="bg-green-100 border border-green-300 rounded-xl p-4 mb-6" data-test="after-toc">
+              <h3 className="text-green-800">🚀 TEST: After TOC component</h3>
+            </div>
+            
             <div className="prose prose-lg max-w-none mb-12 blog-content">
               <PortableText value={post.body as unknown} />
             </div>
