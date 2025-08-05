@@ -24,12 +24,7 @@ export default function TableOfContents({ content }: Props) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
-    // 短い遅延を追加してハイドレーションを確実にする
-    const timer = setTimeout(() => {
-      setIsMounted(true)
-    }, 100)
-    
-    return () => clearTimeout(timer)
+    setIsMounted(true)
   }, [])
 
   const items = useMemo<TocItem[]>(() => {
@@ -59,11 +54,18 @@ export default function TableOfContents({ content }: Props) {
     return headings
   }, [content])
 
+  // デバッグ: 一時的に強制表示
+  console.log('TOC Debug:', { isMounted, itemsLength: items.length, contentType: typeof content })
+  
   // SSR/ハイドレーション安全性のため、マウント後のみ表示
-  if (!isMounted) return null
+  if (!isMounted) {
+    return <div style={{padding: '16px', background: '#fee', border: '1px solid #fcc'}}>TOC: Not mounted yet</div>
+  }
   
   // 見出しが無い場合は非表示
-  if (items.length === 0) return null
+  if (items.length === 0) {
+    return <div style={{padding: '16px', background: '#ffe', border: '1px solid #ffcc00'}}>TOC: No headings found ({typeof content}, {Array.isArray(content) ? content.length + ' items' : 'not array'})</div>
+  }
 
   return (
     <section
