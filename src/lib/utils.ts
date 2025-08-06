@@ -5,7 +5,13 @@
 // 見出しテキストからIDを生成する関数
 export const generateHeadingId = (text: string, level: string): string => {
   const cleanText = text.trim()
-  const slug = cleanText.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
+  // 日本語文字を含む文字列に対応したslug生成
+  const slug = cleanText
+    .toLowerCase()
+    .replace(/\s+/g, '-')  // スペースをハイフンに
+    .replace(/[^\w\-ぁ-んァ-ヶー一-龠]/g, '')  // 日本語文字と英数字、ハイフンのみ保持
+    .replace(/-+/g, '-')  // 連続するハイフンを1つに
+    .replace(/^-|-$/g, '')  // 先頭末尾のハイフンを削除
   return `heading-${level}-${slug}`
 }
 

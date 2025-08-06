@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import Link from 'next/link'
+import PortableText from '@/components/PortableText'
+import TableOfContents from '@/components/TableOfContents'
 
 export async function generateStaticParams() {
   const posts = await getAllPosts()
@@ -54,19 +56,14 @@ export default async function PostPage({ params }: PostPageProps) {
             </div>
           )}
           
+          {post.body && Array.isArray(post.body) ? (
+            <TableOfContents content={post.body} />
+          ) : null}
+          
           <div className="prose prose-lg max-w-none">
-            {post.body && Array.isArray(post.body) ? post.body.map((block, index: number) => {
-              const typedBlock = block as { children?: { text: string }[] }
-              return (
-                <div key={index}>
-                  {typedBlock.children && typedBlock.children.map((child: { text: string }, childIndex: number) => (
-                    <p key={childIndex} className="mb-4 text-gray-900 leading-relaxed">
-                      {child.text}
-                    </p>
-                  ))}
-                </div>
-              )
-            }) : null}
+            {post.body && Array.isArray(post.body) ? (
+              <PortableText value={post.body} />
+            ) : null}
           </div>
         </article>
       </div>

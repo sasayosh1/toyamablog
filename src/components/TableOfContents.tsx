@@ -34,17 +34,7 @@ export default function TableOfContents({ content }: Props) {
       .map((b) => {
         const raw = (b?.children?.map(c => c.text).join('') || '').trim()
         const text = raw || '（無題の見出し）'
-        // ID生成
-        const id = (() => {
-          try {
-            return generateHeadingId(text, b.style || 'h2')
-          } catch {
-            return text
-              .toLowerCase()
-              .replace(/\s+/g, '-')
-              .replace(/[^\w\-ぁ-んァ-ヶ一-龠]/g, '')
-          }
-        })()
+        const id = generateHeadingId(text, b.style || 'h2')
         return {
           id,
           text,
