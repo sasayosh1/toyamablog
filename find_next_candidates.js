@@ -35,11 +35,11 @@ async function findNext5Candidates() {
   
   candidates.sort((a, b) => a.chars - b.chars);
   
-  console.log('=== 第79-83記事候補（10回目5記事バッチ - 60%大台突破）===');
-  const next5 = candidates.slice(48, 53); // 74-78記事の次の5記事
+  console.log('=== 第84-88記事候補（11回目5記事バッチ - 慎重な品質継続）===');
+  const next5 = candidates.slice(53, 58); // 79-83記事の次の5記事
   
   next5.forEach((candidate, index) => {
-    console.log(`第${79 + index}記事候補:`);
+    console.log(`第${84 + index}記事候補:`);
     console.log(`  タイトル: ${candidate.title}`);
     console.log(`  スラッグ: ${candidate.slug}`);
     console.log(`  文字数: ${candidate.chars}文字`);
