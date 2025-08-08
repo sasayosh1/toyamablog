@@ -39,6 +39,7 @@ export interface Post {
   youtubeUrl?: string;
   author?: Author;
   excerpt?: string;
+  displayExcerpt?: string;
 }
 
 export type BlogPost = Post;
@@ -67,7 +68,8 @@ export async function getAllPosts(): Promise<Post[]> {
           }
         }
       },
-      "categories": [category]
+      "categories": [category],
+      "displayExcerpt": coalesce(excerpt, description)
     }
   `, {}, { 
     next: { 
@@ -164,7 +166,8 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
           }
         },
         excerpt,
-        "categories": [category]
+        "categories": [category],
+        "displayExcerpt": coalesce(excerpt, description)
       }
     `, { searchTerm });
     
@@ -199,7 +202,8 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
             }
           },
           excerpt,
-          "categories": [category]
+          "categories": [category],
+          "displayExcerpt": coalesce(excerpt, description)
         }
       `);
       

@@ -32,6 +32,7 @@ interface PostCardProps {
     youtubeUrl?: string
     categories?: string[]
     excerpt?: string
+    displayExcerpt?: string
   }
 }
 
@@ -84,9 +85,9 @@ export default function PostCard({ post }: PostCardProps) {
             </div>
           )}
 
-          {post.excerpt && (
+          {(post.displayExcerpt || post.excerpt) && (
             <p className="text-gray-800 text-sm line-clamp-2 leading-relaxed">
-              {post.excerpt}
+              {post.displayExcerpt || post.excerpt}
             </p>
           )}
         </div>
