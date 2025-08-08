@@ -82,7 +82,36 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           <div className="mb-8">
             <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden shadow-md">
               <iframe
-                src={post.youtubeUrl.replace('youtube.com/shorts/', 'youtube.com/embed/').replace('https://youtube.com/shorts/', 'https://www.youtube.com/embed/')}
+                src={(() => {
+                  // YouTube URL を embed形式に変換
+                  const embedUrl = post.youtubeUrl;
+                  
+                  // youtu.be形式の変換
+                  if (embedUrl.includes('youtu.be/')) {
+                    const videoId = embedUrl.split('youtu.be/')[1]?.split('?')[0];
+                    return `https://www.youtube.com/embed/${videoId}`;
+                  }
+                  
+                  // youtube.com/watch形式の変換
+                  if (embedUrl.includes('youtube.com/watch?v=')) {
+                    const videoId = embedUrl.split('v=')[1]?.split('&')[0];
+                    return `https://www.youtube.com/embed/${videoId}`;
+                  }
+                  
+                  // youtube.com/shorts形式の変換
+                  if (embedUrl.includes('youtube.com/shorts/')) {
+                    const videoId = embedUrl.split('shorts/')[1]?.split('?')[0];
+                    return `https://www.youtube.com/embed/${videoId}`;
+                  }
+                  
+                  // 既にembed形式の場合はそのまま
+                  if (embedUrl.includes('youtube.com/embed/')) {
+                    return embedUrl;
+                  }
+                  
+                  // その他の場合はそのまま返す
+                  return embedUrl;
+                })()}
                 title={post.title}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
