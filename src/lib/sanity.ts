@@ -50,6 +50,7 @@ export async function getAllPosts(): Promise<Post[]> {
       title,
       slug,
       description,
+      excerpt,
       tags,
       category,
       publishedAt,
@@ -66,7 +67,6 @@ export async function getAllPosts(): Promise<Post[]> {
           }
         }
       },
-      "excerpt": description,
       "categories": [category]
     }
   `, {}, { 
@@ -163,7 +163,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
             }
           }
         },
-        "excerpt": description,
+        excerpt,
         "categories": [category]
       }
     `, { searchTerm });
@@ -198,7 +198,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
               }
             }
           },
-          "excerpt": description,
+          excerpt,
           "categories": [category]
         }
       `);
