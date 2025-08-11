@@ -6,6 +6,7 @@ import GlobalHeader from '@/components/GlobalHeader'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import ReadingTime from '@/components/ui/ReadingTime'
 import TableOfContents from '@/components/TableOfContents'
+import { TopArticleAd, MiddleArticleAd, BottomArticleAd } from '@/components/ArticleAds'
 
 // キャッシュ無効化: 常に最新を表示
 export const revalidate = 0
@@ -133,12 +134,17 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
+          {/* 記事上部広告 */}
+          <TopArticleAd />
+
         {post.body && Array.isArray(post.body) ? (
           <>
             <TableOfContents content={post.body} />
             <div className="prose prose-lg max-w-none mb-12 blog-content">
               <PortableText value={post.body} />
             </div>
+            {/* 記事中央広告 */}
+            <MiddleArticleAd />
           </>
         ) : null}
 
@@ -158,6 +164,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               </div>
             </div>
           )}
+
+          {/* 記事下部広告 */}
+          <BottomArticleAd />
 
           {/* ナビゲーションボタン */}
           <div className="border-t border-gray-200 pt-8">

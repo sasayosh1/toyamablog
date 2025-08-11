@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@/components/Analytics";
+import { AdSense } from "@/components/AdSense";
 import { Suspense } from "react";
 
 const geistSans = Geist({
@@ -51,6 +52,7 @@ export default function RootLayout({
       >
         <Suspense fallback={null}>
           <Analytics />
+          <AdSense />
         </Suspense>
         {children}
       </body>
