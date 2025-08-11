@@ -2,7 +2,8 @@ export function getYouTubeThumbnail(url: string): string | null {
   if (!url) return null;
 
   try {
-    const videoIdMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    // YouTube Shorts URLも含む改良された正規表現
+    const videoIdMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     
     if (!videoIdMatch || !videoIdMatch[1]) {
       return null;
@@ -22,7 +23,8 @@ export function getYouTubeThumbnailWithFallback(url: string): string | null {
   if (!url) return null;
 
   try {
-    const videoIdMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    // YouTube Shorts URLも含む改良された正規表現
+    const videoIdMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     
     if (!videoIdMatch || !videoIdMatch[1]) {
       return null;

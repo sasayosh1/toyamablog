@@ -8,11 +8,10 @@ import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 interface CategoryLinkProps {
   href: string
   className: string
-  category: string
   children: React.ReactNode
 }
 
-function CategoryLink({ href, className, category, children }: CategoryLinkProps) {
+function CategoryLink({ href, className, children }: CategoryLinkProps) {
   return (
     <Link
       href={href}
@@ -44,16 +43,32 @@ export default function PostCard({ post }: PostCardProps) {
     >
       <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer relative z-[1]">
         {post.youtubeUrl && getYouTubeThumbnailWithFallback(post.youtubeUrl) && (
-          <div className="relative h-48 overflow-hidden">
+          <div className="relative h-48 overflow-hidden bg-gray-100">
             <Image
               src={getYouTubeThumbnailWithFallback(post.youtubeUrl) || ''}
               alt={`${post.title} - YouTube動画サムネイル`}
               fill
-              className="object-cover"
+              className="object-cover transition-opacity duration-300"
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = `
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-red-500 to-red-600">
+                      <div class="text-white text-center p-4">
+                        <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M23.498 6.186a2.998 2.998 0 00-2.11-2.123C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.388.518A2.998 2.998 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.998 2.998 0 002.11 2.123c1.883.518 9.388.518 9.388.518s7.505 0 9.388-.518a2.998 2.998 0 002.11-2.123C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.6 15.568V8.432L15.84 12 9.6 15.568z"/>
+                        </svg>
+                        <p class="text-sm font-medium">YouTube動画</p>
+                      </div>
+                    </div>
+                  `;
+                }
+              }}
+              onLoad={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.opacity = '1';
               }}
             />
           </div>
@@ -71,7 +86,6 @@ export default function PostCard({ post }: PostCardProps) {
                   key={category}
                   href={`/category/${encodeURIComponent(category)}`}
                   className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md hover:bg-blue-100 transition-colors"
-                  category={category}
                 >
                   {category}
                 </CategoryLink>
