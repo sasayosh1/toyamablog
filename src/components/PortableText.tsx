@@ -120,6 +120,50 @@ const components = {
         />
       )
     },
+    youtubeShorts: ({ value }: { value: { url: string } }) => {
+      const { url } = value
+      const videoId = extractYouTubeId(url)
+      
+      if (!videoId) {
+        return (
+          <div style={{ 
+            margin: '2rem 0',
+            padding: '1rem',
+            backgroundColor: '#f0f0f0',
+            borderRadius: '8px',
+            textAlign: 'center'
+          }}>
+            <p>YouTube Shorts: {url}</p>
+          </div>
+        )
+      }
+
+      return (
+        <div style={{ 
+          margin: '2rem 0',
+          position: 'relative',
+          paddingBottom: '56.25%', // 16:9アスペクト比
+          height: 0,
+          overflow: 'hidden'
+        }}>
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}`}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              borderRadius: '8px'
+            }}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="YouTube Shorts video"
+          />
+        </div>
+      )
+    },
   },
   marks: {
     link: ({ children, value }: { children: React.ReactNode; value: { href: string } }) => {
