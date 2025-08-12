@@ -15,7 +15,7 @@ export function AdSense() {
   useEffect(() => {
     // AdSense auto ads initialization
     try {
-      if (window.adsbygoogle && ADSENSE_PUBLISHER_ID) {
+      if (typeof window !== 'undefined' && window.adsbygoogle && ADSENSE_PUBLISHER_ID) {
         (window.adsbygoogle = window.adsbygoogle || []).push({
           google_ad_client: ADSENSE_PUBLISHER_ID,
           enable_page_level_ads: true
@@ -28,17 +28,35 @@ export function AdSense() {
 
   // Don't render if no publisher ID
   if (!ADSENSE_PUBLISHER_ID) {
-    console.warn('AdSense publisher ID not found')
+    if (typeof window !== 'undefined') {
+      console.warn('AdSense publisher ID not found')
+    }
     return null
   }
 
   return (
-    <Script
-      async
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
-      crossOrigin="anonymous"
-      strategy="afterInteractive"
-    />
+    <>
+      <Script
+        id="adsense-script"
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+      />
+      <Script
+        id="adsense-init"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.adsbygoogle = window.adsbygoogle || [];
+            (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "${ADSENSE_PUBLISHER_ID}",
+              enable_page_level_ads: true
+            });
+          `
+        }}
+      />
+    </>
   )
 }
 
@@ -51,13 +69,19 @@ interface AdUnitProps {
 
 export function AdUnit({ slot, format = 'auto', responsive = true, className = '' }: AdUnitProps) {
   useEffect(() => {
-    try {
-      if (window.adsbygoogle) {
-        (window.adsbygoogle = window.adsbygoogle || []).push({})
+    const loadAd = () => {
+      try {
+        if (typeof window !== 'undefined' && window.adsbygoogle) {
+          (window.adsbygoogle = window.adsbygoogle || []).push({})
+        }
+      } catch (error) {
+        console.error('AdSense ad unit initialization error:', error)
       }
-    } catch (error) {
-      console.error('AdSense ad unit initialization error:', error)
     }
+
+    // Delay ad loading to ensure AdSense script is loaded
+    const timer = setTimeout(loadAd, 1000)
+    return () => clearTimeout(timer)
   }, [])
 
   if (!ADSENSE_PUBLISHER_ID) {

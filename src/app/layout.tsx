@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@/components/Analytics";
 import { AdSense } from "@/components/AdSense";
+import Footer from "@/components/Footer";
 import { Suspense } from "react";
 
 const geistSans = Geist({
@@ -55,6 +56,7 @@ export default function RootLayout({
           <AdSense />
         </Suspense>
         {children}
+        <Footer />
       </body>
     </html>
   );
