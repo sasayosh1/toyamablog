@@ -73,8 +73,8 @@ export async function getAllPosts(): Promise<Post[]> {
     }
   `, {}, { 
     next: { 
-      tags: ['posts'], 
-      revalidate: 300 // 5分
+      tags: ['post-list'], 
+      revalidate: 60 // 一覧は最長60秒で更新
     } 
   });
   
@@ -108,8 +108,8 @@ export async function getPost(slug: string): Promise<Post | null> {
     }
   `, { slug }, { 
     next: { 
-      tags: ['posts', `post-${slug.substring(0, 50)}`], // タグ長制限対応
-      revalidate: 60 // 1分
+      tags: ['post-detail', `post-detail-${slug.substring(0, 50)}`], 
+      revalidate: 300 // 詳細は5分キャッシュ
     } 
   });
   
@@ -122,7 +122,12 @@ export async function getAllCategories(): Promise<string[]> {
       *[_type == "post" && defined(category)] {
         category
       } | order(category asc)
-    `);
+    `, {}, { 
+      next: { 
+        tags: ['post-list'], // 一覧と同じタグで連動
+        revalidate: 300 // 5分キャッシュ
+      } 
+    });
     
     // ユニークなカテゴリーのみを抽出
     const uniqueCategories = [...new Set(categories.map(item => item.category))];

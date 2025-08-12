@@ -3,9 +3,8 @@ import Image from 'next/image'
 import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 
-// キャッシュ無効化: 常に最新を表示
-export const revalidate = 0
-export const dynamic = 'force-dynamic'
+// ISR: 一覧は最長60秒で更新
+export const revalidate = 60
 
 export default async function Home() {
   const [posts, categories] = await Promise.all([

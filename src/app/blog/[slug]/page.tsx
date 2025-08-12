@@ -8,9 +8,8 @@ import ReadingTime from '@/components/ui/ReadingTime'
 import TableOfContents from '@/components/TableOfContents'
 import { TopArticleAd, MiddleArticleAd, BottomArticleAd } from '@/components/ArticleAds'
 
-// キャッシュ無効化: 常に最新を表示
-export const revalidate = 0
-export const dynamic = 'force-dynamic'
+// ISR: 詳細ページは5分キャッシュ
+export const revalidate = 300
 
 interface SanityPost {
   slug: string;

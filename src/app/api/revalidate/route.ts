@@ -4,7 +4,6 @@ import { revalidateTag, revalidatePath } from 'next/cache'
 export async function POST(request: NextRequest) {
   try {
     // セキュリティチェック
-    const authHeader = request.headers.get('authorization')
     const secret = process.env.REVALIDATE_SECRET
     
     if (!secret) {
@@ -14,10 +13,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Authorization: Bearer <secret> or ?secret=<secret>
-    const providedSecret = authHeader?.replace('Bearer ', '') || 
-                          request.nextUrl.searchParams.get('secret')
-    
+    const body = await request.json()
+    const { secret: providedSecret, type, slug } = body
+
+    // 受信JSON: { secret, type: 'list' | 'detail', slug? }
     if (providedSecret !== secret) {
       return NextResponse.json(
         { error: 'Invalid secret' },
@@ -25,48 +24,55 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
-    const { type, slug, tags, paths } = body
+    console.log(`[Revalidate] Request: ${JSON.stringify({ type, slug })}`)
 
-    console.log(`[Revalidate] Request: ${JSON.stringify(body)}`)
+    const revalidatedTags: string[] = []
+    const revalidatedPaths: string[] = []
 
-    // タグベースの再検証
-    if (tags && Array.isArray(tags)) {
-      for (const tag of tags) {
-        revalidateTag(tag)
-        console.log(`[Revalidate] Tag: ${tag}`)
-      }
+    // type==='list' -> revalidateTag('post-list')
+    if (type === 'list') {
+      revalidateTag('post-list')
+      revalidatedTags.push('post-list')
+      revalidatePath('/')
+      revalidatedPaths.push('/')
+      console.log(`[Revalidate] List updated`)
     }
 
-    // パスベースの再検証
-    if (paths && Array.isArray(paths)) {
-      for (const path of paths) {
-        revalidatePath(path)
-        console.log(`[Revalidate] Path: ${path}`)
-      }
+    // type==='detail' && slug -> revalidatePath(`/blog/${slug}`)
+    if (type === 'detail' && slug) {
+      const shortSlug = slug.substring(0, 50)
+      revalidateTag(`post-detail-${shortSlug}`)
+      revalidatePath(`/blog/${slug}`)
+      revalidatedTags.push(`post-detail-${shortSlug}`)
+      revalidatedPaths.push(`/blog/${slug}`)
+      console.log(`[Revalidate] Detail updated: ${slug}`)
     }
 
-    // Sanity Webhookからの自動判定
+    // 従来のpost typeサポート（後方互換性）
     if (type === 'post') {
-      // 投稿関連の全タグを再検証
-      revalidateTag('posts')
+      revalidateTag('post-list')
+      revalidatedTags.push('post-list')
+      revalidatePath('/')
+      revalidatedPaths.push('/')
       
       if (slug) {
-        const shortSlug = slug.substring(0, 50) // タグ長制限対応
-        revalidateTag(`post-${shortSlug}`)
+        const shortSlug = slug.substring(0, 50)
+        revalidateTag(`post-detail-${shortSlug}`)
         revalidatePath(`/blog/${slug}`)
-        console.log(`[Revalidate] Post: ${slug}`)
+        revalidatedTags.push(`post-detail-${shortSlug}`)
+        revalidatedPaths.push(`/blog/${slug}`)
       }
       
-      // ホームページも再検証（新着記事表示）
-      revalidatePath('/')
+      console.log(`[Revalidate] Post updated (legacy): ${slug || 'all'}`)
     }
 
     return NextResponse.json({
       revalidated: true,
       timestamp: new Date().toISOString(),
-      tags: tags || (type === 'post' ? ['posts', slug && `post-${slug}`].filter(Boolean) : []),
-      paths: paths || (type === 'post' && slug ? ['/', `/blog/${slug}`] : ['/'])
+      type,
+      slug,
+      tags: revalidatedTags,
+      paths: revalidatedPaths
     })
 
   } catch (error) {
@@ -81,27 +87,39 @@ export async function POST(request: NextRequest) {
 // GET method for manual testing
 export async function GET(request: NextRequest) {
   const secret = request.nextUrl.searchParams.get('secret')
-  const tag = request.nextUrl.searchParams.get('tag')
-  const path = request.nextUrl.searchParams.get('path')
+  const type = request.nextUrl.searchParams.get('type') // 'list' | 'detail'
+  const slug = request.nextUrl.searchParams.get('slug')
   
   if (!secret || secret !== process.env.REVALIDATE_SECRET) {
     return NextResponse.json({ error: 'Invalid secret' }, { status: 401 })
   }
 
-  if (tag) {
-    revalidateTag(tag)
-    console.log(`[Revalidate] Manual tag: ${tag}`)
+  const revalidatedTags: string[] = []
+  const revalidatedPaths: string[] = []
+
+  if (type === 'list') {
+    revalidateTag('post-list')
+    revalidatePath('/')
+    revalidatedTags.push('post-list')
+    revalidatedPaths.push('/')
+    console.log(`[Revalidate] Manual list update`)
   }
   
-  if (path) {
-    revalidatePath(path)
-    console.log(`[Revalidate] Manual path: ${path}`)
+  if (type === 'detail' && slug) {
+    const shortSlug = slug.substring(0, 50)
+    revalidateTag(`post-detail-${shortSlug}`)
+    revalidatePath(`/blog/${slug}`)
+    revalidatedTags.push(`post-detail-${shortSlug}`)
+    revalidatedPaths.push(`/blog/${slug}`)
+    console.log(`[Revalidate] Manual detail update: ${slug}`)
   }
 
   return NextResponse.json({
     revalidated: true,
-    tag,
-    path,
+    type,
+    slug,
+    tags: revalidatedTags,
+    paths: revalidatedPaths,
     timestamp: new Date().toISOString()
   })
 }
