@@ -16,7 +16,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
               <Link
-                href="https://youtube.com/@sasakiyoshimasa"
+                href="https://www.youtube.com/@sasayoshi"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -27,7 +27,7 @@ export default function Footer() {
                 </svg>
               </Link>
               <Link
-                href="https://x.com/sasakiyoshimasa"
+                href="https://x.com/sasayoshi_tym"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -38,7 +38,7 @@ export default function Footer() {
                 </svg>
               </Link>
               <Link
-                href="https://instagram.com/sasakiyoshimasa"
+                href="https://www.instagram.com/sasayoshi_tym/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
