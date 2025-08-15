@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:headers": "playwright test --config=playwright.config.ts tests/headers.spec.ts",
+    "test:headers:prod": "PLAYWRIGHT_BASE_URL=https://sasakiyoshimasa.com playwright test --config=playwright.config.ts tests/headers.spec.ts",
     "env:setup": "node scripts/setup-env.js",
     "env:dev": "node scripts/env-manager.js dev",
     "env:prod": "node scripts/env-manager.js prod",
@@ -28,11 +30,12 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-is": "^19.1.0",
-    "styled-components": "^6.1.19",
-    "sanity": "^3.99.0"
+    "sanity": "^3.99.0",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.54.2",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -1,0 +1,89 @@
+name: Security Headers Regression Test
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'next.config.ts'
+      - 'vercel.json'
+      - 'src/middleware.ts'
+      - '.github/workflows/security-headers-test.yml'
+      - 'tests/headers.spec.ts'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'next.config.ts'
+      - 'vercel.json'
+      - 'src/middleware.ts'
+      - 'tests/headers.spec.ts'
+
+jobs:
+  test-headers:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright
+      run: npx playwright install chromium
+
+    - name: Build Next.js app
+      run: npm run build
+
+    - name: Start Next.js app
+      run: npm start &
+      env:
+        NODE_ENV: production
+
+    - name: Wait for server
+      run: npx wait-on http://localhost:3000 --timeout 60000
+
+    - name: Run header regression tests
+      run: npm run test:headers
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-results
+        path: test-results/
+        retention-days: 30
+
+  test-production-headers:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright
+      run: npx playwright install chromium
+
+    - name: Test production headers
+      run: npm run test:headers:prod
+
+    - name: Upload production test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-production-results
+        path: test-results/
+        retention-days: 30
