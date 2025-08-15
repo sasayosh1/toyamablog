@@ -2,7 +2,20 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(req: NextRequest) {
-  if (!req.nextUrl.pathname.startsWith('/studio')) {
+  const pathname = req.nextUrl.pathname
+
+  // 間違ったルートをリダイレクト
+  if (pathname.startsWith('/structure/')) {
+    // /structure/category -> /categories にリダイレクト
+    if (pathname === '/structure/category' || pathname.startsWith('/structure/category/')) {
+      return NextResponse.redirect(new URL('/categories', req.url))
+    }
+    // その他の /structure/* は /categories にリダイレクト
+    return NextResponse.redirect(new URL('/categories', req.url))
+  }
+
+  // Studio用の設定
+  if (!pathname.startsWith('/studio')) {
     return NextResponse.next()
   }
 
@@ -13,7 +26,6 @@ export function middleware(req: NextRequest) {
   res.headers.delete('content-security-policy')
 
   // Sanity ダッシュボードからの埋め込みを許可
-  // ※ ALLOW-FROM は非推奨なので使わず、CSP の frame-ancestors を設定
   res.headers.set(
     'Content-Security-Policy',
     "frame-ancestors 'self' https://sanity.io https://*.sanity.io"
@@ -25,7 +37,6 @@ export function middleware(req: NextRequest) {
   return res
 }
 
-// /studio 配下だけ適用
 export const config = {
-  matcher: ['/studio/:path*'],
+  matcher: ['/studio/:path*', '/structure/:path*'],
 }
