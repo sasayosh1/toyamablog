@@ -58,15 +58,9 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.sanity.io https://*.sanity.io",
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https://cdn.sanity.io https://*.sanity.io",
-              "connect-src 'self' https://*.sanity.io https://*.sanity.dev",
-              "frame-ancestors 'self' https://sanity.io https://*.sanity.io https://*.sanity.build https://*.sanity.work"
-            ].join('; ')
+            value: "frame-ancestors 'self' https://sanity.io https://*.sanity.io",
           },
+          // X-Frame-Options は付けない（middleware で制御）
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
