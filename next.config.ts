@@ -33,6 +33,17 @@ const nextConfig: NextConfig = {
     // optimizeCss: true, // Vercelデプロイエラー回避のため一時的にコメントアウト
   },
   
+  // リダイレクト設定
+  async redirects() {
+    return [
+      {
+        source: '/structure/:path*',
+        destination: '/categories',
+        permanent: true,
+      },
+    ];
+  },
+
   // セキュリティヘッダー
   async headers() {
     return [
