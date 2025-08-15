@@ -105,15 +105,21 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* お問い合わせ */}
+          {/* お問い合わせ・管理 */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">お問い合わせ</h4>
             <div className="text-sm text-gray-300 space-y-2">
               <p>撮影のご依頼、取材のご相談は</p>
               <p>SNSのDMでお気軽にご連絡ください</p>
-              <p className="mt-4 pt-4 border-t border-gray-700">
-                運営者：ささよし
-              </p>
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                <p className="mb-3">運営者：ささよし</p>
+                <Link 
+                  href="/studio-access.html"
+                  className="inline-block px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-md transition-colors"
+                >
+                  🎯 記事管理
+                </Link>
+              </div>
             </div>
           </div>
         </div>
