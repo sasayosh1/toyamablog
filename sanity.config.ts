@@ -18,7 +18,12 @@ export default defineConfig({
   },
 
   cors: {
-    origin: ['http://localhost:3000', 'https://sasakiyoshimasa.com', 'https://sasakiyoshimasa.sanity.studio'],
+    origin: [
+      'http://localhost:3000', 
+      'https://sasakiyoshimasa.com', 
+      'https://sanity.io',
+      'https://aoxze287.sanity.studio'
+    ],
     credentials: true
   },
 
