@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Analytics } from "@/components/Analytics";
+import GAProvider from "./ga-provider";
 import { AdSense } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 import { Suspense } from "react";
@@ -52,7 +52,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Suspense fallback={null}>
-          <Analytics />
+          <GAProvider />
           <AdSense />
         </Suspense>
         {children}
