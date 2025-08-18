@@ -7,7 +7,7 @@ import {structure} from './src/sanity/structure'
 
 export default defineConfig({
   name: 'default',
-  title: 'TOYAMA BLOG',
+  title: '富山のくせに - AMAZING TOYAMA',
 
   projectId: 'aoxze287',
   dataset: 'production',

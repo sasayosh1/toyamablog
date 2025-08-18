@@ -17,24 +17,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TOYAMA BLOG",
-  description: "TOYAMA BLOG",
+  title: "富山のくせに - AMAZING TOYAMA",
+  description: "富山の魅力を発信するブログ「富山のくせに」- AMAZING TOYAMA。地元グルメ、観光スポット、文化イベントなど富山の「くせに」すごい魅力をお届けします。",
   metadataBase: new URL('https://sasakiyoshimasa.com'),
   alternates: {
     canonical: 'https://sasakiyoshimasa.com',
   },
   openGraph: {
-    title: "TOYAMA BLOG",
-    description: "TOYAMA BLOG",
+    title: "富山のくせに - AMAZING TOYAMA",
+    description: "富山の魅力を発信するブログ「富山のくせに」- AMAZING TOYAMA。地元グルメ、観光スポット、文化イベントなど富山の「くせに」すごい魅力をお届けします。",
     url: 'https://sasakiyoshimasa.com',
-    siteName: 'TOYAMA BLOG',
+    siteName: '富山のくせに',
     locale: 'ja_JP',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "TOYAMA BLOG",
-    description: "TOYAMA BLOG",
+    title: "富山のくせに - AMAZING TOYAMA",
+    description: "富山の魅力を発信するブログ「富山のくせに」- AMAZING TOYAMA。地元グルメ、観光スポット、文化イベントなど富山の「くせに」すごい魅力をお届けします。",
   },
   verification: {
     google: "NocI3MMwDMlZ9xW66Er1NNBu4KIfUhL71SWYQpGysfE",
