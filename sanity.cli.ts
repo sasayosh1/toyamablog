@@ -8,5 +8,6 @@ export default defineCliConfig({
   api: {
     projectId: 'aoxze287',
     dataset: 'production'
-  }
+  },
+  studioHost: 'aoxze287'
 })

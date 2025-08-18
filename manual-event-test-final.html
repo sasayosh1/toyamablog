@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 手動イベント送信テスト</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header {
+            text-align: center;
+            background: #17a2b8;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .step {
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #17a2b8;
+        }
+        .step h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-number {
+            background: #17a2b8;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            border: 2px solid #4a5568;
+        }
+        .instruction {
+            background: #e7f3ff;
+            border: 2px solid #17a2b8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        button {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #218838; }
+        .btn-primary { background: #007bff; }
+        .btn-primary:hover { background: #0056b3; }
+        .large-button {
+            font-size: 18px;
+            padding: 20px 40px;
+        }
+        .event-test {
+            background: #f8f9fa;
+            border: 2px solid #17a2b8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .test-result {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 手動イベント送信テスト</h1>
+            <p><strong>目的:</strong> カスタムイベントの送信とGA4での記録確認</p>
+            <p><strong>測定ID:</strong> G-5VS8BF91VH</p>
+            <p><strong>テスト時刻:</strong> <span id="timestamp"></span></p>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">1</span>🌐 TOYAMA BLOGを開く</h3>
+            <p>イベント送信テストのため、実際のサイトを新しいタブで開きます。</p>
+            
+            <button class="large-button btn-success" onclick="openSiteForEventTest()">
+                🚀 TOYAMA BLOGを開く
+            </button>
+            
+            <div class="warning">
+                <strong>📝 重要:</strong> 新しいタブが開いたら、そのタブでDevTools (F12) を開いてConsoleタブとNetworkタブを準備してください。
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">2</span>🎯 基本イベント送信テスト</h3>
+            <p>最もシンプルなカスタムイベントを送信して、GA4での記録を確認します。</p>
+            
+            <div class="instruction">
+                <strong>テスト手順:</strong>
+                <ol>
+                    <li>TOYAMA BLOGのDevTools Consoleを開く</li>
+                    <li>下のスクリプトをコピーして貼り付け</li>
+                    <li>Enterキーで実行</li>
+                    <li>Networkタブで「collect」リクエストを確認</li>
+                </ol>
+            </div>
+
+            <div class="code-block">// 基本イベント送信テスト
+if (typeof window.gtag === 'function') {
+    console.log('🎯 基本イベント送信テスト開始');
+    
+    // シンプルなカスタムイベント
+    window.gtag('event', 'test_button_click', {
+        event_category: 'engagement',
+        event_label: 'manual_test_basic',
+        value: 1
+    });
+    
+    console.log('✅ 基本イベントを送信しました');
+    console.log('💡 Networkタブでcollectリクエストを確認してください');
+} else {
+    console.log('❌ gtag関数が利用できません');
+}</div>
+            
+            <button onclick="copyBasicEventScript()">📋 基本イベントスクリプトをコピー</button>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">3</span>📊 詳細イベント送信テスト</h3>
+            <p>より詳細なパラメータを含むイベントを送信して、GA4での詳細記録を確認します。</p>
+
+            <div class="code-block">// 詳細イベント送信テスト
+if (typeof window.gtag === 'function') {
+    console.log('📊 詳細イベント送信テスト開始');
+    
+    const timestamp = Date.now();
+    
+    // 詳細パラメータ付きイベント
+    window.gtag('event', 'detailed_interaction', {
+        event_category: 'user_engagement',
+        event_label: `manual_test_detailed_${timestamp}`,
+        value: 5,
+        custom_parameter_1: 'console_test',
+        custom_parameter_2: 'detailed_verification',
+        test_timestamp: timestamp,
+        user_action: 'manual_event_test'
+    });
+    
+    console.log('✅ 詳細イベントを送信しました');
+    console.log(`📊 イベントID: detailed_interaction_${timestamp}`);
+    console.log('💡 GA4リアルタイムレポートで確認してください');
+} else {
+    console.log('❌ gtag関数が利用できません');
+}</div>
+            
+            <button onclick="copyDetailedEventScript()">📋 詳細イベントスクリプトをコピー</button>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">4</span>🔄 連続イベント送信テスト</h3>
+            <p>複数のイベントを連続で送信して、GA4での処理能力を確認します。</p>
+
+            <div class="code-block">// 連続イベント送信テスト
+if (typeof window.gtag === 'function') {
+    console.log('🔄 連続イベント送信テスト開始');
+    
+    const events = [
+        { name: 'page_scroll', category: 'engagement', label: 'scroll_test' },
+        { name: 'content_view', category: 'content', label: 'article_view' },
+        { name: 'user_interaction', category: 'engagement', label: 'click_test' },
+        { name: 'custom_conversion', category: 'conversion', label: 'test_conversion' }
+    ];
+    
+    events.forEach((event, index) => {
+        setTimeout(() => {
+            window.gtag('event', event.name, {
+                event_category: event.category,
+                event_label: `${event.label}_${index + 1}`,
+                value: index + 1,
+                test_sequence: index + 1,
+                batch_id: 'continuous_test_' + Date.now()
+            });
+            console.log(`✅ イベント${index + 1}/${events.length}: ${event.name} を送信`);
+        }, index * 1000); // 1秒間隔で送信
+    });
+    
+    console.log('🚀 4つのイベントを1秒間隔で送信開始');
+    console.log('💡 4秒後に完了予定です');
+} else {
+    console.log('❌ gtag関数が利用できません');
+}</div>
+            
+            <button onclick="copyContinuousEventScript()">📋 連続イベントスクリプトをコピー</button>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">5</span>📈 GA4での確認方法</h3>
+            <p>送信したイベントがGA4で正しく記録されていることを確認します。</p>
+            
+            <div class="instruction">
+                <strong>確認手順:</strong>
+                <ol>
+                    <li><strong>DevTools Network確認:</strong> collect リクエストの即座の発生</li>
+                    <li><strong>GA4リアルタイムレポート:</strong> イベント数の増加（1-2分後）</li>
+                    <li><strong>GA4イベントレポート:</strong> 詳細なイベント記録（数分後）</li>
+                </ol>
+            </div>
+            
+            <button class="btn-primary" onclick="openGA4Events()">📊 GA4イベントレポートを開く</button>
+            <button class="btn-primary" onclick="openGA4Realtime()">⏱️ GA4リアルタイムレポートを開く</button>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">6</span>🧪 トラブルシューティング</h3>
+            <p>イベント送信で問題が発生した場合の診断と解決方法。</p>
+            
+            <div class="event-test">
+                <h4>🔍 診断スクリプト</h4>
+                <div class="code-block">// GA4イベント送信診断
+console.log('🔍 GA4イベント送信診断開始');
+
+// 1. gtag関数確認
+if (typeof window.gtag === 'function') {
+    console.log('✅ gtag関数: 利用可能');
+    
+    // 2. dataLayer確認
+    if (Array.isArray(window.dataLayer)) {
+        console.log(`✅ dataLayer: ${window.dataLayer.length}個の要素`);
+        
+        // 3. 測定ID確認
+        const hasGA4 = window.dataLayer.some(item => 
+            Array.isArray(item) && item.includes('G-5VS8BF91VH')
+        );
+        console.log(`${hasGA4 ? '✅' : '❌'} 測定ID G-5VS8BF91VH: ${hasGA4 ? '確認済み' : '未確認'}`);
+        
+        // 4. テストイベント送信
+        console.log('🧪 診断用テストイベントを送信...');
+        window.gtag('event', 'diagnostic_test', {
+            event_category: 'troubleshooting',
+            event_label: 'diagnostic_event',
+            diagnostic_timestamp: Date.now()
+        });
+        console.log('✅ 診断用イベント送信完了');
+        
+    } else {
+        console.log('❌ dataLayer: 利用不可');
+    }
+} else {
+    console.log('❌ gtag関数: 利用不可');
+    console.log('💡 ページが完全に読み込まれていない可能性があります');
+}
+
+console.log('🔍 診断完了');</div>
+                
+                <button onclick="copyDiagnosticScript()">📋 診断スクリプトをコピー</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">7</span>📊 最終テスト結果</h3>
+            <p>全てのイベント送信テストの結果をまとめて記録します。</p>
+            
+            <div class="success">
+                <strong>✅ 成功基準:</strong><br>
+                <div style="margin-top: 10px;">
+                    <label><input type="checkbox" id="check-basic"> 基本イベント送信成功</label><br>
+                    <label><input type="checkbox" id="check-detailed"> 詳細イベント送信成功</label><br>
+                    <label><input type="checkbox" id="check-continuous"> 連続イベント送信成功</label><br>
+                    <label><input type="checkbox" id="check-network"> Networkタブでcollectリクエスト確認</label><br>
+                    <label><input type="checkbox" id="check-realtime"> GA4リアルタイムレポートでイベント増加確認</label><br>
+                    <label><input type="checkbox" id="check-diagnostic"> 診断スクリプト実行成功</label><br>
+                </div>
+            </div>
+            
+            <button onclick="generateEventTestReport()">📋 イベントテスト結果レポートを生成</button>
+        </div>
+
+        <div id="report" style="display: none;">
+            <div class="step">
+                <h2>📊 手動イベント送信テスト結果</h2>
+                <div id="reportContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // タイムスタンプ表示
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('ja-JP');
+
+        function openSiteForEventTest() {
+            console.log('🌐 TOYAMA BLOGを新しいタブで開いています...');
+            const siteWindow = window.open('https://sasakiyoshimasa.com', '_blank', 'width=1200,height=800');
+            
+            if (siteWindow) {
+                alert('✅ TOYAMA BLOGを新しいタブで開きました！\n\n次の手順:\n1. 新しいタブでF12を押してDevToolsを開く\n2. Consoleタブを選択\n3. 下のスクリプトをコピーして実行\n4. Networkタブでcollectリクエストを確認');
+            } else {
+                alert('❌ ポップアップがブロックされました。\nブラウザの設定でポップアップを許可してください。');
+            }
+        }
+
+        function copyBasicEventScript() {
+            const script = `// 基本イベント送信テスト
+if (typeof window.gtag === 'function') {
+    console.log('🎯 基本イベント送信テスト開始');
+    
+    // シンプルなカスタムイベント
+    window.gtag('event', 'test_button_click', {
+        event_category: 'engagement',
+        event_label: 'manual_test_basic',
+        value: 1
+    });
+    
+    console.log('✅ 基本イベントを送信しました');
+    console.log('💡 Networkタブでcollectリクエストを確認してください');
+} else {
+    console.log('❌ gtag関数が利用できません');
+}`;
+            
+            copyToClipboard(script, '基本イベントスクリプト');
+        }
+
+        function copyDetailedEventScript() {
+            const script = `// 詳細イベント送信テスト
+if (typeof window.gtag === 'function') {
+    console.log('📊 詳細イベント送信テスト開始');
+    
+    const timestamp = Date.now();
+    
+    // 詳細パラメータ付きイベント
+    window.gtag('event', 'detailed_interaction', {
+        event_category: 'user_engagement',
+        event_label: \`manual_test_detailed_\${timestamp}\`,
+        value: 5,
+        custom_parameter_1: 'console_test',
+        custom_parameter_2: 'detailed_verification',
+        test_timestamp: timestamp,
+        user_action: 'manual_event_test'
+    });
+    
+    console.log('✅ 詳細イベントを送信しました');
+    console.log(\`📊 イベントID: detailed_interaction_\${timestamp}\`);
+    console.log('💡 GA4リアルタイムレポートで確認してください');
+} else {
+    console.log('❌ gtag関数が利用できません');
+}`;
+            
+            copyToClipboard(script, '詳細イベントスクリプト');
+        }
+
+        function copyContinuousEventScript() {
+            const script = `// 連続イベント送信テスト
+if (typeof window.gtag === 'function') {
+    console.log('🔄 連続イベント送信テスト開始');
+    
+    const events = [
+        { name: 'page_scroll', category: 'engagement', label: 'scroll_test' },
+        { name: 'content_view', category: 'content', label: 'article_view' },
+        { name: 'user_interaction', category: 'engagement', label: 'click_test' },
+        { name: 'custom_conversion', category: 'conversion', label: 'test_conversion' }
+    ];
+    
+    events.forEach((event, index) => {
+        setTimeout(() => {
+            window.gtag('event', event.name, {
+                event_category: event.category,
+                event_label: \`\${event.label}_\${index + 1}\`,
+                value: index + 1,
+                test_sequence: index + 1,
+                batch_id: 'continuous_test_' + Date.now()
+            });
+            console.log(\`✅ イベント\${index + 1}/\${events.length}: \${event.name} を送信\`);
+        }, index * 1000); // 1秒間隔で送信
+    });
+    
+    console.log('🚀 4つのイベントを1秒間隔で送信開始');
+    console.log('💡 4秒後に完了予定です');
+} else {
+    console.log('❌ gtag関数が利用できません');
+}`;
+            
+            copyToClipboard(script, '連続イベントスクリプト');
+        }
+
+        function copyDiagnosticScript() {
+            const script = `// GA4イベント送信診断
+console.log('🔍 GA4イベント送信診断開始');
+
+// 1. gtag関数確認
+if (typeof window.gtag === 'function') {
+    console.log('✅ gtag関数: 利用可能');
+    
+    // 2. dataLayer確認
+    if (Array.isArray(window.dataLayer)) {
+        console.log(\`✅ dataLayer: \${window.dataLayer.length}個の要素\`);
+        
+        // 3. 測定ID確認
+        const hasGA4 = window.dataLayer.some(item => 
+            Array.isArray(item) && item.includes('G-5VS8BF91VH')
+        );
+        console.log(\`\${hasGA4 ? '✅' : '❌'} 測定ID G-5VS8BF91VH: \${hasGA4 ? '確認済み' : '未確認'}\`);
+        
+        // 4. テストイベント送信
+        console.log('🧪 診断用テストイベントを送信...');
+        window.gtag('event', 'diagnostic_test', {
+            event_category: 'troubleshooting',
+            event_label: 'diagnostic_event',
+            diagnostic_timestamp: Date.now()
+        });
+        console.log('✅ 診断用イベント送信完了');
+        
+    } else {
+        console.log('❌ dataLayer: 利用不可');
+    }
+} else {
+    console.log('❌ gtag関数: 利用不可');
+    console.log('💡 ページが完全に読み込まれていない可能性があります');
+}
+
+console.log('🔍 診断完了');`;
+            
+            copyToClipboard(script, '診断スクリプト');
+        }
+
+        function copyToClipboard(text, name) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`✅ ${name}をコピーしました！\n\nTOYAMA BLOGのDevTools Consoleに貼り付けて実行してください。`);
+            }).catch(err => {
+                console.error('コピーに失敗:', err);
+                alert('クリップボードへのコピーに失敗しました。手動でコピーしてください。');
+            });
+        }
+
+        function openGA4Events() {
+            const eventsUrl = 'https://analytics.google.com/analytics/web/#/p498053318/reports/explorer?params=_u..nav%3Dmaui%26_u.comparisonOption%3Ddisabled%26_u.date00%3D20250101%26_u.date01%3D20251231&r=events-overview';
+            window.open(eventsUrl, '_blank');
+        }
+
+        function openGA4Realtime() {
+            const realtimeUrl = 'https://analytics.google.com/analytics/web/#/p498053318/realtime/overview';
+            window.open(realtimeUrl, '_blank');
+        }
+
+        function generateEventTestReport() {
+            const now = new Date().toLocaleString('ja-JP');
+            const checks = [
+                { id: 'check-basic', label: '基本イベント送信成功' },
+                { id: 'check-detailed', label: '詳細イベント送信成功' },
+                { id: 'check-continuous', label: '連続イベント送信成功' },
+                { id: 'check-network', label: 'Networkタブでcollectリクエスト確認' },
+                { id: 'check-realtime', label: 'GA4リアルタイムレポートでイベント増加確認' },
+                { id: 'check-diagnostic', label: '診断スクリプト実行成功' }
+            ];
+            
+            let completed = 0;
+            let checkHTML = '';
+            
+            checks.forEach(check => {
+                const isChecked = document.getElementById(check.id).checked;
+                if (isChecked) completed++;
+                const status = isChecked ? '✅' : '❌';
+                checkHTML += `<p>${status} ${check.label}</p>`;
+            });
+            
+            const successRate = Math.round((completed / checks.length) * 100);
+            const overallStatus = successRate >= 80 ? '🎉 成功' : successRate >= 60 ? '⚠️ 部分的成功' : '❌ 要改善';
+            
+            const reportContent = `
+                <div class="success">
+                    <h3>🎯 手動イベント送信テスト結果</h3>
+                    <p><strong>テスト実施日時:</strong> ${now}</p>
+                    <p><strong>測定ID:</strong> G-5VS8BF91VH</p>
+                    <p><strong>対象サイト:</strong> https://sasakiyoshimasa.com</p>
+                    <p><strong>総合評価:</strong> ${overallStatus} (${successRate}%)</p>
+                    <p><strong>完了項目:</strong> ${completed}/${checks.length}</p>
+                    
+                    <h4>📋 テスト結果詳細</h4>
+                    ${checkHTML}
+                    
+                    <h4>🎉 結論</h4>
+                    <p>${successRate >= 80 ? 
+                        '<strong style="color: #28a745;">GA4カスタムイベント送信は正常に動作しています！</strong><br>全てのイベントタイプが正しく送信され、GA4で記録されています。' : 
+                        successRate >= 60 ?
+                        '<strong style="color: #ffc107;">基本的なイベント送信は動作していますが、一部改善が必要です。</strong><br>未完了の項目について再度確認してください。' :
+                        '<strong style="color: #dc3545;">イベント送信に問題があります。</strong><br>GA4の実装確認が必要です。'
+                    }</p>
+                    
+                    <h4>📞 次のステップ</h4>
+                    <p>${successRate >= 80 ? 
+                        'GA4実装は完全に成功しています。継続的な監視とカスタムイベントの活用をお勧めします。' :
+                        '未完了の項目について、DevToolsでの詳細確認とGA4設定の見直しを行ってください。'
+                    }</p>
+                    
+                    <h4>🔗 参考リンク</h4>
+                    <p><a href="https://analytics.google.com/analytics/web/#/p498053318/realtime/overview" target="_blank">GA4リアルタイムレポート</a></p>
+                    <p><a href="https://analytics.google.com/analytics/web/#/p498053318/reports/explorer" target="_blank">GA4イベントレポート</a></p>
+                </div>
+            `;
+            
+            document.getElementById('reportContent').innerHTML = reportContent;
+            document.getElementById('report').style.display = 'block';
+            document.getElementById('report').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ページ読み込み時の案内
+        window.onload = () => {
+            console.log('🎯 手動イベント送信テストツールを開始しました');
+            console.log('手順に従ってカスタムイベントの送信テストを行ってください');
+        };
+    </script>
+</body>
+</html>

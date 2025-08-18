@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 直接GA4確認手順</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .step {
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #007bff;
+        }
+        .step h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        .action-button {
+            background: #28a745;
+        }
+        .action-button:hover {
+            background: #218838;
+        }
+        .warning-button {
+            background: #ffc107;
+            color: #212529;
+        }
+        .warning-button:hover {
+            background: #e0a800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 GA4動作確認：実際の手順</h1>
+        
+        <div class="success">
+            <strong>📊 測定ID:</strong> G-5VS8BF91VH<br>
+            <strong>🌐 対象サイト:</strong> https://sasakiyoshimasa.com<br>
+            <strong>⏰ 確認時刻:</strong> <span id="timestamp"></span>
+        </div>
+
+        <div class="step">
+            <h3>🚀 Step 1: サイトを新しいタブで開く</h3>
+            <p>CORS制限を回避するため、直接サイトにアクセスします。</p>
+            
+            <button class="action-button" onclick="openSiteForTesting()">
+                🌐 TOYAMA BLOG を開く
+            </button>
+            
+            <div class="highlight">
+                <strong>📝 重要:</strong> ポップアップブロックを解除してください。<br>
+                新しいタブで https://sasakiyoshimasa.com が開かれます。
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔧 Step 2: DevToolsでGA4スクリプト確認</h3>
+            <p>開いたサイトでDevToolsを使用してGA4の実装を確認します。</p>
+            
+            <div class="highlight">
+                <strong>手順:</strong><br>
+                1. 新しく開いたタブで <strong>F12</strong> を押す<br>
+                2. <strong>Network</strong> タブを選択<br>
+                3. フィルター欄に <strong>gtag</strong> と入力<br>
+                4. <strong>Ctrl+R</strong> でページリロード
+            </div>
+            
+            <div class="success">
+                <strong>✅ 期待される結果:</strong><br>
+                <code>gtag/js?id=G-5VS8BF91VH</code> のリクエストが表示される
+            </div>
+            
+            <button onclick="copyToClipboard('gtag')">📋 検索ワード「gtag」をコピー</button>
+        </div>
+
+        <div class="step">
+            <h3>📊 Step 3: Console でGA4実装確認</h3>
+            <p>DevTools Consoleで実装状況を詳細確認します。</p>
+            
+            <div class="highlight">
+                <strong>手順:</strong><br>
+                1. DevToolsの <strong>Console</strong> タブに切り替え<br>
+                2. 下のスクリプトをコピーして貼り付け<br>
+                3. <strong>Enter</strong> で実行
+            </div>
+
+            <div class="code-block">// GA4実装確認スクリプト
+console.log('🎯 GA4確認開始');
+console.log('測定ID: G-5VS8BF91VH');
+
+// 1. gtag関数確認
+if (typeof window.gtag === 'function') {
+    console.log('✅ gtag関数: 存在');
+} else {
+    console.log('❌ gtag関数: 未検出');
+}
+
+// 2. dataLayer確認
+if (Array.isArray(window.dataLayer)) {
+    console.log(`✅ dataLayer: ${window.dataLayer.length}個の要素`);
+    console.log('dataLayer内容:', window.dataLayer);
+} else {
+    console.log('❌ dataLayer: 未検出');
+}
+
+// 3. GA4スクリプト確認
+const gtagScripts = document.querySelectorAll('script[src*="gtag/js"]');
+console.log(`📡 GA4スクリプト数: ${gtagScripts.length}`);
+gtagScripts.forEach((script, i) => {
+    console.log(`✅ スクリプト${i+1}: ${script.src}`);
+});
+
+// 4. 測定ID確認
+const allScripts = document.querySelectorAll('script');
+let found = false;
+allScripts.forEach(script => {
+    if (script.innerHTML.includes('G-5VS8BF91VH')) {
+        found = true;
+        console.log('✅ 測定ID G-5VS8BF91VH を確認');
+    }
+});
+if (!found) console.log('❌ 測定ID未検出');
+
+console.log('🎯 確認完了!');</div>
+            
+            <button onclick="copyToClipboard(document.querySelector('.code-block').textContent)">
+                📋 スクリプトをコピー
+            </button>
+        </div>
+
+        <div class="step">
+            <h3>🔄 Step 4: ページビュー送信確認</h3>
+            <p>実際のページ遷移でpageviewイベントが送信されることを確認します。</p>
+            
+            <div class="highlight">
+                <strong>手順:</strong><br>
+                1. DevToolsの <strong>Network</strong> タブでフィルターを <strong>collect</strong> に変更<br>
+                2. サイト内の記事リンクをクリック<br>
+                3. ページ遷移後、collectリクエストが送信されることを確認
+            </div>
+            
+            <div class="success">
+                <strong>✅ 期待される結果:</strong><br>
+                <code>collect?v=2&tid=G-5VS8BF91VH</code> のリクエストが表示される<br>
+                <strong>重要:</strong> ページ遷移ごとに1回だけ送信される
+            </div>
+            
+            <button onclick="copyToClipboard('collect')">📋 検索ワード「collect」をコピー</button>
+        </div>
+
+        <div class="step">
+            <h3>🚀 Step 5: 手動pageview送信テスト</h3>
+            <p>Consoleから手動でpageviewを送信してGA4の動作を確認します。</p>
+            
+            <div class="code-block">// 手動pageview送信テスト
+if (typeof window.gtag === 'function') {
+    window.gtag('config', 'G-5VS8BF91VH', {
+        page_path: '/manual-test-' + Date.now(),
+        page_title: 'Manual Test Page'
+    });
+    console.log('✅ 手動pageviewを送信しました');
+    console.log('💡 Networkタブでcollectリクエストを確認してください');
+} else {
+    console.log('❌ gtag関数が利用できません');
+}</div>
+            
+            <button onclick="copyToClipboard('if (typeof window.gtag === \'function\') { window.gtag(\'config\', \'G-5VS8BF91VH\', { page_path: \'/manual-test-\' + Date.now(), page_title: \'Manual Test Page\' }); console.log(\'✅ 手動pageviewを送信しました\'); } else { console.log(\'❌ gtag関数が利用できません\'); }')">
+                📋 送信テストをコピー
+            </button>
+        </div>
+
+        <div class="step">
+            <h3>📈 Step 6: GA4リアルタイムレポート確認</h3>
+            <p>GA4ダッシュボードでリアルタイムの計測データを確認します。</p>
+            
+            <button class="warning-button" onclick="openGA4Dashboard()">
+                📊 GA4リアルタイムレポートを開く
+            </button>
+            
+            <div class="highlight">
+                <strong>確認項目:</strong><br>
+                • アクティブユーザー数<br>
+                • ページビュー数<br>
+                • ページパス<br>
+                • イベント数
+            </div>
+            
+            <div class="success">
+                <strong>✅ 期待される結果:</strong><br>
+                サイトアクセス後1-2分でリアルタイムデータが表示される
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🎉 Step 7: 最終確認</h3>
+            <p>全ての確認項目をチェックして実装完了を確認します。</p>
+            
+            <div class="success">
+                <strong>✅ 確認チェックリスト:</strong><br>
+                □ gtag/js?id=G-5VS8BF91VH スクリプト読み込み<br>
+                □ window.gtag関数の存在<br>
+                □ window.dataLayerの存在<br>
+                □ 測定ID G-5VS8BF91VH の確認<br>
+                □ ページ遷移時のcollectリクエスト送信<br>
+                □ GA4リアルタイムレポートでの計測確認
+            </div>
+            
+            <button onclick="generateReport()">📋 確認レポートを生成</button>
+        </div>
+
+        <div id="report" style="display: none;">
+            <h2>📊 確認レポート</h2>
+            <div id="reportContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // タイムスタンプ表示
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('ja-JP');
+
+        function openSiteForTesting() {
+            console.log('🌐 TOYAMA BLOGを新しいタブで開いています...');
+            const siteWindow = window.open('https://sasakiyoshimasa.com', '_blank', 'width=1200,height=800');
+            
+            if (siteWindow) {
+                alert('✅ TOYAMA BLOGを新しいタブで開きました！\n\n次の手順:\n1. 新しいタブでF12を押してDevToolsを開く\n2. NetworkタブでGA4スクリプトを確認\n3. Consoleタブで実装状況を確認');
+            } else {
+                alert('❌ ポップアップがブロックされました。\nブラウザの設定でポップアップを許可してください。');
+            }
+        }
+
+        function openGA4Dashboard() {
+            console.log('📊 GA4リアルタイムレポートを開いています...');
+            const dashboardUrl = 'https://analytics.google.com/analytics/web/#/p498053318/realtime/overview';
+            const dashboardWindow = window.open(dashboardUrl, '_blank');
+            
+            if (dashboardWindow) {
+                alert('✅ GA4リアルタイムレポートを開きました！\n\n確認項目:\n• アクティブユーザー\n• ページビュー\n• リアルタイムイベント\n\nサイトアクセス後1-2分で反映されます。');
+            } else {
+                alert('❌ ポップアップがブロックされました。');
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = event.target.textContent;
+                event.target.textContent = '✅ コピー完了!';
+                event.target.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    event.target.textContent = originalText;
+                    event.target.style.background = '#007bff';
+                }, 2000);
+            }).catch(err => {
+                console.error('コピーに失敗:', err);
+                alert('クリップボードへのコピーに失敗しました。手動でコピーしてください。');
+            });
+        }
+
+        function generateReport() {
+            const now = new Date().toLocaleString('ja-JP');
+            const reportContent = `
+                <div class="success">
+                    <h3>🎯 GA4実装確認レポート</h3>
+                    <p><strong>確認日時:</strong> ${now}</p>
+                    <p><strong>測定ID:</strong> G-5VS8BF91VH</p>
+                    <p><strong>対象サイト:</strong> https://sasakiyoshimasa.com</p>
+                    
+                    <h4>📋 確認項目</h4>
+                    <p>□ DevToolsでgtag/js?id=G-5VS8BF91VH を確認</p>
+                    <p>□ Consoleでwindow.gtag関数を確認</p>
+                    <p>□ Consoleでwindow.dataLayerを確認</p>
+                    <p>□ Networkタブでcollectリクエストを確認</p>
+                    <p>□ GA4リアルタイムレポートで計測を確認</p>
+                    
+                    <h4>🎉 結論</h4>
+                    <p>上記の全項目が確認できれば、GA4実装は<strong>正常に動作</strong>しています。</p>
+                </div>
+            `;
+            
+            document.getElementById('reportContent').innerHTML = reportContent;
+            document.getElementById('report').style.display = 'block';
+            document.getElementById('report').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ページ読み込み時の案内
+        window.onload = () => {
+            console.log('🎯 GA4直接確認ツールを開始しました');
+            console.log('手順に従って確認を進めてください');
+        };
+    </script>
+</body>
+</html>

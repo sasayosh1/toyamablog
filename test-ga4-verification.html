@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GA4 実装確認テスト</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        #results { margin-top: 20px; }
+        .log { background: #f8f9fa; padding: 10px; margin: 5px 0; border-left: 3px solid #007bff; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 GA4 実装確認テスト</h1>
+        <p><strong>測定ID:</strong> G-5VS8BF91VH</p>
+        <p><strong>対象サイト:</strong> https://sasakiyoshimasa.com</p>
+        
+        <div class="test-section">
+            <h3>📊 GA4 実装状況</h3>
+            <div id="ga4-status"></div>
+            <button onclick="checkGA4Implementation()">GA4実装をチェック</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 ページビュー追跡テスト</h3>
+            <div id="pageview-status"></div>
+            <button onclick="testPageViews()">ページビュートラッキングをテスト</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🌐 リアルタイム計測確認</h3>
+            <div id="realtime-status"></div>
+            <button onclick="testRealTimeTracking()">リアルタイム計測をテスト</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const log = (message, type = 'info') => {
+            const results = document.getElementById('results');
+            const logElement = document.createElement('div');
+            logElement.className = `log ${type}`;
+            logElement.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(logElement);
+            console.log(message);
+        };
+
+        const updateStatus = (elementId, message, type) => {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="${type}">${message}</div>`;
+        };
+
+        async function checkGA4Implementation() {
+            log('🔍 GA4実装チェックを開始...');
+            updateStatus('ga4-status', '検査中...', 'info');
+
+            try {
+                // 本番サイトをiframeで読み込んでGA4スクリプトを確認
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = 'https://sasakiyoshimasa.com';
+                document.body.appendChild(iframe);
+
+                await new Promise(resolve => {
+                    iframe.onload = () => {
+                        setTimeout(() => {
+                            try {
+                                // iframeのコンテンツを確認
+                                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                                const scripts = iframeDoc.querySelectorAll('script');
+                                
+                                let gtagFound = false;
+                                let measurementIdFound = false;
+                                let googletagmanagerFound = false;
+
+                                scripts.forEach(script => {
+                                    const src = script.src || '';
+                                    const content = script.innerHTML || '';
+                                    
+                                    if (src.includes('googletagmanager.com/gtag/js')) {
+                                        googletagmanagerFound = true;
+                                        log('✅ Google Tag Manager スクリプトを発見');
+                                    }
+                                    
+                                    if (content.includes('G-5VS8BF91VH')) {
+                                        measurementIdFound = true;
+                                        log('✅ 測定ID G-5VS8BF91VH を発見');
+                                    }
+                                    
+                                    if (content.includes('gtag')) {
+                                        gtagFound = true;
+                                        log('✅ gtag関数の使用を発見');
+                                    }
+                                });
+
+                                if (googletagmanagerFound && measurementIdFound && gtagFound) {
+                                    updateStatus('ga4-status', '✅ GA4が正常に実装されています！', 'success');
+                                    log('🎉 GA4実装確認完了 - すべて正常です');
+                                } else {
+                                    updateStatus('ga4-status', '⚠️ GA4実装に問題がある可能性があります', 'warning');
+                                    log(`❌ 実装不完全: gtag=${gtagFound}, measurementId=${measurementIdFound}, gtm=${googletagmanagerFound}`);
+                                }
+
+                                document.body.removeChild(iframe);
+                                resolve();
+                            } catch (e) {
+                                log('❌ クロスオリジン制限のためiframe内容を確認できません');
+                                log('💡 代替手法でGA4実装を確認します...');
+                                
+                                // 代替確認: ネットワークリクエストをチェック
+                                checkNetworkRequests();
+                                resolve();
+                            }
+                        }, 2000);
+                    };
+                });
+            } catch (error) {
+                log(`❌ エラー: ${error.message}`);
+                updateStatus('ga4-status', '❌ 確認中にエラーが発生しました', 'error');
+            }
+        }
+
+        function checkNetworkRequests() {
+            // Performance APIでGoogleタグマネージャーのリクエストを確認
+            const entries = performance.getEntriesByType('resource');
+            let gtmRequests = entries.filter(entry => 
+                entry.name.includes('googletagmanager.com') || 
+                entry.name.includes('google-analytics.com')
+            );
+
+            if (gtmRequests.length > 0) {
+                log(`✅ Google Analytics関連のリクエストを${gtmRequests.length}件発見`);
+                updateStatus('ga4-status', '✅ GA4関連のネットワークリクエストを確認', 'success');
+            } else {
+                log('❌ Google Analytics関連のリクエストが見つかりません');
+                updateStatus('ga4-status', '❌ GA4リクエストが確認できません', 'error');
+            }
+        }
+
+        async function testPageViews() {
+            log('📊 ページビュートラッキングテストを開始...');
+            updateStatus('pageview-status', 'テスト中...', 'info');
+
+            // 本番サイトでページ遷移をテストするため、新しいウィンドウを開く
+            const testWindow = window.open('https://sasakiyoshimasa.com', '_blank');
+            
+            if (testWindow) {
+                log('✅ テストウィンドウを開きました');
+                log('📝 手動確認項目:');
+                log('1. Chrome DevToolsのNetworkタブを開く');
+                log('2. "collect" でフィルタリング');
+                log('3. サイト内でページ遷移を行う');
+                log('4. ページ遷移ごとにcollectリクエストが1回だけ送信されることを確認');
+                
+                updateStatus('pageview-status', '✅ テストウィンドウを開きました。DevToolsで確認してください。', 'success');
+            } else {
+                log('❌ ポップアップがブロックされました');
+                updateStatus('pageview-status', '❌ テストウィンドウを開けませんでした', 'error');
+            }
+        }
+
+        async function testRealTimeTracking() {
+            log('🌐 リアルタイム計測テストを開始...');
+            updateStatus('realtime-status', 'テスト中...', 'info');
+
+            // GA4リアルタイムレポートページを開く
+            const ga4Url = 'https://analytics.google.com/analytics/web/#/p498053318/realtime/overview?params=_u..nav%3Dmaui';
+            const realtimeWindow = window.open(ga4Url, '_blank');
+            
+            if (realtimeWindow) {
+                log('✅ GA4リアルタイムレポートを開きました');
+                log('📝 確認手順:');
+                log('1. GA4ダッシュボードにログイン');
+                log('2. リアルタイム → 概要 を確認');
+                log('3. 別タブでhttps://sasakiyoshimasa.com にアクセス');
+                log('4. リアルタイムでアクセスが反映されることを確認');
+                
+                updateStatus('realtime-status', '✅ GA4リアルタイムレポートを開きました。手動で確認してください。', 'success');
+
+                // 実際のサイトアクセスも実行
+                setTimeout(() => {
+                    const siteWindow = window.open('https://sasakiyoshimasa.com', '_blank');
+                    log('✅ 計測確認用にサイトアクセスを実行しました');
+                }, 2000);
+            } else {
+                log('❌ ポップアップがブロックされました');
+                updateStatus('realtime-status', '❌ GA4レポートを開けませんでした', 'error');
+            }
+        }
+
+        // ページ読み込み時に基本情報を表示
+        window.onload = () => {
+            log('🚀 GA4確認ツールを開始しました');
+            log('💡 各テストボタンをクリックして確認を開始してください');
+        };
+    </script>
+</body>
+</html>
