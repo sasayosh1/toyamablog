@@ -9,6 +9,7 @@ export const postType = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
@@ -18,6 +19,7 @@ export const postType = defineType({
         source: 'title',
         maxLength: 96,
       },
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'author',
@@ -45,9 +47,38 @@ export const postType = defineType({
       type: 'datetime',
     }),
     defineField({
+      name: 'excerpt',
+      title: 'Excerpt',
+      type: 'text',
+      rows: 4,
+      description: 'Brief description of the post for preview and SEO',
+    }),
+    defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      of: [{type: 'string'}],
+      options: {
+        layout: 'tags'
+      }
+    }),
+    defineField({
+      name: 'category',
+      title: 'Primary Category',
+      type: 'string',
+      description: 'Main category for this post',
+    }),
+    defineField({
+      name: 'youtubeUrl',
+      title: 'YouTube URL',
+      type: 'url',
+      description: 'Associated YouTube video URL',
+    }),
+    defineField({
       name: 'body',
       title: 'Body',
       type: 'blockContent',
+      description: 'Main content of the post',
     }),
   ],
 
@@ -56,10 +87,40 @@ export const postType = defineType({
       title: 'title',
       author: 'author.name',
       media: 'mainImage',
+      category: 'category',
+      publishedAt: 'publishedAt',
     },
     prepare(selection) {
-      const {author} = selection
-      return {...selection, subtitle: author && `by ${author}`}
+      const {author, category, publishedAt} = selection
+      const date = publishedAt ? new Date(publishedAt).toLocaleDateString('ja-JP') : ''
+      return {
+        ...selection, 
+        subtitle: `${category || 'No Category'} | ${author ? `by ${author}` : 'No Author'} | ${date}`
+      }
     },
   },
+
+  orderings: [
+    {
+      title: 'Published Date, New',
+      name: 'publishedAtDesc',
+      by: [
+        {field: 'publishedAt', direction: 'desc'}
+      ]
+    },
+    {
+      title: 'Published Date, Old',
+      name: 'publishedAtAsc',
+      by: [
+        {field: 'publishedAt', direction: 'asc'}
+      ]
+    },
+    {
+      title: 'Title A-Z',
+      name: 'titleAsc',
+      by: [
+        {field: 'title', direction: 'asc'}
+      ]
+    },
+  ],
 })

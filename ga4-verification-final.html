@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 GA4最終確認 - 実動テスト</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #007bff, #28a745);
+            color: white;
+            border-radius: 15px;
+        }
+        .step {
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #007bff;
+            position: relative;
+        }
+        .step.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .step.warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        .step.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .step h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-number {
+            background: #007bff;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            border: 2px solid #4a5568;
+        }
+        .highlight {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            position: relative;
+        }
+        .success-box {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .error-box {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn-primary { background: #007bff; }
+        .btn-success { background: #28a745; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; }
+        
+        .btn-success:hover { background: #218838; }
+        .btn-warning:hover { background: #e0a800; }
+        .btn-danger:hover { background: #c82333; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6c757d;
+        }
+        .status-indicator.pending { background: #6c757d; }
+        .status-indicator.processing { background: #ffc107; animation: pulse 1.5s infinite; }
+        .status-indicator.success { background: #28a745; }
+        .status-indicator.error { background: #dc3545; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .instruction-list {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .instruction-list ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .instruction-list li {
+            margin: 8px 0;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 GA4実装最終確認</h1>
+            <p><strong>測定ID:</strong> G-5VS8BF91VH | <strong>対象:</strong> https://sasakiyoshimasa.com</p>
+            <p><strong>確認時刻:</strong> <span id="timestamp"></span></p>
+        </div>
+
+        <div class="step">
+            <div class="status-indicator pending" id="status-1"></div>
+            <h3><span class="step-number">1</span>🌐 サイトを新しいタブで開く</h3>
+            <p>まず、実際のサイトにアクセスしてGA4が読み込まれることを確認します。</p>
+            
+            <button class="btn-success" onclick="openSiteForTesting()" id="btn-open-site">
+                🚀 TOYAMA BLOGを開く
+            </button>
+            
+            <div class="highlight">
+                <strong>📝 重要:</strong> ポップアップブロックを解除してください。<br>
+                新しいタブで https://sasakiyoshimasa.com が開かれます。
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="status-indicator pending" id="status-2"></div>
+            <h3><span class="step-number">2</span>🔧 DevToolsでGA4スクリプト確認</h3>
+            <p>開いたサイトでF12を押してDevToolsを開き、下記の手順でGA4実装を確認してください。</p>
+            
+            <div class="instruction-list">
+                <ol>
+                    <li><strong>F12</strong> を押してDevToolsを開く</li>
+                    <li><strong>Network</strong> タブを選択</li>
+                    <li>フィルター欄に「<strong>gtag</strong>」と入力</li>
+                    <li><strong>Ctrl+R</strong> (Windows) または <strong>Cmd+R</strong> (Mac) でページリロード</li>
+                </ol>
+            </div>
+            
+            <div class="success-box">
+                <strong>✅ 期待される結果:</strong><br>
+                <code>gtag/js?id=G-5VS8BF91VH</code> のリクエストが表示される
+            </div>
+            
+            <button onclick="copyToClipboard('gtag')" class="btn-primary">📋 検索ワード「gtag」をコピー</button>
+        </div>
+
+        <div class="step">
+            <div class="status-indicator pending" id="status-3"></div>
+            <h3><span class="step-number">3</span>📊 Console でGA4実装確認</h3>
+            <p>DevTools Consoleで詳細な実装状況を確認します。</p>
+            
+            <div class="instruction-list">
+                <ol>
+                    <li>DevToolsの <strong>Console</strong> タブに切り替え</li>
+                    <li>下のスクリプトをコピーして貼り付け</li>
+                    <li><strong>Enter</strong> で実行</li>
+                </ol>
+            </div>
+
+            <div class="code-block">// GA4実装確認スクリプト
+console.log('🎯 GA4確認開始 - 測定ID: G-5VS8BF91VH');
+
+// 1. gtag関数確認
+if (typeof window.gtag === 'function') {
+    console.log('✅ gtag関数: 存在');
+} else {
+    console.log('❌ gtag関数: 未検出');
+}
+
+// 2. dataLayer確認
+if (Array.isArray(window.dataLayer)) {
+    console.log(`✅ dataLayer: ${window.dataLayer.length}個の要素`);
+    console.log('dataLayer内容:', window.dataLayer);
+} else {
+    console.log('❌ dataLayer: 未検出');
+}
+
+// 3. GA4スクリプト確認
+const gtagScripts = document.querySelectorAll('script[src*="gtag/js"]');
+console.log(`📡 GA4スクリプト数: ${gtagScripts.length}`);
+gtagScripts.forEach((script, i) => {
+    console.log(`✅ スクリプト${i+1}: ${script.src}`);
+});
+
+// 4. 測定ID確認
+const allScripts = document.querySelectorAll('script');
+let found = false;
+allScripts.forEach(script => {
+    if (script.innerHTML.includes('G-5VS8BF91VH')) {
+        found = true;
+        console.log('✅ 測定ID G-5VS8BF91VH を確認');
+    }
+});
+if (!found) console.log('❌ 測定ID未検出');
+
+console.log('🎯 Console確認完了!');</div>
+            
+            <button onclick="copyToClipboard(getConsoleScript())" class="btn-primary">📋 スクリプトをコピー</button>
+        </div>
+
+        <div class="step">
+            <div class="status-indicator pending" id="status-4"></div>
+            <h3><span class="step-number">4</span>🔄 ページビュー送信確認</h3>
+            <p>実際のページ遷移でpageviewイベントが送信されることを確認します。</p>
+            
+            <div class="instruction-list">
+                <ol>
+                    <li>DevToolsの <strong>Network</strong> タブでフィルターを「<strong>collect</strong>」に変更</li>
+                    <li>サイト内の記事リンクをクリック</li>
+                    <li>ページ遷移後、collectリクエストが送信されることを確認</li>
+                </ol>
+            </div>
+            
+            <div class="success-box">
+                <strong>✅ 期待される結果:</strong><br>
+                <code>collect?v=2&tid=G-5VS8BF91VH</code> のリクエストが表示される<br>
+                <strong>重要:</strong> ページ遷移ごとに1回だけ送信される
+            </div>
+            
+            <button onclick="copyToClipboard('collect')" class="btn-primary">📋 検索ワード「collect」をコピー</button>
+        </div>
+
+        <div class="step">
+            <div class="status-indicator pending" id="status-5"></div>
+            <h3><span class="step-number">5</span>🚀 手動pageview送信テスト</h3>
+            <p>Consoleから手動でpageviewを送信してGA4の動作を確認します。</p>
+            
+            <div class="code-block">// 手動pageview送信テスト
+if (typeof window.gtag === 'function') {
+    window.gtag('config', 'G-5VS8BF91VH', {
+        page_path: '/manual-test-' + Date.now(),
+        page_title: 'Manual Test Page'
+    });
+    console.log('✅ 手動pageviewを送信しました');
+    console.log('💡 Networkタブでcollectリクエストを確認してください');
+} else {
+    console.log('❌ gtag関数が利用できません');
+}</div>
+            
+            <button onclick="copyToClipboard(getManualTestScript())" class="btn-primary">📋 送信テストをコピー</button>
+        </div>
+
+        <div class="step">
+            <div class="status-indicator pending" id="status-6"></div>
+            <h3><span class="step-number">6</span>📈 GA4リアルタイムレポート確認</h3>
+            <p>GA4ダッシュボードでリアルタイムの計測データを確認します。</p>
+            
+            <button class="btn-warning" onclick="openGA4Dashboard()">📊 GA4リアルタイムレポートを開く</button>
+            
+            <div class="grid">
+                <div class="highlight">
+                    <strong>確認項目:</strong><br>
+                    • アクティブユーザー数<br>
+                    • ページビュー数<br>
+                    • ページパス<br>
+                    • イベント数
+                </div>
+                
+                <div class="success-box">
+                    <strong>✅ 期待される結果:</strong><br>
+                    サイトアクセス後1-2分でリアルタイムデータが表示される
+                </div>
+            </div>
+        </div>
+
+        <div class="step success">
+            <div class="status-indicator pending" id="status-7"></div>
+            <h3><span class="step-number">7</span>🎉 最終確認チェックリスト</h3>
+            <p>全ての確認項目をチェックして実装完了を確認します。</p>
+            
+            <div class="success-box">
+                <strong>✅ 確認チェックリスト:</strong><br>
+                <div style="margin-top: 10px;">
+                    <label><input type="checkbox" id="check-1"> gtag/js?id=G-5VS8BF91VH スクリプト読み込み</label><br>
+                    <label><input type="checkbox" id="check-2"> window.gtag関数の存在</label><br>
+                    <label><input type="checkbox" id="check-3"> window.dataLayerの存在</label><br>
+                    <label><input type="checkbox" id="check-4"> 測定ID G-5VS8BF91VH の確認</label><br>
+                    <label><input type="checkbox" id="check-5"> ページ遷移時のcollectリクエスト送信</label><br>
+                    <label><input type="checkbox" id="check-6"> GA4リアルタイムレポートでの計測確認</label><br>
+                </div>
+            </div>
+            
+            <button onclick="generateFinalReport()" class="btn-success">📋 最終確認レポートを生成</button>
+        </div>
+
+        <div id="final-report" style="display: none;">
+            <div class="step success">
+                <h2>📊 GA4実装確認レポート</h2>
+                <div id="report-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // タイムスタンプ表示
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('ja-JP');
+
+        function openSiteForTesting() {
+            console.log('🌐 TOYAMA BLOGを新しいタブで開いています...');
+            updateStatus('status-1', 'processing');
+            
+            const siteWindow = window.open('https://sasakiyoshimasa.com', '_blank', 'width=1200,height=800');
+            
+            if (siteWindow) {
+                updateStatus('status-1', 'success');
+                alert('✅ TOYAMA BLOGを新しいタブで開きました！\n\n次の手順:\n1. 新しいタブでF12を押してDevToolsを開く\n2. NetworkタブでGA4スクリプトを確認\n3. Consoleタブで実装状況を確認');
+                
+                // 次のステップを有効化
+                document.getElementById('btn-open-site').textContent = '✅ サイトを開きました';
+                document.getElementById('btn-open-site').disabled = true;
+            } else {
+                updateStatus('status-1', 'error');
+                alert('❌ ポップアップがブロックされました。\nブラウザの設定でポップアップを許可してください。');
+            }
+        }
+
+        function openGA4Dashboard() {
+            console.log('📊 GA4リアルタイムレポートを開いています...');
+            updateStatus('status-6', 'processing');
+            
+            const dashboardUrl = 'https://analytics.google.com/analytics/web/#/p498053318/realtime/overview';
+            const dashboardWindow = window.open(dashboardUrl, '_blank');
+            
+            if (dashboardWindow) {
+                updateStatus('status-6', 'success');
+                alert('✅ GA4リアルタイムレポートを開きました！\n\n確認項目:\n• アクティブユーザー\n• ページビュー\n• リアルタイムイベント\n\nサイトアクセス後1-2分で反映されます。');
+            } else {
+                updateStatus('status-6', 'error');
+                alert('❌ ポップアップがブロックされました。');
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = event.target.textContent;
+                event.target.textContent = '✅ コピー完了!';
+                event.target.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    event.target.textContent = originalText;
+                    event.target.style.background = '#007bff';
+                }, 2000);
+            }).catch(err => {
+                console.error('コピーに失敗:', err);
+                alert('クリップボードへのコピーに失敗しました。手動でコピーしてください。');
+            });
+        }
+
+        function getConsoleScript() {
+            return `// GA4実装確認スクリプト
+console.log('🎯 GA4確認開始 - 測定ID: G-5VS8BF91VH');
+
+// 1. gtag関数確認
+if (typeof window.gtag === 'function') {
+    console.log('✅ gtag関数: 存在');
+} else {
+    console.log('❌ gtag関数: 未検出');
+}
+
+// 2. dataLayer確認
+if (Array.isArray(window.dataLayer)) {
+    console.log(\`✅ dataLayer: \${window.dataLayer.length}個の要素\`);
+    console.log('dataLayer内容:', window.dataLayer);
+} else {
+    console.log('❌ dataLayer: 未検出');
+}
+
+// 3. GA4スクリプト確認
+const gtagScripts = document.querySelectorAll('script[src*="gtag/js"]');
+console.log(\`📡 GA4スクリプト数: \${gtagScripts.length}\`);
+gtagScripts.forEach((script, i) => {
+    console.log(\`✅ スクリプト\${i+1}: \${script.src}\`);
+});
+
+// 4. 測定ID確認
+const allScripts = document.querySelectorAll('script');
+let found = false;
+allScripts.forEach(script => {
+    if (script.innerHTML.includes('G-5VS8BF91VH')) {
+        found = true;
+        console.log('✅ 測定ID G-5VS8BF91VH を確認');
+    }
+});
+if (!found) console.log('❌ 測定ID未検出');
+
+console.log('🎯 Console確認完了!');`;
+        }
+
+        function getManualTestScript() {
+            return `// 手動pageview送信テスト
+if (typeof window.gtag === 'function') {
+    window.gtag('config', 'G-5VS8BF91VH', {
+        page_path: '/manual-test-' + Date.now(),
+        page_title: 'Manual Test Page'
+    });
+    console.log('✅ 手動pageviewを送信しました');
+    console.log('💡 Networkタブでcollectリクエストを確認してください');
+} else {
+    console.log('❌ gtag関数が利用できません');
+}`;
+        }
+
+        function updateStatus(statusId, status) {
+            const element = document.getElementById(statusId);
+            element.className = `status-indicator ${status}`;
+        }
+
+        function generateFinalReport() {
+            const now = new Date().toLocaleString('ja-JP');
+            const checkboxes = document.querySelectorAll('#final-report input[type="checkbox"]');
+            const checkedCount = document.querySelectorAll('#final-report input[type="checkbox"]:checked').length;
+            const totalCount = checkboxes.length;
+            
+            let checklistHTML = '';
+            for (let i = 1; i <= 6; i++) {
+                const checkbox = document.getElementById(`check-${i}`);
+                const status = checkbox.checked ? '✅' : '❌';
+                const label = checkbox.nextSibling.textContent.trim();
+                checklistHTML += `<p>${status} ${label}</p>`;
+            }
+            
+            const reportContent = `
+                <div class="success-box">
+                    <h3>🎯 GA4実装確認レポート</h3>
+                    <p><strong>確認日時:</strong> ${now}</p>
+                    <p><strong>測定ID:</strong> G-5VS8BF91VH</p>
+                    <p><strong>対象サイト:</strong> https://sasakiyoshimasa.com</p>
+                    <p><strong>確認状況:</strong> ${checkedCount}/${totalCount} 項目完了</p>
+                    
+                    <h4>📋 確認項目</h4>
+                    ${checklistHTML}
+                    
+                    <h4>🎉 結論</h4>
+                    <p>${checkedCount === totalCount ? 
+                        '<strong style="color: #28a745;">GA4実装は正常に動作しています！</strong>' : 
+                        '<strong style="color: #ffc107;">一部の項目で確認が必要です。</strong>'
+                    }</p>
+                    
+                    <h4>📞 サポート</h4>
+                    <p>問題がある場合は、DevToolsのConsoleとNetworkタブのスクリーンショットを含めて報告してください。</p>
+                </div>
+            `;
+            
+            document.getElementById('report-content').innerHTML = reportContent;
+            document.getElementById('final-report').style.display = 'block';
+            document.getElementById('final-report').scrollIntoView({ behavior: 'smooth' });
+            
+            updateStatus('status-7', 'success');
+        }
+
+        // ページ読み込み時の案内
+        window.onload = () => {
+            console.log('🎯 GA4最終確認ツールを開始しました');
+            console.log('手順に従って確認を進めてください');
+        };
+    </script>
+</body>
+</html>

@@ -16,11 +16,17 @@ export const blockContentType = defineType({
         {title: 'H4', value: 'h4'},
         {title: 'Quote', value: 'blockquote'},
       ],
-      lists: [{title: 'Bullet', value: 'bullet'}],
+      lists: [
+        {title: 'Bullet', value: 'bullet'},
+        {title: 'Numbered', value: 'number'}
+      ],
       marks: {
         decorators: [
           {title: 'Strong', value: 'strong'},
           {title: 'Emphasis', value: 'em'},
+          {title: 'Code', value: 'code'},
+          {title: 'Underline', value: 'underline'},
+          {title: 'Strike', value: 'strike-through'},
         ],
         annotations: [
           {
@@ -33,6 +39,11 @@ export const blockContentType = defineType({
                 name: 'href',
                 type: 'url',
               },
+              {
+                title: 'Open in new tab',
+                name: 'blank',
+                type: 'boolean'
+              }
             ],
           },
         ],
@@ -41,6 +52,58 @@ export const blockContentType = defineType({
     defineArrayMember({
       type: 'image',
       options: {hotspot: true},
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alternative Text',
+          description: 'Important for SEO and accessiblity.',
+          validation: (Rule) => Rule.required(),
+        },
+        {
+          name: 'caption',
+          type: 'string',
+          title: 'Caption',
+        }
+      ]
+    }),
+    defineArrayMember({
+      type: 'object',
+      name: 'html',
+      title: 'HTML Embed',
+      fields: [
+        {
+          name: 'html',
+          type: 'text',
+          title: 'HTML Code',
+          description: 'Embed HTML code (use with caution)',
+        }
+      ]
+    }),
+    defineArrayMember({
+      type: 'object',
+      name: 'youtube',
+      title: 'YouTube Video',
+      fields: [
+        {
+          name: 'url',
+          type: 'url',
+          title: 'YouTube URL',
+          validation: (Rule) => Rule.required(),
+        }
+      ],
+      preview: {
+        select: {
+          url: 'url'
+        },
+        prepare(selection) {
+          const {url} = selection
+          return {
+            title: 'YouTube Video',
+            subtitle: url
+          }
+        }
+      }
     }),
   ],
 })
