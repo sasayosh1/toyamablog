@@ -27,11 +27,14 @@ export default async function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white px-4 max-w-4xl">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 drop-shadow-lg">
-              TOYAMA BLOG
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-3 drop-shadow-lg">
+              富山のくせに
             </h1>
-            <p className="text-base md:text-lg lg:text-xl text-gray-100 drop-shadow-md mb-6 md:mb-8">
-              富山の美しい風景と魅力を発信
+            <p className="text-lg md:text-xl lg:text-2xl text-gray-100 drop-shadow-md mb-3 md:mb-4 font-medium">
+              AMAZING TOYAMA
+            </p>
+            <p className="text-sm md:text-base lg:text-lg text-gray-200 drop-shadow-md">
+              富山の「くせに」すごい魅力を発信
             </p>
           </div>
         </div>

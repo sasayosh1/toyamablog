@@ -9,10 +9,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* サイト情報 */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold">TOYAMA BLOG</h3>
+            <h3 className="text-xl font-bold">富山のくせに</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
-              富山県の美しい風景、グルメ、観光スポット、文化を紹介する地域情報ブログです。
-              YouTube Shortsと連携して、富山の魅力をお伝えしています。
+              「富山のくせに」すごい！地域の美しい風景、グルメ、観光スポット、文化を紹介するAMAZING TOYAMAブログです。
+              YouTube Shortsと連携して、富山の「くせに」魅力的なスポットをお伝えしています。
             </p>
             <div className="flex space-x-4">
               <Link
@@ -128,7 +128,7 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-gray-400">
-              © {currentYear} TOYAMA BLOG. All rights reserved.
+              © {currentYear} 富山のくせに - AMAZING TOYAMA. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm">
               <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
