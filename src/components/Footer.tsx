@@ -113,12 +113,6 @@ export default function Footer() {
               <p>SNSのDMでお気軽にご連絡ください</p>
               <div className="mt-4 pt-4 border-t border-gray-700">
                 <p className="mb-3">運営者：ささよし</p>
-                <Link 
-                  href="/studio-access.html"
-                  className="inline-block px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-md transition-colors"
-                >
-                  🎯 記事管理
-                </Link>
               </div>
             </div>
           </div>
