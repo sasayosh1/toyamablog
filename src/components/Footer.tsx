@@ -11,8 +11,8 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-xl font-bold">富山のくせに</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
-              「富山のくせに」すごい！地域の美しい風景、グルメ、観光スポット、文化を紹介するAMAZING TOYAMAブログです。
-              YouTube Shortsと連携して、富山の「くせに」魅力的なスポットをお伝えしています。
+              地域の美しい風景、グルメ、観光スポット、文化を紹介するAMAZING TOYAMAブログです。
+              YouTube Shortsと連携して「富山のくせになかなかええやん！」をお伝えしています。
             </p>
             <div className="flex space-x-4">
               <Link
