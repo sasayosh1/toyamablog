@@ -1,16 +1,17 @@
 import GlobalHeader from '@/components/GlobalHeader'
 import { client, getAllCategories, type Post } from '@/lib/sanity'
 import { Metadata } from 'next'
+import Image from 'next/image'
 
 // キャッシュ無効化: 常に最新を表示 - 強制デプロイ
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export const metadata: Metadata = {
-  title: 'About - TOYAMA BLOG',
+  title: 'About - 富山のくせに',
   description: '富山県の魅力を動画で発信するローカルブロガーのプロフィールページ。YouTube Shortsで富山県内の観光スポット、グルメ、文化を紹介しています。',
   openGraph: {
-    title: 'About - TOYAMA BLOG', 
+    title: 'About - 富山のくせに', 
     description: '富山県の魅力を動画で発信するローカルブロガーのプロフィールページ',
     type: 'website',
     url: 'https://sasakiyoshimasa.com/about',
@@ -37,13 +38,19 @@ export default async function AboutPage() {
       <div className="max-w-4xl mx-auto px-4 py-8 md:py-16">
         {/* プロフィールヘッダー */}
         <div className="text-center mb-12">
-          <div className="relative w-32 h-32 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center shadow-lg">
-            <svg className="w-16 h-16 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+          <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden shadow-lg border-4 border-pink-200">
+            <Image
+              src="/images/sasayoshi-avatar.png"
+              alt="ささよしアバター - 富山のくせにブロガー"
+              width={128}
+              height={128}
+              className="w-full h-full object-cover pixelated"
+              style={{ imageRendering: 'pixelated' }}
+              priority
+            />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            TOYAMA BLOG
+            ささよし
           </h1>
           <p className="text-lg text-gray-800 max-w-2xl mx-auto">
             富山県の魅力を動画で発信するローカルブロガー
@@ -191,7 +198,7 @@ export default async function AboutPage() {
                 これからも心を込めて情報発信を続けてまいります。
               </p>
               <div className="text-right mt-6">
-                <p className="text-gray-700 font-medium">TOYAMA BLOG 管理人</p>
+                <p className="text-gray-700 font-medium">管理人 ささよし</p>
               </div>
             </div>
           </section>
@@ -207,7 +214,7 @@ export default async function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:TOYAMA BLOG <ptb875pmj49@gmail.com>"
+              href="mailto:富山のくせに <ptb875pmj49@gmail.com>"
               className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
