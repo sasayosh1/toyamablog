@@ -4,22 +4,17 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 
-// CategoryLink コンポーネント（Client Component）
-interface CategoryLinkProps {
-  href: string
+// CategoryTag コンポーネント（スタイルのみ、クリックできない）
+interface CategoryTagProps {
   className: string
   children: React.ReactNode
 }
 
-function CategoryLink({ href, className, children }: CategoryLinkProps) {
+function CategoryTag({ className, children }: CategoryTagProps) {
   return (
-    <Link
-      href={href}
-      className={className}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <span className={className}>
       {children}
-    </Link>
+    </span>
   )
 }
 
@@ -82,13 +77,12 @@ export default function PostCard({ post }: PostCardProps) {
           {post.categories && (
             <div className="flex flex-wrap gap-1.5 mb-3">
               {post.categories.slice(0, 2).map((category) => (
-                <CategoryLink
+                <CategoryTag
                   key={category}
-                  href={`/category/${encodeURIComponent(category)}`}
-                  className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md hover:bg-blue-100 transition-colors"
+                  className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md"
                 >
                   {category}
-                </CategoryLink>
+                </CategoryTag>
               ))}
             </div>
           )}

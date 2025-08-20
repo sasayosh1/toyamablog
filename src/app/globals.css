@@ -36,6 +36,14 @@ body {
   color: #111827 !important;
 }
 
+/* ピクセルアート画像のスタイル */
+.pixelated {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
 /* ヒーローセクションの文字色を白色に固定 */
 .text-white, .text-white * {
   color: white !important;
