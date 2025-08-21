@@ -35,7 +35,7 @@ export default async function AboutPage() {
     <div className="min-h-screen bg-gray-50 blog-page">
       <GlobalHeader posts={posts} categories={categories} />
       
-      <div className="max-w-4xl mx-auto px-4 py-8 md:py-16">
+      <div className="max-w-4xl mx-auto px-4 py-8 md:py-16 pt-24">
         {/* プロフィールヘッダー */}
         <div className="text-center mb-12">
           <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden shadow-lg border-4 border-pink-200">
