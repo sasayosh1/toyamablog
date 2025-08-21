@@ -7,7 +7,7 @@ import {structure} from './src/sanity/structure'
 
 export default defineConfig({
   name: 'default',
-  title: '富山のくせに - AMAZING TOYAMA',
+  title: 'TOYAMA BLOG',
 
   projectId: 'aoxze287',
   dataset: 'production',
@@ -26,7 +26,8 @@ export default defineConfig({
       'http://localhost:3000', 
       'https://sasakiyoshimasa.com', 
       'https://sanity.io',
-      'https://aoxze287.sanity.studio'
+      'https://aoxze287.sanity.studio',
+      'https://toyamablog.sanity.studio'
     ],
     credentials: true
   },
