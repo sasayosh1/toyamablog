@@ -56,7 +56,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
     <div className="min-h-screen bg-gray-50 category-page">
       <GlobalHeader posts={allPosts} categories={categories} />
       
-      <div className="max-w-7xl mx-auto py-8 md:py-12 px-4">
+      <div className="max-w-7xl mx-auto py-8 md:py-12 px-4 pt-24">
         <Breadcrumb
           items={[
             {

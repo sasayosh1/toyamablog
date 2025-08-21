@@ -63,7 +63,7 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
     <div className="min-h-screen bg-gray-50">
       <GlobalHeader posts={allPosts} categories={categories} />
       
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
         <Breadcrumb
           items={[
             {

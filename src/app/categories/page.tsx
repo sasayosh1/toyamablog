@@ -36,7 +36,7 @@ export default async function CategoriesPage() {
     <div className="min-h-screen bg-gray-50 categories-page">
       <GlobalHeader posts={posts} categories={categories} />
       
-      <div className="max-w-7xl mx-auto py-8 md:py-12 px-4">
+      <div className="max-w-7xl mx-auto py-8 md:py-12 px-4 pt-24">
         <PageHeader
           title="地域別カテゴリー"
           subtitle="興味のある地域から記事を探してみてください"
