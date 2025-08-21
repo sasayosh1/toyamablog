@@ -58,10 +58,22 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
   const [isLoading, setIsLoading] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
+
+  // スクロール検知
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 50
+      setIsScrolled(scrolled)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // 検索結果をマージし、重複を除去
   const mergeSearchResults = (clientResults: Post[], serverResults: Post[]): Post[] => {
@@ -186,19 +198,35 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
   }, [selectedIndex])
 
   return (
-    <header className="absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/30 to-transparent">
+    <header className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-white shadow-lg backdrop-blur-sm' 
+        : 'bg-gradient-to-b from-black/30 to-transparent'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* PC用メニュー（lg以上で表示） */}
         <div className="hidden lg:flex items-center justify-between h-16">
           {/* PCナビゲーション */}
           <nav className="flex items-center space-x-8">
-            <Link href="/" className="text-white hover:text-yellow-300 font-medium transition-colors">
+            <Link href="/" className={`font-medium transition-colors ${
+              isScrolled 
+                ? 'text-gray-800 hover:text-blue-600' 
+                : 'text-white hover:text-yellow-300'
+            }`}>
               ホーム
             </Link>
-            <Link href="/categories" className="text-white hover:text-yellow-300 font-medium transition-colors">
+            <Link href="/categories" className={`font-medium transition-colors ${
+              isScrolled 
+                ? 'text-gray-800 hover:text-blue-600' 
+                : 'text-white hover:text-yellow-300'
+            }`}>
               地域別カテゴリー
             </Link>
-            <Link href="/about" className="text-white hover:text-yellow-300 font-medium transition-colors">
+            <Link href="/about" className={`font-medium transition-colors ${
+              isScrolled 
+                ? 'text-gray-800 hover:text-blue-600' 
+                : 'text-white hover:text-yellow-300'
+            }`}>
               サイトについて
             </Link>
           </nav>
@@ -216,7 +244,11 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
                 onFocus={() => {
                   if (filteredPosts.length > 0) setIsSearchOpen(true)
                 }}
-                className="w-full px-4 py-2 text-gray-900 bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300 transition-all placeholder-gray-600"
+                className={`w-full px-4 py-2 text-gray-900 rounded-lg transition-all ${
+                  isScrolled
+                    ? 'bg-gray-100 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500'
+                    : 'bg-white/90 backdrop-blur-sm border border-white/30 focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300 placeholder-gray-600'
+                }`}
               />
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                 {isLoading ? (
@@ -306,7 +338,11 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
           {/* ハンバーガーメニューボタン */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex items-center justify-center w-8 h-8 text-white hover:text-yellow-300 focus:outline-none"
+            className={`flex items-center justify-center w-8 h-8 focus:outline-none transition-colors ${
+              isScrolled
+                ? 'text-gray-800 hover:text-blue-600'
+                : 'text-white hover:text-yellow-300'
+            }`}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -326,7 +362,11 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
                 onFocus={() => {
                   if (filteredPosts.length > 0) setIsSearchOpen(true)
                 }}
-                className="w-full px-4 py-2 text-gray-900 bg-white/90 backdrop-blur-sm border border-white/30 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300 transition-all placeholder-gray-600"
+                className={`w-full px-4 py-2 text-gray-900 rounded-lg transition-all ${
+                  isScrolled
+                    ? 'bg-gray-100 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500'
+                    : 'bg-white/90 backdrop-blur-sm border border-white/30 focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300 placeholder-gray-600'
+                }`}
               />
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                 {isLoading ? (

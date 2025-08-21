@@ -15,7 +15,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gray-50 blog-page">
       <GlobalHeader posts={posts} categories={categories} />
-      <div className="relative h-64 md:h-80 lg:h-96 overflow-hidden">
+      <div className="relative h-80 md:h-96 lg:h-[32rem] overflow-hidden">
         <Image
           src="/images/toyama-hero.png"
           alt="富山市の風景 - 立山連峰を背景にした橋と川"
