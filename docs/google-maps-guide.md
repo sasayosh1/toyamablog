@@ -42,19 +42,28 @@ await client.patch(articleId).set({ body: updatedBody }).commit();
 
 ### 2. HTMLテンプレート
 
+**📋 重要: 2025年8月22日更新**
+マップの上下テキスト（タイトルと説明文）は不要です。シンプルなiframeのみを使用してください。
+
 ```html
-<div style="margin: 20px 0; text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-  <h4 style="margin-bottom: 15px; color: #333; font-size: 18px;">📍 施設名の場所</h4>
-  <iframe 
-    src="Googleマップ埋め込みURL" 
-    width="100%" 
-    height="300" 
-    style="border:0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" 
-    allowfullscreen="" 
-    loading="lazy" 
-    referrerpolicy="no-referrer-when-downgrade">
-  </iframe>
-  <p style="margin-top: 10px; font-size: 14px; color: #666;">施設の簡潔な説明</p>
+<iframe 
+  src="Googleマップ埋め込みURL" 
+  width="100%" 
+  height="300" 
+  style="border:0; border-radius: 8px;" 
+  allowfullscreen="" 
+  loading="lazy" 
+  referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+```
+
+**🚫 使用禁止 - 以下のようなテキスト付きは使わない:**
+```html
+<!-- ❌ このような形式は使用しない -->
+<div style="padding: 15px; background: #f8f9fa;">
+  <h4>📍 施設名の場所</h4>
+  <iframe src="..."></iframe>
+  <p>施設の説明</p>
 </div>
 ```
 
@@ -86,24 +95,20 @@ await client.patch(articleId).set({ body: updatedBody }).commit();
 
 ## 実装例
 
-### 成功例：大岩山日石寺
+### 成功例：大岩山日石寺（2025年8月22日更新版）
 ```javascript
 const googleMapBlock = {
   _type: 'html',
   _key: 'googlemap-daiiwayama-nissekiji-' + Date.now(),
-  html: `<div style="margin: 20px 0; text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-    <h4 style="margin-bottom: 15px; color: #333; font-size: 18px;">📍 大岩山日石寺の場所</h4>
-    <iframe src="正確なGoogleマップURL" width="100%" height="300" 
-      style="border:0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" 
-      allowfullscreen="" loading="lazy" 
-      referrerpolicy="no-referrer-when-downgrade">
-    </iframe>
-    <p style="margin-top: 10px; font-size: 14px; color: #666;">
-      滝行体験もできる真言密宗大本山の古刹です
-    </p>
-  </div>`
+  html: `<iframe src="正確なGoogleマップURL" width="100%" height="300" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`
 };
 ```
+
+**✅ シンプルで効果的:**
+- 不要なテキストなし
+- iframeのみの表示
+- レスポンシブ対応
+- 丸角とボーダーなしのスタイル
 
 ## 注意事項
 
@@ -140,4 +145,52 @@ const googleMapBlock = {
    - viewportの設定確認
 
 ## 更新履歴
+- 2025-08-22: **重要更新** - マップの上下テキスト削除、シンプルiframe形式に変更
 - 2024-08-21: 初版作成（大岩山日石寺対応）
+
+## ⚡ 2025年8月22日の重要変更
+- **全ての既存記事**: マップの上下テキストを削除済み
+- **今後の記事**: シンプルなiframeのみ使用
+- **理由**: ユーザビリティ向上とデザイン統一
+
+## ⚠️ 重要な注意事項
+**指示されていない変更は絶対に行わないこと**
+- 記事のサムネイル表示機能を勝手に変更しない
+- 既存の動作している機能には触れない
+- 明確に指示された作業のみを実行する
+- 「指示したものだけ」をやること
+
+## 📺 YouTube動画サムネイル統一ルール
+**YouTube動画がある記事には、その動画と同じサムネイルを記事にも採用すること**
+
+### 基本方針
+- YouTube動画のサムネイルと記事カードのサムネイルを完全に統一
+- ユーザーが動画と記事の関連性を一目で理解できるようにする
+- ブランディングの一貫性を保つ
+
+### 実装方法
+1. **YouTube URLの設定**: 記事にyoutubeUrlフィールドを設定
+2. **自動サムネイル取得**: システムがYouTube URLからサムネイルを自動取得
+3. **表示統一**: PostCardコンポーネントで同じサムネイルを表示
+
+### 技術仕様
+```javascript
+// サムネイル取得関数（youtube.ts）
+export function getYouTubeThumbnailWithFallback(url: string): string | null {
+  const videoIdMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (!videoIdMatch || !videoIdMatch[1]) return null;
+  const videoId = videoIdMatch[1];
+  return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+}
+```
+
+### 品質基準
+- **解像度**: mqdefault.jpg（320x180px）を使用
+- **フォールバック**: 動画が削除された場合のSVGフォールバック
+- **レスポンシブ**: 全デバイスで適切に表示
+
+### チェックリスト
+- [ ] YouTube動画のサムネイルが記事カードに表示されているか
+- [ ] サムネイルが動画内容と一致しているか
+- [ ] モバイル・タブレット・PCで正常表示されるか
+- [ ] 動画削除時のフォールバック表示が適切か
