@@ -56,5 +56,13 @@ export default defineConfig({
       // デフォルトのアクションをすべて有効化
       return prev
     },
+  },
+  
+  // エディターの動作改善
+  form: {
+    // フィールドのレンダリング設定
+    render: (props) => {
+      return props.renderDefault(props)
+    }
   }
 })
