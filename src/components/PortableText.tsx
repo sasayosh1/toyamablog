@@ -120,6 +120,35 @@ const components = {
         />
       )
     },
+    googleMaps: ({ value }: { value: { iframe: string; description?: string } }) => {
+      if (!value?.iframe) {
+        return null
+      }
+      
+      // iframeのwidth/heightを統一フォーマットに調整
+      const processedIframe = value.iframe
+        .replace(/width="[^"]*"/g, 'width="100%"')
+        .replace(/height="[^"]*"/g, 'height="300"')
+        .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"')
+      
+      return (
+        <div style={{ margin: '2rem 0', textAlign: 'center' }}>
+          <div 
+            dangerouslySetInnerHTML={{ __html: processedIframe }}
+          />
+          {value.description && (
+            <p style={{
+              marginTop: '0.5rem',
+              fontSize: '0.875rem',
+              color: '#666',
+              fontStyle: 'italic'
+            }}>
+              {value.description}
+            </p>
+          )}
+        </div>
+      )
+    },
     youtubeShorts: ({ value }: { value: { url: string } }) => {
       const { url } = value
       const videoId = extractYouTubeId(url)

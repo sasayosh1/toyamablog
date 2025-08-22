@@ -71,14 +71,103 @@ export const blockContentType = defineType({
       type: 'object',
       name: 'html',
       title: 'HTML Embed',
+      icon: () => '🔗',
       fields: [
         {
           name: 'html',
           type: 'text',
           title: 'HTML Code',
-          description: 'Embed HTML code (use with caution)',
+          description: 'Google Maps iframe、その他のHTML埋め込みコード用（例: <iframe src="..." width="100%" height="300" ...></iframe>）',
+          rows: 8,
+          validation: (Rule) => Rule.required()
         }
-      ]
+      ],
+      preview: {
+        select: {
+          html: 'html'
+        },
+        prepare(selection) {
+          const {html} = selection
+          const isGoogleMaps = html?.includes('maps/embed') || html?.includes('google.com/maps')
+          const isYouTube = html?.includes('youtube.com/embed') || html?.includes('youtu.be')
+          
+          let title = 'HTML埋め込み'
+          if (isGoogleMaps) {
+            title = '🗺️ Googleマップ'
+          } else if (isYouTube) {
+            title = '📺 YouTube動画'
+          }
+          
+          // HTMLコードの最初の50文字をサブタイトルに
+          const subtitle = html ? html.substring(0, 50) + '...' : 'HTMLコードなし'
+          
+          return {
+            title: title,
+            subtitle: subtitle
+          }
+        }
+      }
+    }),
+    defineArrayMember({
+      type: 'object',
+      name: 'googleMaps',
+      title: 'Google Maps',
+      icon: () => '🗺️',
+      fields: [
+        {
+          name: 'iframe',
+          type: 'text',
+          title: 'Google Maps iframe',
+          description: 'Google Mapsの「共有」→「地図を埋め込む」で取得したiframeコードをそのまま貼り付けてください',
+          rows: 6,
+          placeholder: '<iframe src="https://www.google.com/maps/embed?pb=..." width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
+          validation: (Rule) => 
+            Rule.required()
+              .custom((iframe) => {
+                if (!iframe) return '地図のiframeコードが必要です'
+                if (!iframe.includes('google.com/maps/embed')) {
+                  return 'Google Mapsの埋め込みコードを入力してください'
+                }
+                return true
+              })
+        },
+        {
+          name: 'description',
+          type: 'string',
+          title: '説明（オプション）',
+          description: '地図の説明文（例: 施設名や住所）',
+          placeholder: '例: 富山駅から徒歩5分の便利な立地'
+        }
+      ],
+      preview: {
+        select: {
+          iframe: 'iframe',
+          description: 'description'
+        },
+        prepare(selection) {
+          const {iframe, description} = selection
+          
+          // iframe内から施設名を抽出しようとする
+          let locationName = '場所名不明'
+          if (iframe) {
+            // URLデコードして日本語の施設名を抽出
+            try {
+              const decodedUrl = decodeURIComponent(iframe)
+              const match = decodedUrl.match(/2s([^!]+)!/)
+              if (match && match[1]) {
+                locationName = match[1].replace(/\+/g, ' ')
+              }
+            } catch (e) {
+              // デコードに失敗した場合はデフォルト値のまま
+            }
+          }
+          
+          return {
+            title: `🗺️ ${locationName}`,
+            subtitle: description || 'Googleマップ'
+          }
+        }
+      }
     }),
     defineArrayMember({
       type: 'object',
