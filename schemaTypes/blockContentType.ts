@@ -6,6 +6,7 @@ export const blockContentType = defineType({
   type: 'array',
   // エディターのオプション設定
   options: {
+    // インサートメニューの設定
     insertMenu: {
       // よく使う要素を上位に表示
       groups: [
@@ -20,7 +21,9 @@ export const blockContentType = defineType({
           of: ['youtube', 'html', 'googleMaps']
         }
       ]
-    }
+    },
+    // エディター内でのフォーカス改善
+    layout: 'default'
   },
   of: [
     defineArrayMember({
