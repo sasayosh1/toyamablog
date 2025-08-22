@@ -32,8 +32,8 @@ export function getYouTubeThumbnailWithFallback(url: string): string | null {
 
     const videoId = videoIdMatch[1];
     
-    // hqdefaultを使用（より確実に存在する）
-    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    // mqdefaultを使用（より確実に存在する）
+    return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
   } catch (error) {
     console.error('YouTube thumbnail extraction error:', error);
     return null;
