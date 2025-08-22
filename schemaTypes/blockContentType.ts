@@ -4,6 +4,24 @@ export const blockContentType = defineType({
   title: 'Block Content',
   name: 'blockContent',
   type: 'array',
+  // エディターのオプション設定
+  options: {
+    insertMenu: {
+      // よく使う要素を上位に表示
+      groups: [
+        {
+          name: 'content',
+          title: 'コンテンツ',
+          of: ['block', 'image']
+        },
+        {
+          name: 'media',
+          title: 'メディア',
+          of: ['youtube', 'html', 'googleMaps']
+        }
+      ]
+    }
+  },
   of: [
     defineArrayMember({
       title: 'Block',
@@ -70,7 +88,7 @@ export const blockContentType = defineType({
     defineArrayMember({
       type: 'object',
       name: 'html',
-      title: 'HTML Embed',
+      title: '🔗 HTML・iframe埋め込み',
       icon: () => '🔗',
       fields: [
         {
@@ -111,7 +129,7 @@ export const blockContentType = defineType({
     defineArrayMember({
       type: 'object',
       name: 'googleMaps',
-      title: 'Google Maps',
+      title: '🗺️ Googleマップ',
       icon: () => '🗺️',
       fields: [
         {
