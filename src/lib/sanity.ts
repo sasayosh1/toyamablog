@@ -180,7 +180,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
         publishedAt,
         youtubeUrl,
         thumbnail{
-          asset->{
+          asset{
             _ref,
             url
           },
@@ -223,7 +223,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
           publishedAt,
           youtubeUrl,
           thumbnail{
-            asset->{
+            asset{
               _ref,
               url
             },
