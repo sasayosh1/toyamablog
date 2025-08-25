@@ -58,11 +58,5 @@ export default defineConfig({
     },
   },
   
-  // エディターの動作改善
-  form: {
-    // フィールドのレンダリング設定
-    render: (props) => {
-      return props.renderDefault(props)
-    }
-  }
+  // エディターの動作改善は省略
 })
