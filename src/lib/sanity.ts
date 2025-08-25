@@ -40,6 +40,13 @@ export interface Post {
   author?: Author;
   excerpt?: string;
   displayExcerpt?: string;
+  thumbnail?: {
+    asset: {
+      _ref: string;
+      url: string;
+    };
+    alt?: string;
+  };
 }
 
 export type BlogPost = Post;
@@ -56,6 +63,13 @@ export async function getAllPosts(): Promise<Post[]> {
       category,
       publishedAt,
       youtubeUrl,
+      thumbnail{
+        asset->{
+          _ref,
+          url
+        },
+        alt
+      },
       author->{
         _id,
         name,
@@ -93,6 +107,13 @@ export async function getPost(slug: string): Promise<Post | null> {
       publishedAt,
       body,
       youtubeUrl,
+      thumbnail{
+        asset->{
+          _ref,
+          url
+        },
+        alt
+      },
       author->{
         _id,
         name,
@@ -158,6 +179,13 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
         category,
         publishedAt,
         youtubeUrl,
+        thumbnail{
+          asset->{
+            _ref,
+            url
+          },
+          alt
+        },
         author->{
           _id,
           name,
@@ -194,6 +222,13 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
           category,
           publishedAt,
           youtubeUrl,
+          thumbnail{
+            asset->{
+              _ref,
+              url
+            },
+            alt
+          },
           author->{
             _id,
             name,

@@ -22,8 +22,7 @@ export const blockContentType = defineType({
         }
       ]
     },
-    // エディター内でのフォーカス改善
-    layout: 'default'
+    // エディター内でのフォーカス改善は省略
   },
   of: [
     defineArrayMember({
@@ -144,9 +143,9 @@ export const blockContentType = defineType({
           placeholder: '<iframe src="https://www.google.com/maps/embed?pb=..." width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
           validation: (Rule) => 
             Rule.required()
-              .custom((iframe) => {
+              .custom((iframe: any) => {
                 if (!iframe) return '地図のiframeコードが必要です'
-                if (!iframe.includes('google.com/maps/embed')) {
+                if (typeof iframe === 'string' && !iframe.includes('google.com/maps/embed')) {
                   return 'Google Mapsの埋め込みコードを入力してください'
                 }
                 return true

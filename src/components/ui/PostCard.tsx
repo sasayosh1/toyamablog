@@ -28,21 +28,41 @@ interface PostCardProps {
     categories?: string[]
     excerpt?: string
     displayExcerpt?: string
+    thumbnail?: {
+      asset: {
+        _ref: string
+        url: string
+      }
+      alt?: string
+    }
   }
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  // サムネイル優先順位: 1.Sanity画像 > 2.YouTube動的取得
+  const getThumbnailUrl = () => {
+    if (post.thumbnail?.asset?.url) {
+      return post.thumbnail.asset.url;
+    }
+    if (post.youtubeUrl) {
+      return getYouTubeThumbnailWithFallback(post.youtubeUrl);
+    }
+    return null;
+  };
+
+  const thumbnailUrl = getThumbnailUrl();
+
   return (
     <Link 
       href={`/blog/${post.slug.current}`}
       className="block"
     >
       <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer relative z-[1]">
-        {post.youtubeUrl && (
+        {thumbnailUrl && (
           <div className="relative h-48 overflow-hidden bg-gray-100">
             <Image
-              src={getYouTubeThumbnailWithFallback(post.youtubeUrl) || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRkY0NDQ0Ii8+CjxwYXRoIGQ9Ik0xMDUgNjBMMTk1IDEyMEwxMDUgMTgwVjYwWiIgZmlsbD0iI0ZGRkZGRiIvPgo8L3N2Zz4K'}
-              alt={`${post.title} - YouTube動画サムネイル`}
+              src={thumbnailUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRkY0NDQ0Ii8+CjxwYXRoIGQ9Ik0xMDUgNjBMMTk1IDEyMEwxMDUgMTgwVjYwWiIgZmlsbD0iI0ZGRkZGRiIvPgo8L3N2Zz4K'}
+              alt={post.thumbnail?.alt || `${post.title} - サムネイル`}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
