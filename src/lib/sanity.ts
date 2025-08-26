@@ -162,14 +162,15 @@ export async function getAllCategories(): Promise<string[]> {
 export async function searchPosts(searchTerm: string): Promise<Post[]> {
   if (!searchTerm.trim()) return [];
   
+  console.log(`Starting search for: "${searchTerm}"`);
+  
   try {
-    // より安全で効果的な検索クエリ
+    // シンプルで高速な検索クエリ
     const posts = await client.fetch<Post[]>(`
       *[_type == "post" && (
         title match "*" + $searchTerm + "*" ||
         description match "*" + $searchTerm + "*" ||
-        category match "*" + $searchTerm + "*" ||
-        pt::text(body) match "*" + $searchTerm + "*"
+        category match "*" + $searchTerm + "*"
       )] | order(publishedAt desc) [0...20] {
         _id,
         title,
@@ -180,7 +181,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
         publishedAt,
         youtubeUrl,
         thumbnail{
-          asset{
+          asset->{
             _ref,
             url
           },
@@ -202,18 +203,23 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
         "categories": [category],
         "displayExcerpt": coalesce(excerpt, description)
       }
-    `, { searchTerm });
+    `, { searchTerm }, { 
+      // キャッシュを無効にして即座に結果を取得
+      next: { revalidate: 0 },
+      cache: 'no-store'
+    });
     
-    console.log(`Search for "${searchTerm}" returned ${posts.length} results`);
+    console.log(`Direct search for "${searchTerm}" returned ${posts.length} results`);
     return posts;
     
   } catch (error) {
-    console.error('Search error:', error);
+    console.error('Direct search error:', error);
     
-    // フォールバック: シンプルな検索
+    // フォールバック: 全件取得してクライアントサイドフィルタリング
     try {
+      console.log('Attempting fallback search...');
       const fallbackPosts = await client.fetch<Post[]>(`
-        *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...20] {
+        *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
           _id,
           title,
           slug,
@@ -223,7 +229,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
           publishedAt,
           youtubeUrl,
           thumbnail{
-            asset{
+            asset->{
               _ref,
               url
             },
@@ -245,13 +251,19 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
           "categories": [category],
           "displayExcerpt": coalesce(excerpt, description)
         }
-      `);
+      `, {}, { 
+        next: { revalidate: 0 },
+        cache: 'no-store'
+      });
+      
+      console.log(`Fetched ${fallbackPosts.length} posts for client-side filtering`);
       
       // クライアントサイドフィルタリング
       const filtered = fallbackPosts.filter(post => 
         post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         post.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.category?.toLowerCase().includes(searchTerm.toLowerCase())
+        post.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
       );
       
       console.log(`Fallback search for "${searchTerm}" returned ${filtered.length} results`);
