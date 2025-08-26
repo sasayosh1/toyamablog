@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { Post } from '@/lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 
 // SearchResultLink コンポーネント（Client Component）
@@ -15,14 +16,26 @@ interface SearchResultLinkProps {
 }
 
 function SearchResultLink({ href, className, onResultClick, children }: SearchResultLinkProps) {
+  const router = useRouter()
+  
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    console.log('Search result clicked:', href)
+    
+    // 検索状態をクリア
+    onResultClick()
+    
+    // Next.js Routerでナビゲーション
+    router.push(href)
+  }
+  
   return (
-    <Link
-      href={href}
-      className={className}
-      onClick={onResultClick}
+    <div
+      className={`cursor-pointer ${className}`}
+      onClick={handleClick}
     >
       {children}
-    </Link>
+    </div>
   )
 }
 
@@ -62,6 +75,7 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   // 検索結果をマージし、重複を除去
   const mergeSearchResults = (clientResults: Post[], serverResults: Post[]): Post[] => {
@@ -94,24 +108,9 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
       setIsSearchOpen(clientFiltered.length > 0)
       setSelectedIndex(-1)
       
-      // サーバーサイド検索（より詳細な結果用）
-      if (query.length >= 2) {
-        try {
-          const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
-          
-          if (response.ok) {
-            const data = await response.json()
-            
-            if (data.posts && Array.isArray(data.posts)) {
-              const mergedResults = mergeSearchResults(clientFiltered, data.posts)
-              setFilteredPosts(mergedResults.slice(0, 10))
-              setIsSearchOpen(mergedResults.length > 0)
-            }
-          }
-        } catch (fetchError) {
-          console.error('Search API fetch error:', fetchError)
-        }
-      }
+      // サーバーサイド検索は一旦無効化（パフォーマンス改善のため）
+      // クライアントサイドフィルタリングのみ使用
+      console.log(`Client-side search returned ${clientFiltered.length} results for "${query}"`)
     } catch (error) {
       console.error('Search error:', error)
     } finally {
@@ -161,7 +160,11 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
       case 'Enter':
         e.preventDefault()
         if (selectedIndex >= 0 && filteredPosts[selectedIndex]) {
-          window.location.href = `/blog/${filteredPosts[selectedIndex].slug.current}`
+          const selectedPost = filteredPosts[selectedIndex]
+          console.log('Navigating via Enter key to:', selectedPost.slug.current)
+          setIsSearchOpen(false)
+          setSelectedIndex(-1)
+          router.push(`/blog/${selectedPost.slug.current}`)
         }
         break
       case 'Escape':
