@@ -5,6 +5,12 @@
 - **正しい値**: `NEXT_PUBLIC_GA_ID=G-5VS8BF91VH`
 - **注意**: この値は絶対に変更しないこと
 - この測定IDが正しく、SVS8BF91VHは間違いです
+- **動作確認済み**: 2025年8月28日にリアルタイム計測で正常動作を確認
+- **関連ファイル**: 
+  - `.env.local` - 環境変数設定
+  - `src/app/ga-provider.tsx` - Google Analytics プロバイダー
+  - `src/lib/gtag.ts` - トラッキングライブラリ
+  - `src/app/layout.tsx` - GAProvider読み込み
 
 ## 数字の積極的活用
 - **読者に伝わりやすい場合は必ず数字を使用**
