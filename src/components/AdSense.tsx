@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || 'ca-pub-9743843249239449'
+const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ''
 
 export function AdSense() {
   useEffect(() => {
