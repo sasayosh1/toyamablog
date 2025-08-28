@@ -88,11 +88,11 @@ function extractLocationAndCategory(title, description) {
 
   // カテゴリマッピング
   const categoryMap = {
-    '寺院|神社|お寺|神社': '神社・寺院',
-    'グルメ|食べ物|レストラン|カフェ|ラーメン|寿司': 'グルメ',
-    '公園|桜|花|自然|山|海|川': '自然・公園',
+    '寺院|神社|お寺': '神社・寺院',
+    'グルメ|食べ物|レストラン|カフェ|ラーメン|寿司|ランチ|中華|パティスリー|ドリア': 'グルメ',
+    '公園|桜|花|自然|山|海|川|ペンギン|ヤギ|アザラシ|動物|牧場': '自然・公園',
     '温泉|ホテル|宿泊': '温泉・宿泊',
-    'イベント|祭り|花火|イルミネーション': 'イベント・祭り',
+    'イベント|祭り|花火|イルミネーション|噴水|ファウンテン|鬼滅': 'イベント・祭り',
     '観光|名所|スポット': '観光スポット'
   };
 
@@ -258,7 +258,7 @@ async function createSanityArticle(video, locationData) {
     publishedAt: new Date().toISOString(),
     author: {
       _type: 'reference',
-      _ref: 'author-sasayoshi' // 既存のAuthor IDを使用
+      _ref: '95vBmVlXBxlHRIj7vD7uCv' // 既存のささよしAuthor ID
     }
   };
 
