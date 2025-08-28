@@ -14,7 +14,10 @@
     "env:dev": "node scripts/env-manager.js dev",
     "env:prod": "node scripts/env-manager.js prod",
     "env:backup": "node scripts/env-manager.js backup",
-    "env:restore": "node scripts/env-manager.js restore"
+    "env:restore": "node scripts/env-manager.js restore",
+    "youtube:check": "node scripts/manual-youtube-check.cjs",
+    "youtube:create": "node scripts/check-youtube-and-create-articles.cjs",
+    "youtube:test": "node scripts/test-youtube-system.cjs"
   },
   "dependencies": {
     "@portabletext/react": "^3.2.1",
@@ -23,6 +26,7 @@
     "@sanity/vision": "^3.99.0",
     "autoprefixer": "^10.4.21",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.1",
     "googleapis": "^152.0.0",
     "gray-matter": "^4.0.3",
     "next": "^15.4.3",
