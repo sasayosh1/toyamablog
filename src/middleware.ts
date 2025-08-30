@@ -23,7 +23,7 @@ export function middleware(request: NextRequest) {
   )
 
   // レート制限（簡易版）
-  const ip = request.ip || request.headers.get('x-forwarded-for') || '127.0.0.1'
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '127.0.0.1'
   const isAPIRoute = request.nextUrl.pathname.startsWith('/api/')
   
   if (isAPIRoute) {
