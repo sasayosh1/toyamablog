@@ -19,7 +19,7 @@ export default function Footer() {
                 href="https://www.youtube.com/@sasayoshi"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 hover:text-white transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md hover:bg-gray-800"
                 aria-label="YouTube チャンネル"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -30,7 +30,7 @@ export default function Footer() {
                 href="https://x.com/sasayoshi_tym"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 hover:text-white transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md hover:bg-gray-800"
                 aria-label="X (Twitter)"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@ export default function Footer() {
                 href="https://www.instagram.com/sasayoshi_tym/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 hover:text-white transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md hover:bg-gray-800"
                 aria-label="Instagram"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -56,17 +56,17 @@ export default function Footer() {
             <h4 className="text-lg font-semibold">サイト案内</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                   ホーム
                 </Link>
               </li>
               <li>
-                <Link href="/categories" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/categories" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                   カテゴリー一覧
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/about" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                   サイトについて
                 </Link>
               </li>
@@ -78,27 +78,27 @@ export default function Footer() {
             <h4 className="text-lg font-semibold">人気エリア</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/category/富山市" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/category/富山市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                   富山市
                 </Link>
               </li>
               <li>
-                <Link href="/category/高岡市" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/category/高岡市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                   高岡市
                 </Link>
               </li>
               <li>
-                <Link href="/category/氷見市" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/category/氷見市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                   氷見市
                 </Link>
               </li>
               <li>
-                <Link href="/category/南砺市" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/category/南砺市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                   南砺市
                 </Link>
               </li>
               <li>
-                <Link href="/category/砺波市" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/category/砺波市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                   砺波市
                 </Link>
               </li>
@@ -124,14 +124,14 @@ export default function Footer() {
             <p className="text-sm text-gray-400">
               © {currentYear} 富山のくせに - AMAZING TOYAMA. All rights reserved.
             </p>
-            <div className="flex space-x-6 text-sm">
-              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+            <div className="flex flex-wrap gap-4 text-sm">
+              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                 プライバシーポリシー
               </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                 利用規約
               </Link>
-              <Link href="/sitemap.xml" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="/sitemap.xml" className="text-gray-400 hover:text-white transition-colors py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                 サイトマップ
               </Link>
             </div>

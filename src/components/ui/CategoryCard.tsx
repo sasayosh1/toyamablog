@@ -18,6 +18,7 @@ export default function CategoryCard({
       <Link
         href={href}
         className="group block p-4 bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-blue-50 transition-all border border-gray-100 hover:border-blue-200"
+        aria-label={`${name}カテゴリー（${count}件の記事）を表示`}
       >
         <div className="flex items-center justify-between">
           <span className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-1">
@@ -32,7 +33,7 @@ export default function CategoryCard({
   }
 
   return (
-    <Link href={href} className="group">
+    <Link href={href} className="group" aria-label={`${name}カテゴリー（${count}件の記事）を表示`}>
       <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg hover:bg-green-50 transition-all duration-200 border border-gray-200 group-hover:border-green-300 h-full">
         <div className="flex items-center justify-between mb-4">
           <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
@@ -45,9 +46,9 @@ export default function CategoryCard({
           </span>
         </div>
         
-        <h2 className="text-lg font-semibold text-gray-800 group-hover:text-green-700 transition-colors mb-3 line-clamp-2">
+        <h3 className="text-lg font-semibold text-gray-800 group-hover:text-green-700 transition-colors mb-3 line-clamp-2">
           {name}
-        </h2>
+        </h3>
         
         <div className="flex items-center text-green-600 group-hover:text-green-700 transition-colors">
           <span className="text-sm font-medium">記事を見る</span>

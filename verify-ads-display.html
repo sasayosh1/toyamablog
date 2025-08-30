@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdSense広告テスト</title>
+</head>
+<body>
+    <h1>AdSense広告表示テスト</h1>
+    <p>このページは開発環境でAdSense広告が正常に読み込まれるかテストします。</p>
+    
+    <h2>チェックポイント:</h2>
+    <ul>
+        <li>AdSenseスクリプトが読み込まれているか</li>
+        <li>console.logでエラーがないか</li>
+        <li>ネットワークタブでadsbygoogle.jsが読み込まれているか</li>
+    </ul>
+
+    <script>
+        // AdSenseの読み込み状況をチェック
+        window.addEventListener('load', function() {
+            console.log('=== AdSense 広告設定チェック ===');
+            
+            // adsbygoogleの存在確認
+            if (window.adsbygoogle) {
+                console.log('✅ AdSenseスクリプト読み込み成功');
+                console.log('adsbygoogle配列:', window.adsbygoogle);
+            } else {
+                console.log('❌ AdSenseスクリプトが読み込まれていません');
+            }
+
+            // 環境変数の確認（Next.jsでは直接アクセスできないが、スクリプトタグから推測）
+            const adScripts = document.querySelectorAll('script[src*="googlesyndication.com"]');
+            if (adScripts.length > 0) {
+                console.log('✅ Google AdSenseスクリプトタグが存在します');
+                adScripts.forEach((script, index) => {
+                    console.log(`AdScript ${index + 1}: ${script.src}`);
+                });
+            } else {
+                console.log('❌ Google AdSenseスクリプトタグが見つかりません');
+            }
+
+            // 自動広告の初期化状況確認
+            setTimeout(() => {
+                const adElements = document.querySelectorAll('.adsbygoogle');
+                console.log(`広告要素の数: ${adElements.length}`);
+                
+                if (adElements.length > 0) {
+                    console.log('✅ AdSense広告要素が見つかりました');
+                } else {
+                    console.log('ℹ️ 自動広告は表示まで時間がかかる場合があります');
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

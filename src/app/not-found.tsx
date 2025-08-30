@@ -1,4 +1,10 @@
 import Link from 'next/link'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'ページが見つかりません - 富山のくせに',
+  description: 'お探しのページは見つかりませんでした。ホームページから他のコンテンツをご覧ください。',
+}
 
 export default function NotFound() {
   return (
@@ -15,21 +21,22 @@ export default function NotFound() {
         <div className="space-y-3">
           <Link 
             href="/"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-block w-full"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded inline-block w-full min-h-[44px] flex items-center justify-center"
+            data-testid="home-link"
           >
             🏠 ホームに戻る
           </Link>
           
           <Link 
             href="/categories"
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded inline-block w-full"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded inline-block w-full min-h-[44px] flex items-center justify-center"
           >
             📂 カテゴリー一覧
           </Link>
           
           <Link 
             href="/studio-access.html"
-            className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded inline-block w-full"
+            className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-4 rounded inline-block w-full min-h-[44px] flex items-center justify-center"
           >
             🎯 記事管理
           </Link>

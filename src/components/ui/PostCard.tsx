@@ -36,9 +36,10 @@ interface PostCardProps {
       alt?: string
     }
   }
+  priority?: boolean
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, priority = false }: PostCardProps) {
   // サムネイル優先順位: 1.Sanity画像 > 2.YouTube動的取得
   const getThumbnailUrl = () => {
     if (post.thumbnail?.asset?.url) {
@@ -55,9 +56,11 @@ export default function PostCard({ post }: PostCardProps) {
   return (
     <Link 
       href={`/blog/${post.slug.current}`}
-      className="block"
+      className="block min-h-[44px]"
+      data-testid="article-card"
+      aria-label={`記事「${post.title}」を読む`}
     >
-      <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer relative z-[1]">
+      <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer relative z-[1]" role="article">
         {thumbnailUrl && (
           <div className="relative h-48 overflow-hidden bg-gray-100">
             <Image
@@ -66,16 +69,19 @@ export default function PostCard({ post }: PostCardProps) {
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              unoptimized={true}
-              priority={false}
+              quality={priority ? 90 : 75}
+              loading={priority ? "eager" : "lazy"}
+              priority={priority}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
             />
           </div>
         )}
         
-        <div className="p-5 md:p-6">
-          <h2 className="text-lg md:text-xl font-semibold mb-3 text-gray-800 line-clamp-2 leading-tight">
+        <div className="p-5 md:p-6 min-h-[44px]">
+          <h3 className="text-lg md:text-xl font-semibold mb-3 text-gray-800 line-clamp-2 leading-tight">
             {post.title}
-          </h2>
+          </h3>
           
           {post.categories && (
             <div className="flex flex-wrap gap-1.5 mb-3">
