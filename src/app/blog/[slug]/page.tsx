@@ -7,6 +7,10 @@ import Breadcrumb from '@/components/ui/Breadcrumb'
 import ReadingTime from '@/components/ui/ReadingTime'
 import TableOfContents from '@/components/TableOfContents'
 import { TopArticleAd, MiddleArticleAd, BottomArticleAd } from '@/components/ArticleAds'
+import StructuredData from '@/components/StructuredData'
+import { generateArticleLD, generateBreadcrumbLD } from '@/lib/structured-data'
+import ArticleErrorBoundary from '@/components/ui/ArticleErrorBoundary'
+import type { Metadata } from 'next'
 
 // ISR: 詳細ページは5分キャッシュ
 export const revalidate = 300
@@ -21,6 +25,63 @@ export async function generateStaticParams() {
   return posts.map((post) => ({
     slug: post.slug,
   }));
+}
+
+// メタデータ生成
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const post = await getPost(slug)
+  
+  if (!post) {
+    return {
+      title: 'ページが見つかりません',
+      description: 'お探しのページは見つかりませんでした。'
+    }
+  }
+  
+  // サムネイル画像URLを取得
+  const thumbnailUrl = post.youtubeUrl 
+    ? `https://img.youtube.com/vi/${post.youtubeUrl.split('/').pop()}/maxresdefault.jpg`
+    : post.thumbnail?.asset?.url || '/images/og-image.png'
+  
+  const publishedTime = post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined
+  const modifiedTime = publishedTime
+  
+  return {
+    title: post.title,
+    description: post.excerpt || post.description || `${post.title}の詳細情報を紹介しています。`,
+    keywords: post.tags || [post.category || '富山'],
+    authors: [{ name: 'ささよし', url: 'https://sasakiyoshimasa.com' }],
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || post.description || `${post.title}の詳細情報を紹介しています。`,
+      url: `https://sasakiyoshimasa.com/blog/${slug}`,
+      siteName: '富山のくせに',
+      images: [{
+        url: thumbnailUrl,
+        width: 1200,
+        height: 630,
+        alt: post.title
+      }],
+      locale: 'ja_JP',
+      type: 'article',
+      publishedTime,
+      modifiedTime,
+      section: post.category || '富山',
+      tags: post.tags || [post.category || '富山'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt || post.description || `${post.title}の詳細情報を紹介しています。`,
+      site: '@sasayoshi_tym',
+      creator: '@sasayoshi_tym',
+      images: [thumbnailUrl],
+    },
+    alternates: {
+      canonical: `https://sasakiyoshimasa.com/blog/${slug}`,
+    },
+  }
 }
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -43,9 +104,19 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     getAllCategories()
   ])
 
+  // 構造化データを生成
+  const articleLD = generateArticleLD(post, slug)
+  const breadcrumbLD = generateBreadcrumbLD([
+    { name: 'ホーム', url: 'https://sasakiyoshimasa.com/' },
+    ...(post.category ? [{ name: post.category, url: `https://sasakiyoshimasa.com/category/${encodeURIComponent(post.category)}` }] : []),
+    { name: post.title }
+  ])
+
   return (
-    <div className="min-h-screen bg-gray-50 blog-page">
-      <GlobalHeader posts={posts} categories={categories} />
+    <>
+      <StructuredData data={[articleLD, breadcrumbLD]} />
+      <div className="min-h-screen bg-gray-50 blog-page">
+        <GlobalHeader posts={posts} categories={categories} />
       
       <div className="max-w-4xl mx-auto px-4 py-8 pt-24">
         <Breadcrumb
@@ -69,10 +140,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           ]}
         />
 
-        <article className="bg-white rounded-xl shadow-sm p-8 md:p-12">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-gray-900 leading-tight">
-            {post.title}
-          </h1>
+        <ArticleErrorBoundary articleTitle={post.title}>
+          <article className="bg-white rounded-xl shadow-sm p-8 md:p-12">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-gray-900 leading-tight">
+              {post.title}
+            </h1>
           
           {Array.isArray(post.body) && post.body.length > 0 && (
             <ReadingTime content={post.body} />
@@ -192,8 +264,10 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               </Link>
             </div>
           </div>
-        </article>
+          </article>
+        </ArticleErrorBoundary>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

@@ -17,10 +17,7 @@ async function getArticlesSummary() {
       tags,
       category,
       publishedAt,
-      body[_type == "html" && html match "*iframe*"] {
-        _key,
-        html
-      }
+      body
     }`);
     
     console.log(`📊 総記事数: ${posts.length}件`);
@@ -33,7 +30,11 @@ async function getArticlesSummary() {
     posts.forEach((post) => {
       const hasYoutube = !!post.youtubeUrl;
       const hasGoogleMap = post.body && post.body.some(block => 
-        block.html && block.html.includes('maps.google.com')
+        block._type === 'html' && 
+        block.html && 
+        (block.html.includes('maps.google.com') || 
+         block.html.includes('google.com/maps') || 
+         block.html.includes('maps'))
       );
       const hasTagsSet = post.tags && post.tags.length > 0;
       

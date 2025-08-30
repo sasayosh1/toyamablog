@@ -4,6 +4,8 @@ import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 import Breadcrumb from '@/components/ui/Breadcrumb'
+import StructuredData from '@/components/StructuredData'
+import { generateTagLD, generateBreadcrumbLD } from '@/lib/structured-data'
 
 // キャッシュ無効化: 常に最新を表示
 export const revalidate = 0
@@ -59,9 +61,18 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
     getAllCategories()
   ])
 
+  // 構造化データを生成
+  const tagLD = generateTagLD(decodedTag, posts)
+  const breadcrumbLD = generateBreadcrumbLD([
+    { name: 'ホーム', url: 'https://sasakiyoshimasa.com/' },
+    { name: `タグ: ${decodedTag}` }
+  ])
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <GlobalHeader posts={allPosts} categories={categories} />
+    <>
+      <StructuredData data={[tagLD, breadcrumbLD]} />
+      <div className="min-h-screen bg-gray-50">
+        <GlobalHeader posts={allPosts} categories={categories} />
       
       <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
         <Breadcrumb
@@ -118,7 +129,8 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
           </Link>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

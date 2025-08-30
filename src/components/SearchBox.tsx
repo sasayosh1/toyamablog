@@ -17,7 +17,7 @@ export default function SearchBox({ posts }: SearchBoxProps) {
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // 検索結果をフィルタリング
+  // 検索結果をフィルタリング（デバウンス付き）
   useEffect(() => {
     if (searchQuery.trim() === '') {
       setFilteredPosts([])
@@ -25,16 +25,20 @@ export default function SearchBox({ posts }: SearchBoxProps) {
       return
     }
 
-    const query = searchQuery.toLowerCase().trim()
-    const filtered = posts.filter(post => 
-      post.title.toLowerCase().includes(query) ||
-      post.description?.toLowerCase().includes(query) ||
-      post.categories?.some(cat => cat.toLowerCase().includes(query)) ||
-      post.tags?.some(tag => tag.toLowerCase().includes(query))
-    ).slice(0, 10) // 最大10件まで表示
+    const timeoutId = setTimeout(() => {
+      const query = searchQuery.toLowerCase().trim()
+      const filtered = posts.filter(post => 
+        post.title.toLowerCase().includes(query) ||
+        post.description?.toLowerCase().includes(query) ||
+        post.categories?.some(cat => cat.toLowerCase().includes(query)) ||
+        post.tags?.some(tag => tag.toLowerCase().includes(query))
+      ).slice(0, 10) // 最大10件まで表示
 
-    setFilteredPosts(filtered)
-    setIsOpen(filtered.length > 0)
+      setFilteredPosts(filtered)
+      setIsOpen(filtered.length > 0)
+    }, 300) // 300msデバウンス
+
+    return () => clearTimeout(timeoutId)
   }, [searchQuery, posts])
 
   // 外部クリックで検索結果を閉じる
@@ -65,7 +69,7 @@ export default function SearchBox({ posts }: SearchBoxProps) {
   }
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-md mx-auto">
+    <div ref={searchRef} className="relative w-full max-w-md mx-auto" data-testid="search-form">
       {/* 検索入力フィールド */}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -85,7 +89,8 @@ export default function SearchBox({ posts }: SearchBoxProps) {
         </div>
         <input
           ref={inputRef}
-          type="text"
+          type="search"
+          name="search"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -96,6 +101,7 @@ export default function SearchBox({ posts }: SearchBoxProps) {
           }}
           placeholder="記事を検索..."
           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 bg-white/95 backdrop-blur-sm shadow-lg transition-all duration-200 placeholder-gray-500 text-gray-800"
+          data-testid="search-input"
         />
         {searchQuery && (
           <button
@@ -124,7 +130,7 @@ export default function SearchBox({ posts }: SearchBoxProps) {
 
       {/* 検索結果ドロップダウン */}
       {isOpen && filteredPosts.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto" data-testid="search-results">
           <div className="py-2">
             <div className="px-4 py-2 text-xs text-gray-500 font-medium border-b border-gray-100">
               {filteredPosts.length}件の検索結果
@@ -135,6 +141,7 @@ export default function SearchBox({ posts }: SearchBoxProps) {
                 href={`/blog/${post.slug.current}`}
                 onClick={handleResultClick}
                 className="block px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0"
+                data-testid="article-card"
               >
                 <div className="flex items-start space-x-3">
                   {/* サムネイル */}
@@ -189,7 +196,7 @@ export default function SearchBox({ posts }: SearchBoxProps) {
 
       {/* 検索中で結果がない場合 */}
       {isOpen && searchQuery && filteredPosts.length === 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-xl z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-xl z-50" data-testid="no-results">
           <div className="px-4 py-6 text-center text-gray-500">
             <svg 
               className="mx-auto h-8 w-8 text-gray-400 mb-2" 

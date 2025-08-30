@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
+import SearchErrorBoundary from '@/components/ui/SearchErrorBoundary'
 
 // SearchResultLink コンポーネント（Client Component）
 interface SearchResultLinkProps {
@@ -13,9 +14,10 @@ interface SearchResultLinkProps {
   className: string
   onResultClick: () => void
   children: React.ReactNode
+  'data-testid'?: string
 }
 
-function SearchResultLink({ href, className, onResultClick, children }: SearchResultLinkProps) {
+function SearchResultLink({ href, className, onResultClick, children, 'data-testid': dataTestId }: SearchResultLinkProps) {
   const router = useRouter()
   
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -33,6 +35,7 @@ function SearchResultLink({ href, className, onResultClick, children }: SearchRe
     <div
       className={`cursor-pointer ${className}`}
       onClick={handleClick}
+      data-testid={dataTestId}
     >
       {children}
     </div>
@@ -207,11 +210,16 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
           </nav>
 
           {/* PC用検索エリア */}
-          <div ref={searchRef} className="relative max-w-md">
+          <SearchErrorBoundary onError={() => {
+            setSearchQuery('')
+            setIsSearchOpen(false)
+          }}>
+            <div ref={searchRef} className="relative max-w-md" data-testid="search-form">
             <div className="relative">
               <input
                 ref={inputRef}
-                type="text"
+                type="search"
+                name="search"
                 placeholder="記事を検索..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -220,6 +228,12 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
                   if (filteredPosts.length > 0) setIsSearchOpen(true)
                 }}
                 className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500 transition-all"
+                data-testid="search-input"
+                aria-label="記事を検索"
+                aria-describedby="search-instructions"
+                aria-expanded={isSearchOpen}
+                aria-autocomplete="list"
+                role="searchbox"
               />
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                 {isLoading ? (
@@ -233,10 +247,16 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
             </div>
 
             {/* PC用検索結果ドロップダウン */}
+            <div id="search-instructions" className="sr-only">
+              矢印キーで選択、Enterで決定、Escapeで閉じる
+            </div>
             {isSearchOpen && filteredPosts.length > 0 && (
               <div 
                 ref={resultsRef}
                 className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto"
+                data-testid="search-results"
+                role="listbox"
+                aria-label={`${filteredPosts.length}件の検索結果`}
               >
                 {filteredPosts.map((post, index) => (
                   <SearchResultLink
@@ -245,6 +265,7 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
                     className={`block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors ${
                       index === selectedIndex ? 'bg-blue-50' : ''
                     }`}
+                    data-testid="article-card"
                     onResultClick={() => {
                       setIsSearchOpen(false)
                       setSelectedIndex(-1)
@@ -297,19 +318,22 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
             )}
 
             {isSearchOpen && filteredPosts.length === 0 && searchQuery.trim() && !isLoading && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-4 text-center text-gray-500">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-4 text-center text-gray-500" data-testid="no-results">
                 「{searchQuery}」に関する記事が見つかりませんでした
               </div>
             )}
-          </div>
+            </div>
+          </SearchErrorBoundary>
         </div>
 
         {/* モバイル用メニュー（lg未満で表示） */}
         <div className="lg:hidden flex items-center justify-between h-16">
-          {/* ハンバーガーメニューボタン */}
+          {/* ハンバーガーメニューボタン - 44px最小タッチターゲット */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex items-center justify-center w-8 h-8 focus:outline-none transition-colors text-gray-800 hover:text-blue-600"
+            className="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] focus:outline-none transition-colors text-gray-800 hover:text-blue-600 rounded-md hover:bg-gray-100 active:bg-gray-200"
+            data-testid="hamburger-menu"
+            aria-label="メニュー"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -317,7 +341,11 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
           </button>
 
           {/* モバイル用検索エリア */}
-          <div ref={searchRef} className="relative flex-1 max-w-md mx-4">
+          <SearchErrorBoundary onError={() => {
+            setSearchQuery('')
+            setIsSearchOpen(false)
+          }}>
+            <div ref={searchRef} className="relative flex-1 max-w-md mx-4">
             <div className="relative">
               <input
                 ref={inputRef}
@@ -407,11 +435,12 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
             )}
 
             {isSearchOpen && filteredPosts.length === 0 && searchQuery.trim() && !isLoading && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-4 text-center text-gray-500">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-4 text-center text-gray-500" data-testid="no-results">
                 「{searchQuery}」に関する記事が見つかりませんでした
               </div>
             )}
-          </div>
+            </div>
+          </SearchErrorBoundary>
 
           {/* 右側の余白 */}
           <div className="w-8"></div>
@@ -420,12 +449,12 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
 
       {/* モバイル用ハンバーガーメニュー */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
-          <nav className="max-w-7xl mx-auto px-4 py-4">
+        <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg" data-testid="mobile-menu">
+          <nav className="max-w-7xl mx-auto px-4 py-4" aria-label="mobile">
             <div className="flex flex-col space-y-3">
               <MenuLink
                 href="/"
-                className="flex items-center px-3 py-2 text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
+                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
                 onMenuClick={() => setIsMenuOpen(false)}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,7 +464,7 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
               </MenuLink>
               <MenuLink
                 href="/categories"
-                className="flex items-center px-3 py-2 text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
+                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
                 onMenuClick={() => setIsMenuOpen(false)}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,7 +474,7 @@ export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderPro
               </MenuLink>
               <MenuLink
                 href="/about"
-                className="flex items-center px-3 py-2 text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
+                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
                 onMenuClick={() => setIsMenuOpen(false)}
               >
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

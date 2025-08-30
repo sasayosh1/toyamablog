@@ -6,6 +6,8 @@ import Breadcrumb from '@/components/ui/Breadcrumb'
 import PageHeader from '@/components/ui/PageHeader'
 import PostCard from '@/components/ui/PostCard'
 import CategoryCard from '@/components/ui/CategoryCard'
+import StructuredData from '@/components/StructuredData'
+import { generateCategoryLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import { Metadata } from 'next'
 
 // キャッシュ無効化: 常に最新を表示
@@ -52,9 +54,19 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
     notFound()
   }
 
+  // 構造化データを生成
+  const categoryLD = generateCategoryLD(decodedCategory, categoryPosts)
+  const breadcrumbLD = generateBreadcrumbLD([
+    { name: 'ホーム', url: 'https://sasakiyoshimasa.com/' },
+    { name: 'カテゴリー', url: 'https://sasakiyoshimasa.com/categories' },
+    { name: decodedCategory }
+  ])
+
   return (
-    <div className="min-h-screen bg-gray-50 category-page">
-      <GlobalHeader posts={allPosts} categories={categories} />
+    <>
+      <StructuredData data={[categoryLD, breadcrumbLD]} />
+      <div className="min-h-screen bg-gray-50 category-page">
+        <GlobalHeader posts={allPosts} categories={categories} />
       
       <div className="max-w-7xl mx-auto py-8 md:py-12 px-4 pt-24">
         <Breadcrumb
@@ -157,6 +169,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   )
 }
