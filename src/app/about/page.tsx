@@ -40,7 +40,7 @@ export default async function AboutPage() {
         <div className="text-center mb-12">
           <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden shadow-lg border-4 border-pink-200">
             <Image
-              src="/images/sasayoshi-avatar.png"
+              src="/profile.png"
               alt="ささよしアバター - 富山のくせにブロガー"
               width={128}
               height={128}
