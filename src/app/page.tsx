@@ -67,6 +67,15 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* プロモーション表示 - ヒーロー直下配置 */} {/* 追加 */}
+      <div className="bg-yellow-50 border-l-4 border-yellow-400 py-4 px-6">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-center text-base font-medium text-gray-800 leading-relaxed">
+            ※本サイトで紹介している商品・サービス等の外部リンクには、プロモーションが含まれています。
+          </p>
+        </div>
+      </div>
+
       <main className="max-w-7xl mx-auto py-8 md:py-12 px-4 relative z-0">
         <section aria-labelledby="latest-articles-heading">
           <h2 id="latest-articles-heading" className="sr-only">最新記事一覧</h2>
@@ -98,15 +107,6 @@ export default async function Home() {
           </div>
         )}
         </section>
-
-        {/* プロモーション表示 - 改善版 */} {/* 修正 */}
-        <div className="mt-12 pt-8 border-t-2 border-gray-300 bg-gray-50 rounded-lg p-6">
-          <div className="text-center">
-            <p className="text-base font-medium text-gray-800 leading-relaxed">
-              ※本サイトで紹介している商品・サービス等の外部リンクには、プロモーションが含まれています。
-            </p>
-          </div>
-        </div>
       </main>
       </div>
     </>
