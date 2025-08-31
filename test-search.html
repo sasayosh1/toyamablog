@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Test</title>
+</head>
+<body>
+    <h1>富山ブログ検索テスト</h1>
+    <p>開発サーバー: <a href="http://localhost:3002" target="_blank">http://localhost:3002</a></p>
+    <p>テスト手順:</p>
+    <ol>
+        <li>上記リンクをクリックしてサイトを開く</li>
+        <li>右上の検索バーを探す（PC版）または上部の検索バー（モバイル版）</li>
+        <li>「富山」や「グルメ」などのキーワードを入力</li>
+        <li>ブラウザのデベロッパーツール (F12) でコンソールを確認</li>
+        <li>検索結果が表示されるか確認</li>
+    </ol>
+    
+    <h2>期待される動作:</h2>
+    <ul>
+        <li>コンソールに「GlobalHeader posts data」のログが表示される</li>
+        <li>文字入力時に「Search input change」のログが表示される</li>
+        <li>検索実行時に「performSearch called with」のログが表示される</li>
+        <li>検索結果のドロップダウンが表示される</li>
+    </ul>
+
+    <script>
+        // ブラウザテスト用の簡単なスクリプト
+        console.log('Test page loaded - ready to test search functionality');
+    </script>
+</body>
+</html>
