@@ -67,8 +67,8 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* プロモーション表示 - ヒーロー直下配置 */} {/* 追加 */}
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 py-4 px-6">
+      {/* プロモーション表示 - ヒーロー直下配置 */} {/* 修正 */}
+      <div className="bg-white py-4 px-6">
         <div className="max-w-7xl mx-auto">
           <p className="text-center text-base font-medium text-gray-800 leading-relaxed">
             ※本サイトで紹介している商品・サービス等の外部リンクには、プロモーションが含まれています。
