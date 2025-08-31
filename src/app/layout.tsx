@@ -4,6 +4,7 @@ import "./globals.css";
 import GAProvider from "./ga-provider";
 import { AdSense } from "@/components/AdSense";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Suspense } from "react";
 
@@ -98,6 +99,7 @@ export default function RootLayout({
           </Suspense>
           {children}
           <Footer />
+          <ScrollToTop />
         </ErrorBoundary>
       </body>
     </html>
