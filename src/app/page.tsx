@@ -6,8 +6,8 @@ import StructuredData from '@/components/StructuredData'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
 import { Suspense } from 'react'
 
-// ISR: 一覧は最長60秒で更新（モバイル読み込み速度向上）
-export const revalidate = 60
+// ISR: キャッシュクリア用に一時的に1秒に設定 // 修正
+export const revalidate = 1
 
 // メタデータ最適化
 export const metadata = {
@@ -99,10 +99,10 @@ export default async function Home() {
         )}
         </section>
 
-        {/* プロモーション表示 */}
-        <div className="mt-8 pt-8 border-t border-gray-200">
+        {/* プロモーション表示 - 改善版 */} {/* 修正 */}
+        <div className="mt-12 pt-8 border-t-2 border-gray-300 bg-gray-50 rounded-lg p-6">
           <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-base font-medium text-gray-800 leading-relaxed">
               ※本サイトで紹介している商品・サービス等の外部リンクには、プロモーションが含まれています。
             </p>
           </div>
