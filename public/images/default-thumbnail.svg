@@ -1,0 +1,17 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="400" height="300" fill="#f3f4f6"/>
+  
+  <!-- 立山連峰のシルエット -->
+  <path d="M0 200 L50 150 L100 120 L150 100 L200 90 L250 100 L300 120 L350 150 L400 200 L400 300 L0 300 Z" fill="#e5e7eb"/>
+  
+  <!-- 中景の山 -->
+  <path d="M0 220 L80 180 L160 160 L240 170 L320 180 L400 220 L400 300 L0 300 Z" fill="#d1d5db"/>
+  
+  <!-- 前景の山 -->
+  <path d="M0 250 L100 210 L200 200 L300 210 L400 250 L400 300 L0 300 Z" fill="#9ca3af"/>
+  
+  <!-- 富山のくせにロゴ -->
+  <text x="200" y="150" font-family="'Hiragino Sans', 'Yu Gothic', sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#374151">富山のくせに</text>
+  <text x="200" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="normal" text-anchor="middle" fill="#6b7280">AMAZING TOYAMA</text>
+</svg>
