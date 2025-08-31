@@ -6,8 +6,8 @@ import StructuredData from '@/components/StructuredData'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
 import { Suspense } from 'react'
 
-// ISR: キャッシュクリア用に一時的に1秒に設定 // 修正
-export const revalidate = 1
+// ISR: 一覧は最長60秒で更新（モバイル読み込み速度向上） // 修正
+export const revalidate = 60
 
 // メタデータ最適化
 export const metadata = {
