@@ -1,6 +1,7 @@
 import { getAllPosts, getAllCategories } from '@/lib/sanity'
 import Image from 'next/image'
 import GlobalHeader from '@/components/GlobalHeader'
+import MainSearchBar from '@/components/MainSearchBar'
 import PostCard from '@/components/ui/PostCard'
 import StructuredData from '@/components/StructuredData'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
@@ -32,6 +33,8 @@ export default async function Home() {
     getAllPosts(),
     getAllCategories()
   ])
+
+  // posts データ読み込み完了 // 修正
 
   // 構造化データを生成
   const organizationLD = generateOrganizationLD()
@@ -75,6 +78,9 @@ export default async function Home() {
           </p>
         </div>
       </div>
+
+      {/* メイン検索バー */}
+      <MainSearchBar posts={posts} />
 
       <main className="max-w-7xl mx-auto py-8 md:py-12 px-4 relative z-0">
         <section aria-labelledby="latest-articles-heading">
