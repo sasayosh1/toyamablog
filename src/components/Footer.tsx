@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* サイト情報 */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold">富山のくせに</h3>
@@ -68,38 +68,6 @@ export default function Footer() {
               <li>
                 <Link href="/about" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
                   サイトについて
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* 人気カテゴリー */}
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold">人気エリア</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/category/富山市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
-                  富山市
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/高岡市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
-                  高岡市
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/氷見市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
-                  氷見市
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/南砺市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
-                  南砺市
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/砺波市" className="text-gray-300 hover:text-white transition-colors block py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">
-                  砺波市
                 </Link>
               </li>
             </ul>
