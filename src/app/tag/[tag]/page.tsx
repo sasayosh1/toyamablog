@@ -140,7 +140,7 @@ export async function generateMetadata({ params }: { params: Promise<{ tag: stri
   const decodedTag = decodeURIComponent(tag)
   
   return {
-    title: `${decodedTag} - タグ | TOYAMA BLOG`,
+    title: `${decodedTag} - タグ | 富山のくせに`,
     description: `富山の魅力を紹介する「${decodedTag}」タグの記事一覧ページです。`,
   }
 }
