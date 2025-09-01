@@ -46,7 +46,7 @@ export default async function Home({
   
   // ページネーション対応で記事を取得、検索用には全記事を取得
   const [paginatedData, allPosts, categories] = await Promise.all([
-    getPostsPaginated(currentPage, 50),
+    getPostsPaginated(currentPage, 51),
     getAllPosts(),
     getAllCategories()
   ])
@@ -139,7 +139,7 @@ export default async function Home({
 
         {/* 記事統計表示 */}
         <div className="text-center text-gray-600 text-sm mt-8">
-          全 {totalPosts} 件中 {((page - 1) * 50) + 1} - {Math.min(page * 50, totalPosts)} 件を表示
+          全 {totalPosts} 件中 {((page - 1) * 51) + 1} - {Math.min(page * 51, totalPosts)} 件を表示
         </div>
         </section>
       </main>

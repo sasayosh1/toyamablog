@@ -84,7 +84,7 @@ export async function getAllPosts(): Promise<Post[]> {
   return posts;
 }
 
-export async function getPostsPaginated(page: number = 1, limit: number = 50): Promise<{
+export async function getPostsPaginated(page: number = 1, limit: number = 51): Promise<{
   posts: Post[]
   totalPosts: number
   totalPages: number

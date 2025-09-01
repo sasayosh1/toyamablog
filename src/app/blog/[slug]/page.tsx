@@ -39,6 +39,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
   
+  // タイトルから#shortsを削除（クラウドルール準拠）
+  const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
+  
   // サムネイル画像URLを取得
   const thumbnailUrl = post.youtubeUrl 
     ? `https://img.youtube.com/vi/${post.youtubeUrl.split('/').pop()}/maxresdefault.jpg`
@@ -48,20 +51,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const modifiedTime = publishedTime
   
   return {
-    title: post.title,
-    description: post.excerpt || post.description || `${post.title}の詳細情報を紹介しています。`,
+    title: cleanTitle,
+    description: post.excerpt || post.description || `${cleanTitle}の詳細情報を紹介しています。`,
     keywords: post.tags || [post.category || '富山'],
     authors: [{ name: 'ささよし', url: 'https://sasakiyoshimasa.com' }],
     openGraph: {
-      title: post.title,
-      description: post.excerpt || post.description || `${post.title}の詳細情報を紹介しています。`,
+      title: cleanTitle,
+      description: post.excerpt || post.description || `${cleanTitle}の詳細情報を紹介しています。`,
       url: `https://sasakiyoshimasa.com/blog/${slug}`,
       siteName: '富山のくせに',
       images: [{
         url: thumbnailUrl,
         width: 1200,
         height: 630,
-        alt: post.title
+        alt: cleanTitle
       }],
       locale: 'ja_JP',
       type: 'article',
@@ -72,8 +75,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
-      description: post.excerpt || post.description || `${post.title}の詳細情報を紹介しています。`,
+      title: cleanTitle,
+      description: post.excerpt || post.description || `${cleanTitle}の詳細情報を紹介しています。`,
       site: '@sasayoshi_tym',
       creator: '@sasayoshi_tym',
       images: [thumbnailUrl],
