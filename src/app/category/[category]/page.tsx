@@ -131,43 +131,52 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
         </div>
 
         {/* 他のカテゴリーへのリンク */}
-        {categories.length > 1 && (
-          <div className="mt-16 border-t border-gray-200 pt-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-              他のカテゴリーも見る
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {categories
-                .filter(cat => cat !== decodedCategory)
-                .slice(0, 8)
-                .map((otherCategory) => {
-                  const count = allPosts.filter(post => post.category === otherCategory).length
-                  return (
-                    <CategoryCard
-                      key={otherCategory}
-                      name={otherCategory}
-                      count={count}
-                      href={`/category/${encodeURIComponent(otherCategory)}`}
-                      variant="compact"
-                    />
-                  )
-                })}
-            </div>
-            {categories.length > 9 && (
-              <div className="text-center mt-6">
-                <Link
-                  href="/categories"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  すべてのカテゴリーを見る
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
+        {(() => {
+          // 地域名のみを抽出（地域名以外のカテゴリーを除外）
+          const locationCategories = [
+            '富山市', '高岡市', '魚津市', '氷見市', '滑川市', '黒部市', '砺波市', '小矢部市', '南砺市', '射水市',
+            '舟橋村', '上市町', '立山町', '入善町', '朝日町', '南砺市福野', '南砺市城端', '南砺市福光',
+            '高岡市福岡町', '砺波市庄川', '富山市八尾町', '富山市婦中町', '富山市山田村',
+            '八尾町', '福岡町', '庄川町'
+          ]
+          const filteredCategories = categories.filter(category => 
+            locationCategories.includes(category) || 
+            category.includes('市') || 
+            category.includes('町') || 
+            category.includes('村')
+          ).filter(category => 
+            category !== 'グルメ' && 
+            category !== '自然・公園' && 
+            category !== '観光' && 
+            category !== 'イベント' && 
+            category !== '文化・歴史' &&
+            category !== decodedCategory
+          )
+
+          return filteredCategories.length > 0 && (
+            <div className="mt-16 border-t border-gray-200 pt-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                他の地域も見る
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredCategories
+                  .slice(0, 8)
+                  .map((otherCategory) => {
+                    const count = allPosts.filter(post => post.category === otherCategory).length
+                    return count > 0 && (
+                      <CategoryCard
+                        key={otherCategory}
+                        name={otherCategory}
+                        count={count}
+                        href={`/category/${encodeURIComponent(otherCategory)}`}
+                        variant="compact"
+                      />
+                    )
+                  })}
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )
+        })()}
       </div>
       </div>
     </>
