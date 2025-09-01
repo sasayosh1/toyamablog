@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { PortableText as BasePortableText } from '@portabletext/react'
 import { urlForImage } from '@/sanity/lib/image'
 import { extractYouTubeId, generateHeadingId } from '@/lib/utils'
@@ -40,18 +41,21 @@ const components = {
         return null
       }
       
+      const imageUrl = urlForImage(value).width(800).height(600).fit('max').auto('format').url()
+      
       return (
         <div style={{ margin: '2rem 0' }}>
-          <img
-            src={urlForImage(value).width(800).height(600).fit('max').auto('format').url()}
-            alt={value.alt || 'Blog image'}
-            style={{
-              width: '100%',
-              height: 'auto',
-              borderRadius: '8px',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
-            }}
-          />
+          <div style={{ position: 'relative', width: '100%', height: '400px' }}>
+            <Image
+              src={imageUrl}
+              alt={value.alt || 'ブログ画像'}
+              fill
+              className="object-cover rounded-lg shadow-md"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 75vw, 50vw"
+              loading="lazy"
+              quality={85}
+            />
+          </div>
           {value.caption && (
             <p style={{
               textAlign: 'center',

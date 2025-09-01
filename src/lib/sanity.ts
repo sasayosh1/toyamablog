@@ -7,6 +7,8 @@ export const client = createClient({
   useCdn: true, // CDN有効化でパフォーマンス向上
   perspective: 'published', // publishedコンテンツのみ
   token: process.env.SANITY_API_TOKEN, // サーバーサイドトークン追加
+  stega: false, // Stegaを無効化してパフォーマンス向上
+  requestTagPrefix: 'toyama-blog', // キャッシュタグ最適化
 });
 
 export interface Author {
@@ -114,13 +116,13 @@ export async function getPostsPaginated(page: number = 1, limit: number = 50): P
     `, {}, { 
       next: { 
         tags: ['post-list-paginated'], 
-        revalidate: 300 
+        revalidate: 600 
       } 
     }),
     client.fetch(`count(*[_type == "post" && defined(publishedAt)])`, {}, {
       next: { 
         tags: ['post-count'], 
-        revalidate: 300 
+        revalidate: 3600 
       } 
     })
   ])
