@@ -45,6 +45,7 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
+  
   // パフォーマンス最適化
   poweredByHeader: false,
   compress: true,
