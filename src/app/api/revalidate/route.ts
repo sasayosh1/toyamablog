@@ -9,7 +9,8 @@ export async function POST(req: Request) {
     }
     if (type === 'list') {
       revalidateTag('post-list');
-      return NextResponse.json({ ok:true, revalidated:'tag:post-list' });
+      revalidatePath('/categories');
+      return NextResponse.json({ ok:true, revalidated:'tag:post-list,path:/categories' });
     }
     if (type === 'detail' && typeof slug === 'string') {
       revalidatePath(`/blog/${slug}`);
