@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     loader: 'default',
-    unoptimized: false,
+    unoptimized: true,
   },
   
   // Sanity CMS用設定
@@ -73,7 +73,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://googletagmanager.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "img-src 'self' data: https: blob:",
+              "img-src 'self' data: https: blob: https://cdn.sanity.io https://i.ytimg.com https://img.youtube.com",
               "font-src 'self' https://fonts.gstatic.com",
               "connect-src 'self' https://www.google-analytics.com https://vitals.vercel-analytics.com https://*.supabase.co wss://*.supabase.co",
               "frame-src 'self' https://www.youtube.com https://youtube.com https://www.google.com",
@@ -120,7 +120,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io",
               "style-src 'self' 'unsafe-inline' https://cdn.sanity.io https://fonts.googleapis.com",
-              "img-src 'self' data: https: blob:",
+              "img-src 'self' data: https: blob: https://cdn.sanity.io https://i.ytimg.com https://img.youtube.com",
               "font-src 'self' https://fonts.gstatic.com https://cdn.sanity.io",
               "connect-src 'self' https://*.sanity.io https://cdn.sanity.io wss://*.sanity.io",
               "frame-src 'self' https://sanity.io https://*.sanity.io",
