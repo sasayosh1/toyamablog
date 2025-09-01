@@ -1,5 +1,4 @@
 import { getAllCategories, getPostsPaginated, getAllPosts } from '@/lib/sanity'
-import Image from 'next/image'
 import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 import StructuredData from '@/components/StructuredData'
@@ -63,15 +62,11 @@ export default async function Home({
       <div className="min-h-screen bg-gray-50 blog-page">
         <GlobalHeader posts={allPosts} categories={categories} />
       <div className="relative h-80 md:h-96 lg:h-[32rem] overflow-hidden">
-        <Image
+        <img
           src="/images/toyama-hero.png"
           alt="富山市の風景 - 立山連峰を背景にした橋と川"
-          fill
-          className="object-cover object-center"
-          priority
-          sizes="100vw"
-          quality={85}
-          placeholder="empty"
+          className="w-full h-full object-cover object-center"
+          loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
         <div className="absolute inset-0 flex items-center justify-center">
