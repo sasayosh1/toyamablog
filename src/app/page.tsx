@@ -1,4 +1,4 @@
-import { getAllPosts, getAllCategories } from '@/lib/sanity'
+import { getAllCategories, client, type Post } from '@/lib/sanity'
 import Image from 'next/image'
 import GlobalHeader from '@/components/GlobalHeader'
 import MainSearchBar from '@/components/MainSearchBar'
@@ -29,8 +29,40 @@ export const metadata = {
 }
 
 export default async function Home() {
+  // ホームページでは最新12件のみ取得（パフォーマンス向上）
   const [posts, categories] = await Promise.all([
-    getAllPosts(),
+    client.fetch<Post[]>(`
+      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...12] {
+        _id,
+        title,
+        slug,
+        description,
+        excerpt,
+        tags,
+        category,
+        publishedAt,
+        youtubeUrl,
+        thumbnail{
+          asset->{
+            _ref,
+            url
+          },
+          alt
+        },
+        author->{
+          _id,
+          name,
+          slug,
+          bio,
+          image{
+            asset->{
+              _ref,
+              url
+            }
+          }
+        }
+      }
+    `),
     getAllCategories()
   ])
 
