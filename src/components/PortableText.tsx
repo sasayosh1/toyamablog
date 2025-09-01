@@ -120,11 +120,6 @@ const components = {
         />
       )
     },
-    googleMaps: ({ value }: { value: { iframe: string; description?: string } }) => {
-      // クラウドルール：Googleマップはタグセクションより上の専用セクションで表示
-      // PortableText内では表示しない（記事ページで専用セクション表示）
-      return null;
-    },
     youtubeShorts: ({ value }: { value: { url: string } }) => {
       const { url } = value
       const videoId = extractYouTubeId(url)

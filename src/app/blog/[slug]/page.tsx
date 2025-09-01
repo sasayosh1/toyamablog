@@ -222,7 +222,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </>
         ) : null}
 
-          {/* Googleマップセクション（クラウドルール：タグより上に配置） */}
+          {/* まとめセクション（クラウドルール：記事本文の後、マップより上） */}
+          <div className="border-t border-gray-200 pt-8 mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">まとめ</h3>
+            <div className="prose prose-lg max-w-none">
+              <p className="text-gray-700 leading-relaxed">
+                {post.category && `${post.category}の`}魅力あふれる{cleanTitle}をご紹介しました。
+                {post.youtubeUrl && 'YouTube動画と合わせて、'}富山県の素晴らしい体験をお楽しみください。
+              </p>
+            </div>
+          </div>
+
+          {/* Googleマップセクション（クラウドルール：まとめの後、タグより上に配置） */}
           {post.body && Array.isArray(post.body) && (() => {
             const googleMapsComponents = post.body.filter((block: any) => block._type === 'googleMaps');
             return googleMapsComponents.length > 0 ? (
