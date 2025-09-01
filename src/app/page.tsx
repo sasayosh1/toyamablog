@@ -7,8 +7,8 @@ import StructuredData from '@/components/StructuredData'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
 import { Suspense } from 'react'
 
-// ISR: 一覧は最長60秒で更新（モバイル読み込み速度向上） // 修正
-export const revalidate = 60
+// ISR: 5分キャッシュでパフォーマンス向上
+export const revalidate = 300
 
 // メタデータ最適化
 export const metadata = {
@@ -29,7 +29,7 @@ export const metadata = {
 }
 
 export default async function Home() {
-  // ホームページでは最新12件のみ取得（パフォーマンス向上）
+  // ホームページでは最新12件のみ取得（軽量化）
   const [posts, categories] = await Promise.all([
     client.fetch<Post[]>(`
       *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...12] {
@@ -38,31 +38,18 @@ export default async function Home() {
         slug,
         description,
         excerpt,
-        tags,
         category,
         publishedAt,
         youtubeUrl,
-        thumbnail{
-          asset->{
-            _ref,
-            url
-          },
-          alt
-        },
-        author->{
-          _id,
-          name,
-          slug,
-          bio,
-          image{
-            asset->{
-              _ref,
-              url
-            }
-          }
-        }
+        "categories": [category],
+        "displayExcerpt": coalesce(excerpt, description)
       }
-    `),
+    `, {}, { 
+      next: { 
+        tags: ['home-posts'], 
+        revalidate: 300 
+      } 
+    }),
     getAllCategories()
   ])
 

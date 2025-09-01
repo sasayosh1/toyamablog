@@ -12,8 +12,8 @@ import { generateArticleLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import ArticleErrorBoundary from '@/components/ui/ArticleErrorBoundary'
 import type { Metadata } from 'next'
 
-// ISR: 詳細ページは5分キャッシュ
-export const revalidate = 300
+// ISR: 詳細ページは10分キャッシュ
+export const revalidate = 600
 
 interface SanityPost {
   slug: string;
@@ -95,15 +95,19 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   // タイトルから#shortsを削除
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
 
-  // 記事一覧とカテゴリーを取得（検索用）
+  // 軽量化：検索用データのみ取得
   const [posts, categories] = await Promise.all([
     client.fetch<Post[]>(`
-      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...100] {
-        _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
-        author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
-        "excerpt": description, "categories": [category]
+      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
+        _id, title, slug, category, publishedAt,
+        "categories": [category]
       }
-    `),
+    `, {}, { 
+      next: { 
+        tags: ['search-posts'], 
+        revalidate: 600 
+      } 
+    }),
     getAllCategories()
   ])
 
