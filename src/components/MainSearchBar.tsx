@@ -54,7 +54,7 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
 
   // デバウンス処理付き検索
   const debouncedSearch = useCallback(
-    debounce(performSearch, 300),
+    (query: string) => debounce(performSearch, 300)(query),
     [posts]
   )
 
@@ -144,9 +144,11 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
               data-testid="main-search-input"
               aria-label="記事を検索"
               aria-describedby="main-search-instructions"
-              aria-expanded={isSearchOpen}
               aria-autocomplete="list"
-              role="searchbox"
+              role="combobox"
+              aria-expanded={isSearchOpen}
+              aria-haspopup="listbox"
+              aria-controls="search-results"
             />
             <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
               {isLoading ? (
@@ -166,6 +168,7 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
           {/* 検索結果ドロップダウン */}
           {isSearchOpen && searchQuery.trim() && filteredPosts.length > 0 && (
             <div 
+              id="search-results"
               ref={resultsRef}
               className="absolute top-full left-0 right-0 mt-3 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto"
               data-testid="main-search-results"

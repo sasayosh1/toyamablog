@@ -1,5 +1,3 @@
-import Script from 'next/script'
-
 interface StructuredDataProps {
   data: object | object[]
 }
@@ -10,10 +8,8 @@ export default function StructuredData({ data }: StructuredDataProps) {
     : JSON.stringify(data)
 
   return (
-    <Script
-      id="structured-data"
+    <script
       type="application/ld+json"
-      strategy="beforeInteractive"
       dangerouslySetInnerHTML={{
         __html: jsonLd
       }}

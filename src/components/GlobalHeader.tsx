@@ -29,7 +29,7 @@ interface GlobalHeaderProps {
   categories?: string[]
 }
 
-export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderProps) {
+export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
 

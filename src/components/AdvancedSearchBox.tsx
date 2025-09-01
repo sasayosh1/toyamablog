@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Post } from '@/lib/sanity'
-import Link from 'next/link'
+// import Link from 'next/link' // 現在未使用
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
@@ -24,11 +24,11 @@ export default function AdvancedSearchBox({ posts }: AdvancedSearchBoxProps) {
   const router = useRouter()
 
   // 検索結果をマージし、重複を除去
-  const mergeSearchResults = (clientResults: Post[], serverResults: Post[]): Post[] => {
-    const seen = new Set(clientResults.map(p => p._id))
-    const uniqueServerResults = serverResults.filter(p => !seen.has(p._id))
-    return [...clientResults, ...uniqueServerResults]
-  }
+  // const mergeSearchResults = (clientResults: Post[], serverResults: Post[]): Post[] => {
+  //   const seen = new Set(clientResults.map(p => p._id))
+  //   const uniqueServerResults = serverResults.filter(p => !seen.has(p._id))
+  //   return [...clientResults, ...uniqueServerResults]
+  // }
 
   // 検索実行関数
   const performSearch = async (query: string) => {
@@ -67,7 +67,7 @@ export default function AdvancedSearchBox({ posts }: AdvancedSearchBoxProps) {
 
   // デバウンス処理付き検索
   const debouncedSearch = useCallback(
-    debounce(performSearch, 300),
+    (query: string) => debounce(performSearch, 300)(query),
     [posts]
   )
 

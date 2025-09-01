@@ -1,12 +1,19 @@
 import { getAllCategories, getPostsPaginated, getAllPosts } from '@/lib/sanity'
 import Image from 'next/image'
 import GlobalHeader from '@/components/GlobalHeader'
-import MainSearchBar from '@/components/MainSearchBar'
 import PostCard from '@/components/ui/PostCard'
-import Pagination from '@/components/ui/Pagination'
 import StructuredData from '@/components/StructuredData'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
 import { Suspense } from 'react'
+import dynamic from 'next/dynamic'
+
+// 動的インポートでパフォーマンス向上
+const MainSearchBar = dynamic(() => import('@/components/MainSearchBar'), {
+  loading: () => <div className="bg-gray-50 py-6 h-20 animate-pulse" />
+})
+const Pagination = dynamic(() => import('@/components/ui/Pagination'), {
+  loading: () => <div className="h-12 animate-pulse bg-gray-100 rounded" />
+})
 
 // ISR: 5分キャッシュでパフォーマンス向上
 export const revalidate = 300
