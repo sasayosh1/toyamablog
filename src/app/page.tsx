@@ -1,8 +1,9 @@
-import { getAllCategories, client, type Post } from '@/lib/sanity'
+import { getAllCategories, getPostsPaginated, getAllPosts } from '@/lib/sanity'
 import Image from 'next/image'
 import GlobalHeader from '@/components/GlobalHeader'
 import MainSearchBar from '@/components/MainSearchBar'
 import PostCard from '@/components/ui/PostCard'
+import Pagination from '@/components/ui/Pagination'
 import StructuredData from '@/components/StructuredData'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
 import { Suspense } from 'react'
@@ -28,32 +29,22 @@ export const metadata = {
   },
 }
 
-export default async function Home() {
-  // ホームページでは最新12件のみ取得（軽量化）
-  const [posts, categories] = await Promise.all([
-    client.fetch<Post[]>(`
-      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...12] {
-        _id,
-        title,
-        slug,
-        description,
-        excerpt,
-        category,
-        publishedAt,
-        youtubeUrl,
-        "categories": [category],
-        "displayExcerpt": coalesce(excerpt, description)
-      }
-    `, {}, { 
-      next: { 
-        tags: ['home-posts'], 
-        revalidate: 300 
-      } 
-    }),
+export default async function Home({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ page?: string }> 
+}) {
+  const params = await searchParams
+  const currentPage = parseInt(params.page || '1', 10)
+  
+  // ページネーション対応で記事を取得、検索用には全記事を取得
+  const [paginatedData, allPosts, categories] = await Promise.all([
+    getPostsPaginated(currentPage, 50),
+    getAllPosts(),
     getAllCategories()
   ])
 
-  // posts データ読み込み完了 // 修正
+  const { posts, totalPosts, totalPages, currentPage: page } = paginatedData
 
   // 構造化データを生成
   const organizationLD = generateOrganizationLD()
@@ -63,7 +54,7 @@ export default async function Home() {
     <>
       <StructuredData data={[organizationLD, websiteLD]} />
       <div className="min-h-screen bg-gray-50 blog-page">
-        <GlobalHeader posts={posts} categories={categories} />
+        <GlobalHeader posts={allPosts} categories={categories} />
       <div className="relative h-80 md:h-96 lg:h-[32rem] overflow-hidden">
         <Image
           src="/images/toyama-hero.png"
@@ -99,7 +90,7 @@ export default async function Home() {
       </div>
 
       {/* メイン検索バー */}
-      <MainSearchBar posts={posts} />
+      <MainSearchBar posts={allPosts} />
 
       <main className="max-w-7xl mx-auto py-8 md:py-12 px-4 relative z-0">
         <section aria-labelledby="latest-articles-heading">
@@ -131,6 +122,18 @@ export default async function Home() {
             <p className="text-gray-800 text-lg">まだ投稿がありません</p>
           </div>
         )}
+
+        {/* ページネーション */}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          basePath="/"
+        />
+
+        {/* 記事統計表示 */}
+        <div className="text-center text-gray-600 text-sm mt-8">
+          全 {totalPosts} 件中 {((page - 1) * 50) + 1} - {Math.min(page * 50, totalPosts)} 件を表示
+        </div>
         </section>
       </main>
       </div>
