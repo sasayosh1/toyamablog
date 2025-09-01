@@ -226,8 +226,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </>
         ) : null}
 
-          {/* まとめセクション（クラウドルール：記事本文の後、マップより上） */}
-          <div className="border-t border-gray-200 pt-8 mb-8">
+        {/* まとめセクション（クラウドルール：記事本文の後、マップより上） */}
+        <div className="border-t border-gray-200 pt-8 mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">まとめ</h3>
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 leading-relaxed">
@@ -235,86 +235,94 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 {post.youtubeUrl && 'YouTube動画と合わせて、'}富山県の素晴らしい体験をお楽しみください。
               </p>
             </div>
-          </div>
+        </div>
 
-          {/* Googleマップセクション（クラウドルール：まとめの後、タグより上に配置） */}
-          {post.body && Array.isArray(post.body) && (() => {
-            const googleMapsComponents = post.body.filter((block: any) => block._type === 'googleMaps');
-            return googleMapsComponents.length > 0 ? (
+        {/* Googleマップセクション（クラウドルール：まとめの後、タグより上に配置） */}
+        {post.body && Array.isArray(post.body) && 
+            post.body.filter((block: unknown) => 
+              typeof block === 'object' && block !== null && 
+              '_type' in block && (block as { _type: string })._type === 'googleMaps'
+            ).length > 0 && (
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">地図</h3>
-                {googleMapsComponents.map((mapBlock: any, index: number) => {
-                  if (!mapBlock?.iframe) return null;
-                  const processedIframe = mapBlock.iframe
-                    .replace(/width="[^"]*"/g, 'width="100%"')
-                    .replace(/height="[^"]*"/g, 'height="300"')
-                    .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
-                  return (
-                    <div key={index} style={{ margin: '2rem 0', textAlign: 'center' }}>
-                      <div dangerouslySetInnerHTML={{ __html: processedIframe }} />
-                      {mapBlock.description && (
-                        <p style={{
-                          marginTop: '0.5rem',
-                          fontSize: '0.875rem',
-                          color: '#666',
-                          fontStyle: 'italic'
-                        }}>
-                          {mapBlock.description}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
+                {post.body
+                  .filter((block: unknown) => 
+                    typeof block === 'object' && block !== null && 
+                    '_type' in block && (block as { _type: string })._type === 'googleMaps'
+                  )
+                  .map((mapBlock: unknown, index: number) => {
+                    const block = mapBlock as { iframe?: string; description?: string };
+                    if (!block?.iframe) return null;
+                    const processedIframe = block.iframe
+                      .replace(/width="[^"]*"/g, 'width="100%"')
+                      .replace(/height="[^"]*"/g, 'height="300"')
+                      .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
+                    return (
+                      <div key={index} style={{ margin: '2rem 0', textAlign: 'center' }}>
+                        <div dangerouslySetInnerHTML={{ __html: processedIframe }} />
+                        {block.description && (
+                          <p style={{
+                            marginTop: '0.5rem',
+                            fontSize: '0.875rem',
+                            color: '#666',
+                            fontStyle: 'italic'
+                          }}>
+                            {block.description}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
               </div>
-            ) : null;
-          })()}
+            )
+        }
 
-          {post.tags && post.tags.length > 0 && (
-            <div className="border-t border-gray-200 pt-8 mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">タグ</h3>
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/tag/${encodeURIComponent(tag)}`}
-                    className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
-                  >
-                    {tag}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 記事下部広告 */}
-          <BottomArticleAd />
-
-          {/* ナビゲーションボタン */}
-          <div className="border-t border-gray-200 pt-8">
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {post.category && (
+        {post.tags && post.tags.length > 0 && (
+          <div className="border-t border-gray-200 pt-8 mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">タグ</h3>
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
                 <Link
-                  href={`/category/${encodeURIComponent(post.category)}`}
-                  className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm"
+                  key={tag}
+                  href={`/tag/${encodeURIComponent(tag)}`}
+                  className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                  </svg>
-                  {post.category}の記事一覧
+                  {tag}
                 </Link>
-              )}
-              <Link
-                href="/"
-                className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                ホームに戻る
-              </Link>
+              ))}
             </div>
           </div>
-          </article>
+        )}
+
+        {/* 記事下部広告 */}
+        <BottomArticleAd />
+
+        {/* ナビゲーションボタン */}
+        <div className="border-t border-gray-200 pt-8">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {post.category && (
+              <Link
+                href={`/category/${encodeURIComponent(post.category)}`}
+                className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                {post.category}の記事一覧
+              </Link>
+            )}
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              ホームに戻る
+            </Link>
+          </div>
+        </div>
+        </article>
         </ArticleErrorBoundary>
       </div>
       </div>
