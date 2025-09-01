@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    unoptimized: false, // 画像最適化を有効化
+    unoptimized: true, // 画像最適化を無効化（Vercel設定と整合）
     minimumCacheTTL: 3600, // 1時間キャッシュ
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
