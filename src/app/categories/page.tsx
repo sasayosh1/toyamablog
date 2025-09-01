@@ -18,7 +18,7 @@ export default async function CategoriesPage() {
   const forceTag = process.env.NEXT_CACHE_REVALIDATE_TAG || 'default'
   const [allCategories, posts] = await Promise.all([
     client.fetch<string[]>(`
-      array::unique(*[_type == "post" && defined(category)].category) | order(@)
+      array::unique(*[_type == "post" && defined(category) && category != "グルメ" && category != "自然・公園"].category) | order(@)
     `, {}, { 
       next: { revalidate: 0, tags: [`categories-${timestamp}-${forceTag}`] },
       cache: 'no-store'
