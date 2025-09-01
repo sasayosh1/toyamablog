@@ -14,11 +14,12 @@ export const metadata = {
 
 export default async function CategoriesPage() {
   // カテゴリーページでは最新データを強制取得（キャッシュ無効化）
+  const timestamp = Date.now()
   const [allCategories, posts] = await Promise.all([
     client.fetch<string[]>(`
       array::unique(*[_type == "post" && defined(category)].category) | order(@)
     `, {}, { 
-      next: { revalidate: 0 },
+      next: { revalidate: 0, tags: [`categories-${timestamp}`] },
       cache: 'no-store'
     }),
     getAllPosts()

@@ -1,6 +1,9 @@
 {
   "framework": "nextjs",
   "buildCommand": "npm run build",
+  "env": {
+    "NEXT_CACHE_FORCE_REFRESH": "true"
+  },
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "outputDirectory": ".next",
