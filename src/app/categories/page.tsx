@@ -15,11 +15,12 @@ export const metadata = {
 export default async function CategoriesPage() {
   // カテゴリーページでは最新データを強制取得（キャッシュ無効化）
   const timestamp = Date.now()
+  const forceTag = process.env.NEXT_CACHE_REVALIDATE_TAG || 'default'
   const [allCategories, posts] = await Promise.all([
     client.fetch<string[]>(`
       array::unique(*[_type == "post" && defined(category)].category) | order(@)
     `, {}, { 
-      next: { revalidate: 0, tags: [`categories-${timestamp}`] },
+      next: { revalidate: 0, tags: [`categories-${timestamp}-${forceTag}`] },
       cache: 'no-store'
     }),
     getAllPosts()
