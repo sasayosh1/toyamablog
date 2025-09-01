@@ -92,6 +92,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     notFound()
   }
 
+  // タイトルから#shortsを削除
+  const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
+
   // 記事一覧とカテゴリーを取得（検索用）
   const [posts, categories] = await Promise.all([
     client.fetch<Post[]>(`
@@ -109,7 +112,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const breadcrumbLD = generateBreadcrumbLD([
     { name: 'ホーム', url: 'https://sasakiyoshimasa.com/' },
     ...(post.category ? [{ name: post.category, url: `https://sasakiyoshimasa.com/category/${encodeURIComponent(post.category)}` }] : []),
-    { name: post.title }
+    { name: cleanTitle }
   ])
 
   return (
@@ -135,15 +138,15 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               href: `/category/${encodeURIComponent(post.category)}`
             }] : []),
             {
-              label: post.title
+              label: cleanTitle
             }
           ]}
         />
 
-        <ArticleErrorBoundary articleTitle={post.title}>
+        <ArticleErrorBoundary articleTitle={cleanTitle}>
           <article className="bg-white rounded-xl shadow-sm p-8 md:p-12">
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-gray-900 leading-tight">
-              {post.title}
+              {cleanTitle}
             </h1>
           
           {Array.isArray(post.body) && post.body.length > 0 && (
@@ -184,7 +187,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                   // その他の場合はそのまま返す
                   return embedUrl;
                 })()}
-                title={post.title}
+                title={cleanTitle}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
