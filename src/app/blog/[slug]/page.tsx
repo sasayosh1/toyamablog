@@ -222,6 +222,38 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </>
         ) : null}
 
+          {/* Googleマップセクション（クラウドルール：タグより上に配置） */}
+          {post.body && Array.isArray(post.body) && (() => {
+            const googleMapsComponents = post.body.filter((block: any) => block._type === 'googleMaps');
+            return googleMapsComponents.length > 0 ? (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">地図</h3>
+                {googleMapsComponents.map((mapBlock: any, index: number) => {
+                  if (!mapBlock?.iframe) return null;
+                  const processedIframe = mapBlock.iframe
+                    .replace(/width="[^"]*"/g, 'width="100%"')
+                    .replace(/height="[^"]*"/g, 'height="300"')
+                    .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
+                  return (
+                    <div key={index} style={{ margin: '2rem 0', textAlign: 'center' }}>
+                      <div dangerouslySetInnerHTML={{ __html: processedIframe }} />
+                      {mapBlock.description && (
+                        <p style={{
+                          marginTop: '0.5rem',
+                          fontSize: '0.875rem',
+                          color: '#666',
+                          fontStyle: 'italic'
+                        }}>
+                          {mapBlock.description}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null;
+          })()}
+
           {post.tags && post.tags.length > 0 && (
             <div className="border-t border-gray-200 pt-8 mb-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">タグ</h3>
