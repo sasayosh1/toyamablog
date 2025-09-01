@@ -53,7 +53,7 @@ export type BlogPost = Post;
 
 export async function getAllPosts(): Promise<Post[]> {
   const posts = await client.fetch(`
-    *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
+    *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) {
       _id,
       title,
       slug,
@@ -62,6 +62,13 @@ export async function getAllPosts(): Promise<Post[]> {
       category,
       publishedAt,
       youtubeUrl,
+      thumbnail {
+        asset -> {
+          _ref,
+          url
+        },
+        alt
+      },
       "categories": [category],
       "displayExcerpt": coalesce(excerpt, description)
     }
@@ -73,6 +80,57 @@ export async function getAllPosts(): Promise<Post[]> {
   });
   
   return posts;
+}
+
+export async function getPostsPaginated(page: number = 1, limit: number = 50): Promise<{
+  posts: Post[]
+  totalPosts: number
+  totalPages: number
+  currentPage: number
+}> {
+  const offset = (page - 1) * limit
+
+  const [posts, totalPosts] = await Promise.all([
+    client.fetch(`
+      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [${offset}...${offset + limit}] {
+        _id,
+        title,
+        slug,
+        description,
+        excerpt,
+        category,
+        publishedAt,
+        youtubeUrl,
+        thumbnail {
+          asset -> {
+            _ref,
+            url
+          },
+          alt
+        },
+        "categories": [category],
+        "displayExcerpt": coalesce(excerpt, description)
+      }
+    `, {}, { 
+      next: { 
+        tags: ['post-list-paginated'], 
+        revalidate: 300 
+      } 
+    }),
+    client.fetch(`count(*[_type == "post" && defined(publishedAt)])`, {}, {
+      next: { 
+        tags: ['post-count'], 
+        revalidate: 300 
+      } 
+    })
+  ])
+  
+  return {
+    posts,
+    totalPosts,
+    totalPages: Math.ceil(totalPosts / limit),
+    currentPage: page
+  }
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
