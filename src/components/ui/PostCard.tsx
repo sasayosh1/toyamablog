@@ -40,6 +40,9 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, priority = false }: PostCardProps) {
+  // タイトルから#shortsを削除
+  const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
+  
   // サムネイル優先順位: 1.Sanity画像 > 2.YouTube動的取得 > 3.フォールバック
   const getThumbnailUrl = () => {
     // 1. Sanity画像が存在する場合
@@ -64,13 +67,13 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
       href={`/blog/${post.slug.current}`}
       className="block min-h-[44px]"
       data-testid="article-card"
-      aria-label={`記事「${post.title}」を読む`}
+      aria-label={`記事「${cleanTitle}」を読む`}
     >
       <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer relative z-[1]" role="article">
         <div className="relative h-48 overflow-hidden bg-gray-100">
           <Image
             src={thumbnailUrl}
-            alt={post.thumbnail?.alt || `${post.title} サムネイル`}
+            alt={post.thumbnail?.alt || `${cleanTitle} サムネイル`}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -90,7 +93,7 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
         
         <div className="p-5 md:p-6 min-h-[44px]">
           <h3 className="text-lg md:text-xl font-semibold mb-3 text-gray-800 line-clamp-2 leading-tight">
-            {post.title}
+            {cleanTitle}
           </h3>
           
           {post.categories && (
