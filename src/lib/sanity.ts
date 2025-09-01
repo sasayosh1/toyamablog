@@ -160,12 +160,12 @@ export async function getPost(slug: string): Promise<Post | null> {
 
 export async function getAllCategories(): Promise<string[]> {
   try {
-    const categories = await client.fetch<{category: string}[]>(`
+    const categories = await client.fetch<string[]>(`
       array::unique(*[_type == "post" && defined(category)].category) | order(@)
     `, {}, { 
       next: { 
         tags: ['categories'], 
-        revalidate: 3600 // 1時間キャッシュ
+        revalidate: 300 // 5分キャッシュに短縮
       } 
     });
     

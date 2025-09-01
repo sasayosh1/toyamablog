@@ -1,4 +1,4 @@
-import { getAllPosts, getAllCategories } from '@/lib/sanity'
+import { getAllPosts, getAllCategories, client } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
@@ -41,10 +41,15 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   const { category } = await params
   const decodedCategory = decodeURIComponent(category)
   
-  // 全記事と全カテゴリーを取得
+  // 全記事と全カテゴリーを取得（カテゴリーは最新データを強制取得）
   const [allPosts, categories] = await Promise.all([
     getAllPosts(),
-    getAllCategories()
+    client.fetch<string[]>(`
+      array::unique(*[_type == "post" && defined(category)].category) | order(@)
+    `, {}, { 
+      next: { revalidate: 0 },
+      cache: 'no-store'
+    })
   ])
   
   // 該当カテゴリーの記事をフィルター

@@ -1,4 +1,4 @@
-import { getAllCategories, getAllPosts } from '@/lib/sanity'
+import { getAllCategories, getAllPosts, client } from '@/lib/sanity'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
 import CategoryCard from '@/components/ui/CategoryCard'
@@ -13,8 +13,14 @@ export const metadata = {
 }
 
 export default async function CategoriesPage() {
+  // カテゴリーページでは最新データを強制取得（キャッシュ無効化）
   const [allCategories, posts] = await Promise.all([
-    getAllCategories(),
+    client.fetch<string[]>(`
+      array::unique(*[_type == "post" && defined(category)].category) | order(@)
+    `, {}, { 
+      next: { revalidate: 0 },
+      cache: 'no-store'
+    }),
     getAllPosts()
   ])
   
