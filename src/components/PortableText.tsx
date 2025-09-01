@@ -33,6 +33,8 @@ function processTextContent(text: string): React.ReactNode {
 // カスタムコンポーネントの定義
 const components = {
   types: {
+    // Googleマップを完全にスキップ（クラウドルール：専用セクションで表示）
+    googleMaps: () => null,
     image: ({ value }: { value: { asset?: { _ref: string }; alt?: string; caption?: string } }) => {
       if (!value?.asset?._ref) {
         return null
