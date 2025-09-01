@@ -2,36 +2,9 @@ import type { NextConfig } from "next";
 
 /** @type {import("next").NextConfig} */
 const nextConfig: NextConfig = {
-  // 画像最適化設定（モバイル読み込み速度向上）
+  // 画像最適化完全無効化
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'img.youtube.com',
-        port: '',
-        pathname: '/vi/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'i.ytimg.com',
-        port: '',
-        pathname: '/vi/**',
-      },
-    ],
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    unoptimized: true, // 画像最適化を無効化（Vercel設定と整合）
-    minimumCacheTTL: 3600, // 1時間キャッシュ
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    loader: 'default',
+    unoptimized: true,
   },
   
   // Sanity CMS用設定

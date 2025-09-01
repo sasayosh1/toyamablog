@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 
 
@@ -43,20 +42,16 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
   // タイトルから#shortsを削除
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
   
-  // サムネイル優先順位: 1.Sanity画像 > 2.YouTube動的取得 > 3.フォールバック
+  // サムネイル優先順位: 1.YouTube動的取得 > 2.フォールバック画像（Sanityを一時的に無効化）
   const getThumbnailUrl = () => {
-    // 1. Sanity画像が存在する場合
-    if (post.thumbnail?.asset?.url) {
-      return post.thumbnail.asset.url;
-    }
-    // 2. YouTubeURLが存在する場合
+    // 1. YouTubeURLが存在する場合
     if (post.youtubeUrl) {
       const youtubeThumb = getYouTubeThumbnailWithFallback(post.youtubeUrl);
       if (youtubeThumb) {
         return youtubeThumb;
       }
     }
-    // 3. フォールバック画像
+    // 2. フォールバック画像（確実に表示されるローカル画像）
     return '/images/default-thumbnail.svg';
   };
 
@@ -71,17 +66,11 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
     >
       <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer relative z-[1]" role="article">
         <div className="relative h-48 overflow-hidden bg-gray-100">
-          <Image
+          <img
             src={thumbnailUrl}
             alt={post.thumbnail?.alt || `${cleanTitle} サムネイル`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            quality={priority ? 90 : 75}
+            className="w-full h-full object-cover"
             loading={priority ? "eager" : "lazy"}
-            priority={priority}
-            placeholder={thumbnailUrl.endsWith('.svg') ? "empty" : "blur"}
-            blurDataURL={thumbnailUrl.endsWith('.svg') ? undefined : "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="}
           />
         </div>
         

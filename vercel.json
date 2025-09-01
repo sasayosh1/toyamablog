@@ -15,7 +15,10 @@
     }
   },
   "images": {
-    "unoptimized": true
+    "unoptimized": true,
+    "domains": [],
+    "formats": ["image/webp"],
+    "minimumCacheTTL": 0
   },
   "redirects": [
     {
