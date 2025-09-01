@@ -13,10 +13,30 @@ export const metadata = {
 }
 
 export default async function CategoriesPage() {
-  const [categories, posts] = await Promise.all([
+  const [allCategories, posts] = await Promise.all([
     getAllCategories(),
     getAllPosts()
   ])
+  
+  // 地域名のみを抽出（地域名以外のカテゴリーを除外）
+  const locationCategories = [
+    '富山市', '高岡市', '魚津市', '氷見市', '滑川市', '黒部市', '砺波市', '小矢部市', '南砺市', '射水市',
+    '舟橋村', '上市町', '立山町', '入善町', '朝日町', '南砺市福野', '南砺市城端', '南砺市福光',
+    '高岡市福岡町', '砺波市庄川', '富山市八尾町', '富山市婦中町', '富山市山田村',
+    '八尾町', '福岡町', '庄川町'
+  ]
+  const categories = allCategories.filter(category => 
+    locationCategories.includes(category) || 
+    category.includes('市') || 
+    category.includes('町') || 
+    category.includes('村')
+  ).filter(category => 
+    category !== 'グルメ' && 
+    category !== '自然・公園' && 
+    category !== '観光' && 
+    category !== 'イベント' && 
+    category !== '文化・歴史'
+  )
   
   // 各カテゴリーの記事数を計算
   const categoriesWithCounts = categories.map(category => {
