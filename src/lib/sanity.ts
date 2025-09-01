@@ -4,7 +4,7 @@ export const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'aoxze287',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
-  useCdn: false, // 即時反映のため無効化
+  useCdn: true, // CDN有効化でパフォーマンス向上
   perspective: 'published', // publishedコンテンツのみ
   token: process.env.SANITY_API_TOKEN, // サーバーサイドトークン追加
 });
@@ -53,42 +53,22 @@ export type BlogPost = Post;
 
 export async function getAllPosts(): Promise<Post[]> {
   const posts = await client.fetch(`
-    *[_type == "post"] | order(publishedAt desc) {
+    *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
       _id,
       title,
       slug,
       description,
       excerpt,
-      tags,
       category,
       publishedAt,
       youtubeUrl,
-      thumbnail{
-        asset->{
-          _ref,
-          url
-        },
-        alt
-      },
-      author->{
-        _id,
-        name,
-        slug,
-        bio,
-        image{
-          asset->{
-            _ref,
-            url
-          }
-        }
-      },
       "categories": [category],
       "displayExcerpt": coalesce(excerpt, description)
     }
   `, {}, { 
     next: { 
       tags: ['post-list'], 
-      revalidate: 60 // 一覧は最長60秒で更新
+      revalidate: 300 // 5分キャッシュ
     } 
   });
   
@@ -106,31 +86,12 @@ export async function getPost(slug: string): Promise<Post | null> {
       category,
       publishedAt,
       body,
-      youtubeUrl,
-      thumbnail{
-        asset->{
-          _ref,
-          url
-        },
-        alt
-      },
-      author->{
-        _id,
-        name,
-        slug,
-        bio,
-        image{
-          asset->{
-            _ref,
-            url
-          }
-        }
-      }
+      youtubeUrl
     }
   `, { slug }, { 
     next: { 
-      tags: ['post-detail', `post-detail-${slug.substring(0, 50)}`], 
-      revalidate: 300 // 詳細は5分キャッシュ
+      tags: ['post-detail', `post-detail-${slug}`], 
+      revalidate: 600 // 10分キャッシュ
     } 
   });
   
@@ -140,19 +101,15 @@ export async function getPost(slug: string): Promise<Post | null> {
 export async function getAllCategories(): Promise<string[]> {
   try {
     const categories = await client.fetch<{category: string}[]>(`
-      *[_type == "post" && defined(category)] {
-        category
-      } | order(category asc)
+      array::unique(*[_type == "post" && defined(category)].category) | order(@)
     `, {}, { 
       next: { 
-        tags: ['post-list'], // 一覧と同じタグで連動
-        revalidate: 300 // 5分キャッシュ
+        tags: ['categories'], 
+        revalidate: 3600 // 1時間キャッシュ
       } 
     });
     
-    // ユニークなカテゴリーのみを抽出
-    const uniqueCategories = [...new Set(categories.map(item => item.category))];
-    return uniqueCategories.filter(Boolean);
+    return categories.filter(Boolean);
   } catch (error) {
     console.error('Categories fetch error:', error);
     return [];
