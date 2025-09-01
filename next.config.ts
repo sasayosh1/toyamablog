@@ -25,7 +25,6 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     loader: 'default',
-    unoptimized: true,
   },
   
   // Sanity CMS用設定
