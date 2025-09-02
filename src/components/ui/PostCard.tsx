@@ -42,20 +42,20 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
   // タイトルから#shortsを削除
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
   
-  // 確実なサムネイル画像取得（フォールバック付き）
+  // 確実なサムネイル画像取得（Sanity優先版）
   const getThumbnailUrl = () => {
-    // 1. YouTubeURLが存在する場合
+    // 1. Sanityサムネイルが存在する場合（最優先）
+    if (post.thumbnail?.asset?.url) {
+      return post.thumbnail.asset.url;
+    }
+    // 2. YouTubeURLが存在する場合（フォールバック）
     if (post.youtubeUrl) {
       const youtubeThumb = getYouTubeThumbnailWithFallback(post.youtubeUrl);
       if (youtubeThumb) {
         return youtubeThumb;
       }
     }
-    // 2. Sanityサムネイルが存在する場合
-    if (post.thumbnail?.asset?.url) {
-      return post.thumbnail.asset.url;
-    }
-    // 3. デフォルトサムネイル（SVGファイル）
+    // 3. デフォルトサムネイル（最終フォールバック）
     return '/images/default-thumbnail.svg';
   };
 
