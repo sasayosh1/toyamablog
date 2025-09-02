@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
-import { getThumbnailImageUrl, FALLBACK_THUMBNAIL_BASE64 } from '@/lib/image-utils'
 
 
 // CategoryTag コンポーネント（スタイルのみ、クリックできない）
@@ -43,21 +42,21 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
   // タイトルから#shortsを削除
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
   
-  // 確実なサムネイル画像取得（Base64フォールバック付き）
+  // 確実なサムネイル画像取得（フォールバック付き）
   const getThumbnailUrl = () => {
     // 1. YouTubeURLが存在する場合
     if (post.youtubeUrl) {
       const youtubeThumb = getYouTubeThumbnailWithFallback(post.youtubeUrl);
       if (youtubeThumb) {
-        return getThumbnailImageUrl(youtubeThumb);
+        return youtubeThumb;
       }
     }
     // 2. Sanityサムネイルが存在する場合
     if (post.thumbnail?.asset?.url) {
-      return getThumbnailImageUrl(post.thumbnail.asset.url);
+      return post.thumbnail.asset.url;
     }
-    // 3. 確実なフォールバック（Base64エンコード画像）
-    return FALLBACK_THUMBNAIL_BASE64;
+    // 3. デフォルトサムネイル（SVGファイル）
+    return '/images/default-thumbnail.svg';
   };
 
   const thumbnailUrl = getThumbnailUrl();
