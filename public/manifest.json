@@ -1,0 +1,18 @@
+{
+  "name": "富山のくせに - AMAZING TOYAMA",
+  "short_name": "富山のくせに",
+  "description": "富山県の観光スポット、グルメ情報、文化を紹介するYouTube Shorts連携ブログ",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/"
+}
