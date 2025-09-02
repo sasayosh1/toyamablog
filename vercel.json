@@ -3,7 +3,9 @@
   "buildCommand": "npm run build",
   "env": {
     "NEXT_CACHE_FORCE_REFRESH": "true",
-    "NEXT_CACHE_REVALIDATE_TAG": "categories-force-refresh-2025-09-01"
+    "NEXT_CACHE_REVALIDATE_TAG": "image-display-fix-2025-09-02",
+    "VERCEL_FORCE_NO_BUILD_CACHE": "1",
+    "NEXT_IMAGE_OPTIMIZATION": "false"
   },
   "devCommand": "npm run dev",
   "installCommand": "npm install",
