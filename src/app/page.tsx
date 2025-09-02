@@ -64,10 +64,16 @@ export default async function Home({
         <GlobalHeader posts={allPosts} categories={categories} />
       <div className="relative h-80 md:h-96 lg:h-[32rem] overflow-hidden">
         <img
-          src={getHeroImageUrl()}
+          src="/images/toyama-hero.png"
           alt="富山市の風景 - 立山連峰を背景にした橋と川"
           className="w-full h-full object-cover object-center"
           loading="eager"
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            if (!img.src.includes('data:image')) {
+              img.src = getHeroImageUrl();
+            }
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
         <div className="absolute inset-0 flex items-center justify-center">

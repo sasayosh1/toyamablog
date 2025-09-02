@@ -76,6 +76,12 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
             alt={post.thumbnail?.alt || `${cleanTitle} サムネイル`}
             className="w-full h-full object-cover"
             loading={priority ? "eager" : "lazy"}
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              if (!img.src.includes('data:image')) {
+                img.src = FALLBACK_THUMBNAIL_BASE64;
+              }
+            }}
           />
         </div>
         
