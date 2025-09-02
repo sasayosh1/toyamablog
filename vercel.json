@@ -16,12 +16,6 @@
       "maxDuration": 10
     }
   },
-  "images": {
-    "unoptimized": true,
-    "domains": [],
-    "formats": ["image/webp"],
-    "minimumCacheTTL": 0
-  },
   "redirects": [
     {
       "source": "/:path*",
