@@ -2,9 +2,13 @@ import type { NextConfig } from "next";
 
 /** @type {import("next").NextConfig} */
 const nextConfig: NextConfig = {
-  // 画像最適化完全無効化
+  // 画像最適化完全無効化（強制）
   images: {
     unoptimized: true,
+    formats: [],
+    deviceSizes: [],
+    imageSizes: [],
+    minimumCacheTTL: 0,
   },
   
   // Sanity CMS用設定

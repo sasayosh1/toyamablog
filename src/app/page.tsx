@@ -3,6 +3,7 @@ import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 import StructuredData from '@/components/StructuredData'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
+import { getHeroImageUrl } from '@/lib/image-utils'
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 
@@ -63,7 +64,7 @@ export default async function Home({
         <GlobalHeader posts={allPosts} categories={categories} />
       <div className="relative h-80 md:h-96 lg:h-[32rem] overflow-hidden">
         <img
-          src="/images/toyama-hero.png"
+          src={getHeroImageUrl()}
           alt="富山市の風景 - 立山連峰を背景にした橋と川"
           className="w-full h-full object-cover object-center"
           loading="eager"
