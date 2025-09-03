@@ -229,6 +229,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </>
         ) : null}
 
+        <>
         {/* まとめセクション（クラウドルール：記事本文の後、マップより上） */}
         <div className="border-t border-gray-200 pt-8 mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">まとめ</h3>
@@ -325,6 +326,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </Link>
           </div>
         </div>
+        </>
         </article>
         </ArticleErrorBoundary>
       </div>
