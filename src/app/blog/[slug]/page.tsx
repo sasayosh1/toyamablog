@@ -215,8 +215,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-          {/* 記事上部広告 */}
-          <TopArticleAd />
+          {/* 記事上部広告 - 一時的に無効化（スロットID未設定のため） */}
+          {/* <TopArticleAd /> */}
 
         {post.body && Array.isArray(post.body) ? (
           <>
@@ -224,8 +224,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <div className="prose prose-lg max-w-none mb-12 blog-content">
               <PortableText value={post.body} />
             </div>
-            {/* 記事中央広告 */}
-            <MiddleArticleAd />
+            {/* 記事中央広告 - 一時的に無効化（スロットID未設定のため） */}
+            {/* <MiddleArticleAd /> */}
           </>
         ) : null}
 
@@ -298,8 +298,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </div>
         )}
 
-        {/* 記事下部広告 */}
-        <BottomArticleAd />
+        {/* 記事下部広告 - 一時的に無効化（スロットID未設定のため） */}
+        {/* <BottomArticleAd /> */}
 
         {/* ナビゲーションボタン */}
         <div className="border-t border-gray-200 pt-8">
