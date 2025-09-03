@@ -42,21 +42,49 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
   // タイトルから#shortsを削除
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
   
-  // 確実なサムネイル画像取得（Sanity優先版）
+  // 確実なサムネイル画像取得（YouTube最優先版）
   const getThumbnailUrl = () => {
-    // 1. Sanityサムネイルが存在する場合（最優先）
-    if (post.thumbnail?.asset?.url) {
-      return post.thumbnail.asset.url;
-    }
-    // 2. YouTubeURLが存在する場合（フォールバック）
+    // 1. YouTubeURLが存在する場合（最優先）
     if (post.youtubeUrl) {
       const youtubeThumb = getYouTubeThumbnailWithFallback(post.youtubeUrl);
       if (youtubeThumb) {
         return youtubeThumb;
       }
     }
-    // 3. デフォルトサムネイル（最終フォールバック）
-    return '/images/default-thumbnail.svg';
+
+    // 2. Sanityサムネイルが存在する場合（2番目の優先度）
+    if (post.thumbnail?.asset?.url) {
+      return post.thumbnail.asset.url;
+    }
+
+    // 3. カテゴリ別のカラーサムネイル（最後のフォールバック）
+    const categoryColor = getCategoryColor(post.categories?.[0]);
+    return `data:image/svg+xml,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225">
+        <rect width="400" height="225" fill="${categoryColor.bg}"/>
+        <text x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" 
+              fill="${categoryColor.text}" font-size="18" font-family="Arial, sans-serif" font-weight="bold">
+          ${post.categories?.[0] || '記事'}
+        </text>
+        <text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" 
+              fill="${categoryColor.text}" font-size="12" font-family="Arial, sans-serif">
+          ${post.title.length > 30 ? post.title.substring(0, 30) + '...' : post.title}
+        </text>
+      </svg>
+    `)}`;
+  };
+
+  // カテゴリ別の色彩定義
+  const getCategoryColor = (category?: string) => {
+    const colorMap: { [key: string]: { bg: string; text: string } } = {
+      'グルメ': { bg: '#FF5722', text: 'white' },
+      '自然・公園': { bg: '#4CAF50', text: 'white' },
+      '観光スポット': { bg: '#2196F3', text: 'white' },
+      '文化・歴史': { bg: '#9C27B0', text: 'white' },
+      'イベント': { bg: '#FF9800', text: 'white' },
+      '温泉': { bg: '#E91E63', text: 'white' },
+    };
+    return colorMap[category || ''] || { bg: '#757575', text: 'white' };
   };
 
   const thumbnailUrl = getThumbnailUrl();
