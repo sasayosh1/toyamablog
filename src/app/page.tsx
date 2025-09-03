@@ -42,7 +42,7 @@ function HeroImage() {
     <img
       src="/images/toyama-hero.png"
       alt="富山市の風景 - 立山連峰を背景にした橋と川"
-      className="w-full h-full object-cover object-center"
+      className="w-full h-full object-cover object-center brightness-110 contrast-105"
       loading="eager"
     />
   )
@@ -76,15 +76,24 @@ export default async function Home({
         <GlobalHeader posts={allPosts} categories={categories} />
       <div className="relative h-80 md:h-96 lg:h-[32rem] overflow-hidden">
         <HeroImage />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white px-4 max-w-4xl">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 drop-shadow-lg">
-              富山のくせに
-            </h1>
-            <p className="text-lg md:text-xl lg:text-2xl text-gray-100 drop-shadow-md font-medium" role="doc-subtitle">
-              AMAZING TOYAMA
-            </p>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/15 to-black/20" />
+        
+        {/* ロゴ部分の強調オーバーレイ */}
+        <div className="absolute inset-0">
+          {/* 左側のロゴエリア強調背景 */}
+          <div className="absolute left-[8%] top-[32%] w-[40%] h-[35%] bg-gradient-radial from-black/30 via-black/15 to-transparent rounded-2xl backdrop-blur-[1px]"></div>
+          
+          {/* ロゴテキストシャドウ効果 */}
+          <div className="absolute left-[10%] top-[38%] w-[35%] h-[20%] flex items-center">
+            <div className="text-white text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold filter brightness-130 contrast-110">
+              <div className="text-shadow-strong tracking-wide">富山のくせに</div>
+            </div>
+          </div>
+          
+          <div className="absolute left-[10%] top-[48%] w-[35%] h-[15%] flex items-center">
+            <div className="text-white text-base md:text-lg lg:text-xl xl:text-2xl font-medium filter brightness-125">
+              <div className="text-shadow-medium tracking-widest">AMAZING TOYAMA</div>
+            </div>
           </div>
         </div>
       </div>
