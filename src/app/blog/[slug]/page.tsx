@@ -232,7 +232,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         <>
         {/* まとめセクション（クラウドルール：記事本文の後、マップより上） */}
         <div className="border-t border-gray-200 pt-8 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">まとめ</h3>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">まとめ</h2>
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 leading-relaxed">
                 {post.category && `${post.category}の`}魅力あふれる{cleanTitle}をご紹介しました。
@@ -248,7 +248,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               '_type' in block && (block as { _type: string })._type === 'googleMaps'
             ).length > 0 && (
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">地図</h3>
                 {post.body
                   .filter((block: unknown) => 
                     typeof block === 'object' && block !== null && 
@@ -283,7 +282,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         {post.tags && post.tags.length > 0 && (
           <div className="border-t border-gray-200 pt-8 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">タグ</h3>
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <Link
