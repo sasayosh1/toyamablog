@@ -80,19 +80,19 @@ export default async function Home({
         
         {/* ロゴ部分の強調オーバーレイ */}
         <div className="absolute inset-0">
-          {/* 中央のロゴエリア強調背景 */}
-          <div className="absolute left-1/2 top-[32%] w-[40%] h-[35%] bg-gradient-radial from-black/30 via-black/15 to-transparent rounded-2xl backdrop-blur-[1px] transform -translate-x-1/2"></div>
+          {/* 左側のロゴエリア強調背景 */}
+          <div className="absolute left-[4%] top-[32%] w-[40%] h-[35%] bg-gradient-radial from-black/30 via-black/15 to-transparent rounded-2xl backdrop-blur-[1px]"></div>
           
           {/* ロゴテキストシャドウ効果 */}
-          <div className="absolute left-1/2 top-[38%] w-auto h-[20%] flex items-center transform -translate-x-1/2">
+          <div className="absolute left-[6%] top-[38%] w-[35%] h-[20%] flex items-center">
             <div className="text-white text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold filter brightness-130 contrast-110">
-              <div className="text-shadow-strong tracking-wide text-center">富山のくせに</div>
+              <div className="text-shadow-strong tracking-wide text-left">富山のくせに</div>
             </div>
           </div>
           
-          <div className="absolute left-1/2 top-[48%] w-auto h-[15%] flex items-center transform -translate-x-1/2">
+          <div className="absolute left-[6%] top-[48%] w-[35%] h-[15%] flex items-center">
             <div className="text-white text-base md:text-lg lg:text-xl xl:text-2xl font-medium filter brightness-125">
-              <div className="text-shadow-medium tracking-widest text-center">AMAZING TOYAMA</div>
+              <div className="text-shadow-medium tracking-widest text-left">AMAZING TOYAMA</div>
             </div>
           </div>
         </div>
