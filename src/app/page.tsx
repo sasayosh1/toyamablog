@@ -51,10 +51,10 @@ function HeroImage() {
 export default async function Home({ 
   searchParams 
 }: { 
-  searchParams: Promise<{ page?: string }> 
+  searchParams: Promise<{ page?: string }> | { page?: string }
 }) {
-  const params = await searchParams
-  const currentPage = parseInt(params.page || '1', 10)
+  const params = searchParams instanceof Promise ? await searchParams : searchParams
+  const currentPage = parseInt(params?.page || '1', 10)
   
   // ページネーション対応で記事を取得、検索用には全記事を取得
   const [paginatedData, allPosts, categories] = await Promise.all([
@@ -90,9 +90,9 @@ export default async function Home({
             </div>
           </div>
           
-          <div className="absolute left-[6%] top-[48%] w-[35%] h-[15%] flex items-center">
-            <div className="text-white text-base md:text-lg lg:text-xl xl:text-2xl font-medium filter brightness-125">
-              <div className="text-shadow-medium tracking-widest text-left">AMAZING TOYAMA</div>
+          <div className="absolute left-[6%] top-[48%] w-[40%] h-[15%] flex items-center">
+            <div className="text-white text-sm md:text-lg lg:text-xl xl:text-2xl font-medium filter brightness-125">
+              <div className="text-shadow-medium tracking-wider text-left whitespace-nowrap">AMAZING TOYAMA</div>
             </div>
           </div>
         </div>
