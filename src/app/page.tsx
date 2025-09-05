@@ -78,22 +78,17 @@ export default async function Home({
         <HeroImage />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/15 to-black/20" />
         
-        {/* ロゴ部分の強調オーバーレイ */}
-        <div className="absolute inset-0">
-          {/* 左側のロゴエリア強調背景 */}
-          <div className="absolute left-[4%] top-[32%] w-[40%] h-[35%] bg-gradient-radial from-black/30 via-black/15 to-transparent rounded-2xl backdrop-blur-[1px]"></div>
-          
-          {/* ロゴテキストシャドウ効果 */}
-          <div className="absolute left-[6%] top-[38%] w-[35%] h-[20%] flex items-center">
-            <div className="text-white text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold filter brightness-130 contrast-110">
-              <div className="text-shadow-strong tracking-wide text-left">富山のくせに</div>
-            </div>
-          </div>
-          
-          <div className="absolute left-[6%] top-[48%] w-[40%] h-[15%] flex items-center">
-            <div className="text-white text-sm md:text-lg lg:text-xl xl:text-2xl font-medium filter brightness-125">
-              <div className="text-shadow-medium tracking-wider text-left whitespace-nowrap">AMAZING TOYAMA</div>
-            </div>
+        {/* ヒーローセクション タイトル */}
+        <div className="absolute inset-0 flex items-center justify-center md:justify-start">
+          <div className="md:ml-20 lg:ml-24 xl:ml-28">
+            <h1 className="text-white font-bold text-center md:text-left">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-2 drop-shadow-lg">
+                富山のくせに
+              </div>
+              <div className="text-sm sm:text-base md:text-lg lg:text-xl font-medium drop-shadow-md">
+                AMAZING TOYAMA
+              </div>
+            </h1>
           </div>
         </div>
       </div>
