@@ -57,6 +57,35 @@
   - `src/lib/gtag.ts` - トラッキングライブラリ
   - `src/app/layout.tsx` - GAProvider読み込み
 
+### API・データベース設定
+#### Sanity CMS設定
+- **プロジェクトID**: `aoxze287`
+- **データセット**: `production`
+- **API バージョン**: `2024-01-01`
+- **API Token**: `skkTjwpdrsjKKpaDxKVShzCSI7GMWE1r5TQdwl0b7LTylVPoAxzBg0oPqhtUQyfPjyvtZW2mu6nfUMNUJ`
+- **使用方法**: 
+  ```bash
+  export SANITY_API_TOKEN="skkTjwpdrsjKKpaDxKVShzCSI7GMWE1r5TQdwl0b7LTylVPoAxzBg0oPqhtUQyfPjyvtZW2mu6nfUMNUJ"
+  ```
+- **関連ファイル**:
+  - `.env.local` - 環境変数設定
+  - `src/lib/sanity.ts` - Sanityクライアント設定
+  - `sanity.config.ts` - Sanity設定
+
+#### Supabase設定（設定済み・未接続）
+- **URL**: `https://toyama-blog-project.supabase.co` (デモURL)
+- **Anon Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.demo_anon_key` (デモキー)
+- **Service Role Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.demo_service_key` (デモキー)
+- **状態**: コード実装済み、実際のプロジェクトへの接続が必要
+- **データベーススキーマ**: users, categories, articles, comments, likes, page_views
+- **関連ファイル**:
+  - `lib/supabase.ts` - Supabaseクライアント設定
+  - `.env.local` - 環境変数設定
+
+#### その他の重要な環境変数
+- **Revalidation Secret**: `REVALIDATE_SECRET=blog_revalidate_secret_2025_secure_token_xyz`
+- **Database URL**: `DATABASE_URL=postgresql://postgres:password@localhost:54322/postgres`
+
 ## 記事作成基本方針
 
 ### 数字の積極的活用
