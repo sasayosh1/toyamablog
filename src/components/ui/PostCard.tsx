@@ -1,8 +1,61 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 
+
+// フォールバック対応サムネイル画像コンポーネント
+interface ThumbnailImageProps {
+  urls: string[]
+  alt: string
+  priority: boolean
+}
+
+function ThumbnailImage({ urls, alt, priority }: ThumbnailImageProps) {
+  const [currentUrlIndex, setCurrentUrlIndex] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const handleImageError = () => {
+    if (currentUrlIndex < urls.length - 1) {
+      setCurrentUrlIndex(currentUrlIndex + 1)
+    } else {
+      setIsLoading(false)
+    }
+  }
+
+  const handleImageLoad = () => {
+    setIsLoading(false)
+  }
+
+  if (currentUrlIndex >= urls.length) {
+    return (
+      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+        <span className="text-gray-500 text-sm">画像を読み込めませんでした</span>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        </div>
+      )}
+      <img
+        src={urls[currentUrlIndex]}
+        alt={alt}
+        className={`w-full h-full object-cover transition-opacity duration-200 ${
+          isLoading ? 'opacity-0' : 'opacity-100'
+        }`}
+        loading={priority ? "eager" : "lazy"}
+        onError={handleImageError}
+        onLoad={handleImageLoad}
+      />
+    </>
+  )
+}
 
 // CategoryTag コンポーネント（スタイルのみ、クリックできない）
 interface CategoryTagProps {
@@ -42,24 +95,34 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
   // タイトルから#shortsを削除
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
   
-  // 確実なサムネイル画像取得（YouTube最優先版）
-  const getThumbnailUrl = () => {
+  // 改善されたサムネイル画像取得
+  const getThumbnailUrls = () => {
+    const urls = [];
+    
     // 1. YouTubeURLが存在する場合（最優先）
     if (post.youtubeUrl) {
       const youtubeThumb = getYouTubeThumbnailWithFallback(post.youtubeUrl);
       if (youtubeThumb) {
-        return youtubeThumb;
+        urls.push(youtubeThumb);
+        
+        // 複数のYouTube画質オプション
+        const videoId = post.youtubeUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
+        if (videoId) {
+          urls.push(`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`);
+          urls.push(`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`);
+          urls.push(`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`);
+        }
       }
     }
 
-    // 2. Sanityサムネイルが存在する場合（2番目の優先度）
+    // 2. Sanityサムネイルが存在する場合
     if (post.thumbnail?.asset?.url) {
-      return post.thumbnail.asset.url;
+      urls.push(post.thumbnail.asset.url);
     }
 
-    // 3. カテゴリ別のカラーサムネイル（最後のフォールバック）
+    // 3. カテゴリ別のカラーサムネイル（確実なフォールバック）
     const categoryColor = getCategoryColor(post.categories?.[0]);
-    return `data:image/svg+xml,${encodeURIComponent(`
+    const fallbackSvg = `data:image/svg+xml,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225">
         <rect width="400" height="225" fill="${categoryColor.bg}"/>
         <text x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" 
@@ -68,10 +131,13 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
         </text>
         <text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" 
               fill="${categoryColor.text}" font-size="12" font-family="Arial, sans-serif">
-          ${post.title.length > 30 ? post.title.substring(0, 30) + '...' : post.title}
+          ${cleanTitle.length > 30 ? cleanTitle.substring(0, 30) + '...' : cleanTitle}
         </text>
       </svg>
     `)}`;
+    urls.push(fallbackSvg);
+    
+    return urls;
   };
 
   // カテゴリ別の色彩定義
@@ -87,7 +153,7 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
     return colorMap[category || ''] || { bg: '#757575', text: 'white' };
   };
 
-  const thumbnailUrl = getThumbnailUrl();
+  const thumbnailUrls = getThumbnailUrls();
 
   return (
     <Link 
@@ -98,11 +164,10 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
     >
       <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer relative z-[1]" role="article">
         <div className="relative h-48 overflow-hidden bg-gray-100">
-          <img
-            src={thumbnailUrl}
+          <ThumbnailImage
+            urls={thumbnailUrls}
             alt={post.thumbnail?.alt || `${cleanTitle} サムネイル`}
-            className="w-full h-full object-cover"
-            loading={priority ? "eager" : "lazy"}
+            priority={priority}
           />
         </div>
         
