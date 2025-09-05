@@ -48,14 +48,14 @@ function HeroImage() {
   )
 }
 
+interface Props {
+  searchParams?: Promise<{ page?: string }>
+}
+
 export default async function Home({ 
   searchParams 
-}: { 
-  searchParams?: Promise<{ page?: string }> | { page?: string }
-}) {
-  const params = searchParams 
-    ? (searchParams instanceof Promise ? await searchParams : searchParams)
-    : {}
+}: Props) {
+  const params = searchParams ? await searchParams : {}
   const currentPage = parseInt(params?.page || '1', 10)
   
   // ページネーション対応で記事を取得、検索用には全記事を取得
