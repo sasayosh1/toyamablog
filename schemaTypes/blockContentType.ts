@@ -66,6 +66,40 @@ export const blockContentType = defineType({
               }
             ],
           },
+          {
+            title: '🛒 アフィリエイトリンク',
+            name: 'affiliateLink',
+            type: 'object',
+            icon: () => '🛒',
+            fields: [
+              {
+                title: 'アフィリエイトURL',
+                name: 'href',
+                type: 'url',
+                validation: (Rule) => Rule.required(),
+              },
+              {
+                title: 'プラットフォーム',
+                name: 'platform',
+                type: 'string',
+                options: {
+                  list: [
+                    { title: 'Amazon', value: 'amazon' },
+                    { title: '楽天市場', value: 'rakuten' },
+                    { title: 'Yahoo!ショッピング', value: 'yahoo' },
+                    { title: 'その他', value: 'generic' }
+                  ]
+                },
+                initialValue: 'generic'
+              },
+              {
+                title: 'アイコン表示',
+                name: 'showIcon',
+                type: 'boolean',
+                initialValue: true
+              }
+            ],
+          },
         ],
       },
     }),
@@ -149,23 +183,15 @@ export const blockContentType = defineType({
                   return 'Google Mapsの埋め込みコードを入力してください'
                 }
                 return true
-              })
-        },
-        {
-          name: 'description',
-          type: 'string',
-          title: '説明（オプション）',
-          description: '地図の説明文（例: 施設名や住所）',
-          placeholder: '例: 富山駅から徒歩5分の便利な立地'
+              }),
         }
       ],
       preview: {
         select: {
-          iframe: 'iframe',
-          description: 'description'
+          iframe: 'iframe'
         },
         prepare(selection) {
-          const {iframe, description} = selection
+          const {iframe} = selection
           
           // iframe内から施設名を抽出しようとする
           let locationName = '場所名不明'
@@ -184,7 +210,7 @@ export const blockContentType = defineType({
           
           return {
             title: `🗺️ ${locationName}`,
-            subtitle: description || 'Googleマップ'
+            subtitle: 'Googleマップ'
           }
         }
       }
@@ -198,7 +224,7 @@ export const blockContentType = defineType({
           name: 'url',
           type: 'url',
           title: 'YouTube URL',
-          validation: (Rule) => Rule.required(),
+          validation: (Rule) => Rule.required()
         }
       ],
       preview: {

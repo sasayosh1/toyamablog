@@ -83,14 +83,16 @@ export default async function Home({
         {/* ヒーローセクション タイトル */}
         <div className="absolute inset-0 flex items-center justify-center md:justify-start">
           <div className="md:ml-20 lg:ml-24 xl:ml-28 px-4">
-            <h1 className="text-white font-bold text-center md:text-left leading-tight">
-              <div className="text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-1 sm:mb-2 drop-shadow-lg">
-                富山のくせに
-              </div>
-              <div className="text-xs sm:text-sm md:text-lg lg:text-xl font-medium drop-shadow-md">
-                AMAZING TOYAMA
-              </div>
-            </h1>
+            <div className="bg-black/20 backdrop-blur-sm rounded-lg px-6 py-4 shadow-lg">
+              <h1 className="text-white font-bold text-center md:text-left leading-tight">
+                <div className="text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-1 sm:mb-2 drop-shadow-lg">
+                  富山のくせに
+                </div>
+                <div className="text-xs sm:text-sm md:text-lg lg:text-xl font-medium drop-shadow-md">
+                  AMAZING TOYAMA
+                </div>
+              </h1>
+            </div>
           </div>
         </div>
       </div>

@@ -15,8 +15,8 @@ function processTextContent(text: string): React.ReactNode {
     })
   }
 
-  // URLを検出してリンクに変換
-  const urlRegex = /(https?:\/\/[^\s<]+)/g
+  // URLを検出してリンクに変換（http://, https://, www.を含むすべてのパターン）
+  const urlRegex = /(https?:\/\/(?:www\.)?[^\s<]+|www\.[^\s<]+)/g
   if (urlRegex.test(text)) {
     const parts = text.split(urlRegex)
     return parts.map((part) => {
@@ -185,6 +185,60 @@ const components = {
         >
           {children}
         </a>
+      )
+    },
+    affiliateLink: ({ children, value }: { 
+      children: React.ReactNode; 
+      value: { 
+        href: string; 
+        platform?: 'amazon' | 'rakuten' | 'yahoo' | 'generic';
+        showIcon?: boolean;
+      } 
+    }) => {
+      const { href, platform = 'generic', showIcon = true } = value
+      
+      const platformStyles = {
+        amazon: 'text-orange-600 hover:text-orange-700 border-b-2 border-orange-200 hover:border-orange-300',
+        rakuten: 'text-red-600 hover:text-red-700 border-b-2 border-red-200 hover:border-red-300',
+        yahoo: 'text-purple-600 hover:text-purple-700 border-b-2 border-purple-200 hover:border-purple-300',
+        generic: 'text-blue-600 hover:text-blue-700 border-b-2 border-blue-200 hover:border-blue-300'
+      }
+      
+      return (
+        <span style={{ display: 'inline-block' }}>
+          <a
+            href={href}
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            className={`inline-flex items-center font-medium transition-all duration-200 ${platformStyles[platform]}`}
+            title="アフィリエイトリンク（外部サイトへ移動します）"
+            style={{
+              textDecoration: 'none',
+              fontWeight: 'bold'
+            }}
+          >
+            {children}
+            {showIcon && (
+              <span style={{ 
+                marginLeft: '4px', 
+                fontSize: '12px',
+                opacity: 0.7
+              }}>
+                ↗
+              </span>
+            )}
+          </a>
+          <span 
+            style={{ 
+              fontSize: '12px', 
+              color: '#9ca3af', 
+              marginLeft: '4px' 
+            }} 
+            title="アフィリエイトリンク"
+          >
+            [PR]
+          </span>
+        </span>
       )
     },
   },
