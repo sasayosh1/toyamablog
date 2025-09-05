@@ -179,8 +179,19 @@ const components = {
           href={value.href}
           rel={rel}
           style={{
-            color: '#0070f3',
-            textDecoration: 'none',
+            color: '#2563eb',
+            textDecoration: 'underline',
+            textDecorationColor: 'transparent',
+            transition: 'all 0.2s ease',
+            cursor: 'pointer'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#1d4ed8'
+            e.currentTarget.style.textDecorationColor = '#1d4ed8'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#2563eb'
+            e.currentTarget.style.textDecorationColor = 'transparent'
           }}
         >
           {children}
@@ -210,11 +221,37 @@ const components = {
             href={href}
             target="_blank"
             rel="nofollow noopener noreferrer"
-            className={`inline-flex items-center font-medium transition-all duration-200 ${platformStyles[platform]}`}
             title="アフィリエイトリンク（外部サイトへ移動します）"
             style={{
-              textDecoration: 'none',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              textDecoration: 'underline',
+              textDecorationColor: 'transparent',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer',
+              ...(platform === 'amazon' ? { color: '#ea580c' } :
+                  platform === 'rakuten' ? { color: '#dc2626' } :
+                  platform === 'yahoo' ? { color: '#7c3aed' } :
+                  { color: '#2563eb' })
+            }}
+            onMouseEnter={(e) => {
+              const colors = {
+                amazon: '#c2410c',
+                rakuten: '#b91c1c', 
+                yahoo: '#6d28d9',
+                generic: '#1d4ed8'
+              }
+              e.currentTarget.style.color = colors[platform as keyof typeof colors]
+              e.currentTarget.style.textDecorationColor = colors[platform as keyof typeof colors]
+            }}
+            onMouseLeave={(e) => {
+              const colors = {
+                amazon: '#ea580c',
+                rakuten: '#dc2626',
+                yahoo: '#7c3aed', 
+                generic: '#2563eb'
+              }
+              e.currentTarget.style.color = colors[platform as keyof typeof colors]
+              e.currentTarget.style.textDecorationColor = 'transparent'
             }}
           >
             {children}

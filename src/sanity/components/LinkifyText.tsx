@@ -28,9 +28,19 @@ export default function LinkifyText({ children }: LinkifyTextProps) {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                color: '#1976d2',
+                color: '#2563eb',
                 textDecoration: 'underline',
+                textDecorationColor: 'transparent',
+                transition: 'all 0.2s ease',
                 cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#1d4ed8'
+                e.currentTarget.style.textDecorationColor = '#1d4ed8'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#2563eb'
+                e.currentTarget.style.textDecorationColor = 'transparent'
               }}
             >
               {part}
