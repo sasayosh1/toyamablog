@@ -51,9 +51,11 @@ function HeroImage() {
 export default async function Home({ 
   searchParams 
 }: { 
-  searchParams: Promise<{ page?: string }> | { page?: string }
+  searchParams?: Promise<{ page?: string }> | { page?: string }
 }) {
-  const params = searchParams instanceof Promise ? await searchParams : searchParams
+  const params = searchParams 
+    ? (searchParams instanceof Promise ? await searchParams : searchParams)
+    : {}
   const currentPage = parseInt(params?.page || '1', 10)
   
   // ページネーション対応で記事を取得、検索用には全記事を取得
