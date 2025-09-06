@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import Image from 'next/image'
 import { PortableText as BasePortableText } from '@portabletext/react'
@@ -36,6 +38,29 @@ const components = {
   types: {
     // Googleマップを完全にスキップ（クラウドルール：専用セクションで表示）
     googleMaps: () => null,
+    // HTMLタイプの処理（Googleマップは完全除外）
+    html: ({ value }: { value: { html: string } }) => {
+      if (!value?.html) return null
+      
+      // Googleマップ関連のHTMLを完全に除外（クラウドルール：専用セクションで表示）
+      const isGoogleMap = value.html.includes('google.com/maps/embed') ||
+                         value.html.includes('maps.google.com') ||
+                         value.html.includes('www.google.com/maps') ||
+                         value.html.toLowerCase().includes('iframe') && 
+                         (value.html.includes('maps') || value.html.includes('embed'))
+      
+      if (isGoogleMap) {
+        console.log('PortableText: Googleマップを検出し、表示をスキップしました', value.html.substring(0, 100))
+        return null
+      }
+      
+      return (
+        <div 
+          dangerouslySetInnerHTML={{ __html: value.html }}
+          style={{ margin: '1rem 0' }}
+        />
+      )
+    },
     image: ({ value }: { value: { asset?: { _ref: string }; alt?: string; caption?: string } }) => {
       if (!value?.asset?._ref) {
         return null
@@ -112,18 +137,6 @@ const components = {
             title="YouTube video"
           />
         </div>
-      )
-    },
-    html: ({ value }: { value: { html: string } }) => {
-      if (!value?.html) {
-        return null
-      }
-      
-      return (
-        <div 
-          dangerouslySetInnerHTML={{ __html: value.html }}
-          style={{ margin: '1rem 0' }}
-        />
       )
     },
     youtubeShorts: ({ value }: { value: { url: string } }) => {

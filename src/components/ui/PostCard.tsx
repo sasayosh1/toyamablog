@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 
 
@@ -15,45 +15,102 @@ interface ThumbnailImageProps {
 function ThumbnailImage({ urls, alt, priority }: ThumbnailImageProps) {
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+  const [debugInfo, setDebugInfo] = useState('')
+
+  // URL変更時にローディング状態をリセット
+  useEffect(() => {
+    setIsLoading(true)
+    setHasError(false)
+    setRetryCount(0)
+    setDebugInfo(`試行中: ${urls[currentUrlIndex]?.substring(0, 50)}...`)
+  }, [currentUrlIndex, urls])
+
+  // タイムアウト処理（10秒後に次のURLに移行）
+  useEffect(() => {
+    if (!isLoading) return
+
+    const timeout = setTimeout(() => {
+      if (isLoading && retryCount < 2) {
+        setRetryCount(prev => prev + 1)
+        // 再試行
+        const img = new Image()
+        img.onload = handleImageLoad
+        img.onerror = handleImageError
+        img.src = urls[currentUrlIndex]
+      } else {
+        handleImageError()
+      }
+    }, 10000) // 10秒タイムアウト
+
+    return () => clearTimeout(timeout)
+  }, [isLoading, retryCount, currentUrlIndex, urls])
 
   const handleImageError = () => {
-    if (currentUrlIndex < urls.length - 1) {
-      setCurrentUrlIndex(currentUrlIndex + 1)
-    } else {
-      setIsLoading(false)
-    }
+    console.log(`画像読み込み失敗: ${urls[currentUrlIndex]} (試行 ${currentUrlIndex + 1}/${urls.length})`)
+    setCurrentUrlIndex(prev => {
+      if (prev < urls.length - 1) {
+        const nextIndex = prev + 1
+        setDebugInfo(`失敗、次を試行中: ${urls[nextIndex]?.substring(0, 50)}...`)
+        return nextIndex
+      } else {
+        setHasError(true)
+        setIsLoading(false)
+        setDebugInfo('すべてのURLで失敗')
+        return prev
+      }
+    })
   }
 
   const handleImageLoad = () => {
+    console.log(`画像読み込み成功: ${urls[currentUrlIndex]}`)
     setIsLoading(false)
+    setHasError(false)
+    setDebugInfo('読み込み成功')
   }
 
-  if (currentUrlIndex >= urls.length) {
+  // 全URLで失敗した場合
+  if (hasError || currentUrlIndex >= urls.length) {
     return (
-      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-        <span className="text-gray-500 text-sm">画像を読み込めませんでした</span>
+      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+        <div className="text-center text-gray-400">
+          <div className="text-4xl mb-2">📷</div>
+          <div className="text-xs">画像を読み込めませんでした</div>
+        </div>
       </div>
     )
   }
 
   return (
-    <>
+    <div className="w-full h-full relative">
       {isLoading && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-          <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-10">
+          <div className="flex flex-col items-center space-y-2">
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+              <span className="text-xs text-gray-500">読み込み中...</span>
+            </div>
+            {process.env.NODE_ENV === 'development' && (
+              <div className="text-xs text-gray-400 px-2 text-center max-w-full break-words">
+                {debugInfo}
+              </div>
+            )}
+          </div>
         </div>
       )}
       <img
         src={urls[currentUrlIndex]}
         alt={alt}
-        className={`w-full h-full object-cover transition-opacity duration-200 ${
+        className={`w-full h-full object-cover transition-opacity duration-300 ${
           isLoading ? 'opacity-0' : 'opacity-100'
         }`}
         loading={priority ? "eager" : "lazy"}
         onError={handleImageError}
         onLoad={handleImageLoad}
+        onLoadStart={() => setIsLoading(true)}
       />
-    </>
+    </div>
   )
 }
 
@@ -95,49 +152,64 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
   // タイトルから#shortsを削除
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
   
-  // 改善されたサムネイル画像取得
+  // 改善されたサムネイル画像取得（信頼性重視）
   const getThumbnailUrls = () => {
     const urls = [];
     
-    // 1. YouTubeURLが存在する場合（最優先）
-    if (post.youtubeUrl) {
-      const youtubeThumb = getYouTubeThumbnailWithFallback(post.youtubeUrl);
-      if (youtubeThumb) {
-        urls.push(youtubeThumb);
-        
-        // 複数のYouTube画質オプション
-        const videoId = post.youtubeUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
-        if (videoId) {
-          urls.push(`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`);
-          urls.push(`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`);
-          urls.push(`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`);
-        }
-      }
-    }
-
-    // 2. Sanityサムネイルが存在する場合
+    // 1. Sanityサムネイルが存在する場合（最も信頼性が高い）
     if (post.thumbnail?.asset?.url) {
       urls.push(post.thumbnail.asset.url);
     }
+    
+    // 2. YouTubeURLが存在する場合
+    if (post.youtubeUrl) {
+      const videoId = post.youtubeUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
+      if (videoId) {
+        // YouTube画像の品質順（存在する可能性が高い順）
+        urls.push(`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`);
+        urls.push(`https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`);
+        urls.push(`https://i.ytimg.com/vi/${videoId}/default.jpg`);
+        urls.push(`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`);
+      }
+    }
 
-    // 3. カテゴリ別のカラーサムネイル（確実なフォールバック）
+    // 3. 地域別のカテゴリ色フォールバック（確実なフォールバック）
     const categoryColor = getCategoryColor(post.categories?.[0]);
     const fallbackSvg = `data:image/svg+xml,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225">
-        <rect width="400" height="225" fill="${categoryColor.bg}"/>
-        <text x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" 
-              fill="${categoryColor.text}" font-size="18" font-family="Arial, sans-serif" font-weight="bold">
-          ${post.categories?.[0] || '記事'}
+        <defs>
+          <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:${categoryColor.bg};stop-opacity:1" />
+            <stop offset="100%" style="stop-color:${adjustBrightness(categoryColor.bg, -20)};stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg)"/>
+        <circle cx="200" cy="112" r="40" fill="${categoryColor.text}" opacity="0.1"/>
+        <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" 
+              fill="${categoryColor.text}" font-size="16" font-family="system-ui, -apple-system, sans-serif" font-weight="600">
+          ${post.categories?.[0] || '富山のくせに'}
         </text>
-        <text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" 
-              fill="${categoryColor.text}" font-size="12" font-family="Arial, sans-serif">
-          ${cleanTitle.length > 30 ? cleanTitle.substring(0, 30) + '...' : cleanTitle}
+        <text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" 
+              fill="${categoryColor.text}" font-size="11" font-family="system-ui, -apple-system, sans-serif" opacity="0.9">
+          ${cleanTitle.length > 35 ? cleanTitle.substring(0, 32) + '...' : cleanTitle}
         </text>
       </svg>
     `)}`;
     urls.push(fallbackSvg);
     
     return urls;
+  };
+
+  // 色の明度調整ヘルパー関数
+  const adjustBrightness = (hex: string, percent: number) => {
+    const num = parseInt(hex.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = (num >> 8 & 0x00FF) + amt;
+    const B = (num & 0x0000FF) + amt;
+    return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+      (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+      (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
   };
 
   // カテゴリ別の色彩定義

@@ -146,7 +146,37 @@ export async function getPost(slug: string): Promise<Post | null> {
       category,
       publishedAt,
       body,
-      youtubeUrl
+      youtubeUrl,
+      thumbnail {
+        asset -> {
+          _ref,
+          _id,
+          url,
+          originalFilename,
+          size,
+          mimeType,
+          metadata {
+            dimensions {
+              width,
+              height
+            }
+          }
+        },
+        alt
+      },
+      excerpt,
+      author->{
+        _id,
+        name,
+        slug,
+        bio,
+        image{
+          asset->{
+            _ref,
+            url
+          }
+        }
+      }
     }
   `, { slug }, { 
     next: { 
@@ -290,5 +320,49 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
       console.error('Fallback search error:', fallbackError);
       return [];
     }
+  }
+}
+
+// 分析用: 全記事の詳細データを取得（body含む）
+export async function getAllPostsForAnalysis(): Promise<Post[]> {
+  try {
+    const posts = await client.fetch<Post[]>(`
+      *[_type == "post"] | order(publishedAt desc) {
+        _id,
+        title,
+        slug,
+        description,
+        tags,
+        category,
+        publishedAt,
+        body,
+        youtubeUrl,
+        excerpt,
+        thumbnail {
+          asset -> {
+            _ref,
+            url
+          },
+          alt
+        },
+        author->{
+          _id,
+          name,
+          slug,
+          bio
+        },
+        "categories": [category],
+        "displayExcerpt": coalesce(excerpt, description),
+        "bodyLength": length(body),
+        "bodyPlainText": array::join(body[_type == "block"].children[_type == "span"].text, " ")
+      }
+    `, {}, { 
+      cache: 'no-store'
+    });
+    
+    return posts;
+  } catch (error) {
+    console.error('Error fetching posts for analysis:', error);
+    return [];
   }
 }
