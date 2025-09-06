@@ -230,55 +230,72 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         ) : null}
 
         <>
-        {/* まとめセクション（クラウドルール：記事本文の後、マップより上） */}
-        <div className="border-t border-gray-200 pt-8 mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">まとめ</h2>
-            <div className="prose prose-lg max-w-none">
-              <p className="text-gray-700 leading-relaxed">
-                {post.category && `${post.category}の`}魅力あふれる{cleanTitle}をご紹介しました。
-                {post.youtubeUrl && 'YouTube動画と合わせて、'}富山県の素晴らしい体験をお楽しみください。
-              </p>
-            </div>
-        </div>
 
-        {/* Googleマップセクション（クラウドルール：まとめの後、タグより上に配置） */}
-        {post.body && Array.isArray(post.body) && 
-            post.body.filter((block: unknown) => 
-              typeof block === 'object' && block !== null && 
-              '_type' in block && (block as { _type: string })._type === 'googleMaps'
-            ).length > 0 && (
-              <div className="mb-8">
-                {post.body
-                  .filter((block: unknown) => 
-                    typeof block === 'object' && block !== null && 
-                    '_type' in block && (block as { _type: string })._type === 'googleMaps'
-                  )
-                  .map((mapBlock: unknown, index: number) => {
-                    const block = mapBlock as { iframe?: string; description?: string };
-                    if (!block?.iframe) return null;
-                    const processedIframe = block.iframe
-                      .replace(/width="[^"]*"/g, 'width="100%"')
-                      .replace(/height="[^"]*"/g, 'height="300"')
-                      .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
-                    return (
-                      <div key={index} style={{ margin: '2rem 0', textAlign: 'center' }}>
-                        <div dangerouslySetInnerHTML={{ __html: processedIframe }} />
-                        {block.description && (
-                          <p style={{
-                            marginTop: '0.5rem',
-                            fontSize: '0.875rem',
-                            color: '#666',
-                            fontStyle: 'italic'
-                          }}>
-                            {block.description}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
+        {/* Googleマップセクション（クラウドルール：記事本文の後、タグより上に配置） */}
+        {post.body && Array.isArray(post.body) && (() => {
+          // 最初に見つかったマップブロック1つのみを表示（重複防止）
+          const firstMapBlock = post.body
+            .filter((block: unknown) => {
+              if (typeof block !== 'object' || block === null || !('_type' in block)) return false;
+              const blockType = (block as { _type: string })._type;
+              
+              // googleMapsタイプの場合
+              if (blockType === 'googleMaps') {
+                return !!(block as { iframe?: string }).iframe;
+              }
+              
+              // htmlタイプでGoogleマップの場合
+              if (blockType === 'html') {
+                const html = (block as { html?: string }).html;
+                return html?.includes('google.com/maps/embed') || false;
+              }
+              
+              return false;
+            })
+            .slice(0, 1)[0]; // 最初の1つのみを取得
+
+          if (!firstMapBlock) return null;
+
+          const block = firstMapBlock as { _type: string; iframe?: string; html?: string; description?: string };
+          
+          let processedIframe = '';
+          
+          // googleMapsタイプの場合
+          if (block._type === 'googleMaps' && block.iframe) {
+            processedIframe = block.iframe
+              .replace(/width="[^"]*"/g, 'width="100%"')
+              .replace(/height="[^"]*"/g, 'height="300"')
+              .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
+          }
+          
+          // htmlタイプの場合
+          if (block._type === 'html' && block.html) {
+            processedIframe = block.html
+              .replace(/width="[^"]*"/g, 'width="100%"')
+              .replace(/height="[^"]*"/g, 'height="300"')
+              .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
+          }
+          
+          if (!processedIframe) return null;
+          
+          return (
+            <div className="mb-8">
+              <div style={{ margin: '2rem 0', textAlign: 'center' }}>
+                <div dangerouslySetInnerHTML={{ __html: processedIframe }} />
+                {block.description && (
+                  <p style={{
+                    marginTop: '0.5rem',
+                    fontSize: '0.875rem',
+                    color: '#666',
+                    fontStyle: 'italic'
+                  }}>
+                    {block.description}
+                  </p>
+                )}
               </div>
-            )
-        }
+            </div>
+          );
+        })()}
 
         {post.tags && post.tags.length > 0 && (
           <div className="border-t border-gray-200 pt-8 mb-8">

@@ -6,7 +6,7 @@ import {schemaTypes} from './schemaTypes'
 import {structure} from './src/sanity/structure'
 
 export default defineConfig({
-  name: 'default',
+  name: 'sasakiyoshimasa-com',
   title: '富山のくせに',
 
   projectId: 'aoxze287',
