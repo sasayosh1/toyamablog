@@ -148,14 +148,16 @@ function generateGoogleMapIframe(location, title) {
 }
 
 /**
- * AIを使用して記事コンテンツを生成
+ * CLAUDE.md クラウドルール厳格準拠の記事コンテンツを生成
+ * 構成: H1タイトル → 動画 → H2本文記事 → まとめ → マップ → タグ
  */
 function generateArticleContent(video, locationData) {
   const { title, description } = video;
   const { location, category } = locationData;
 
-  // 基本的な記事構造を生成
+  // CLAUDE.mdクラウドルール厳格準拠の記事構造
   const articleBlocks = [
+    // 導入文（2-3行で記事の魅力を簡潔に）
     {
       _type: 'block',
       _key: 'intro',
@@ -163,11 +165,13 @@ function generateArticleContent(video, locationData) {
       children: [{
         _type: 'span',
         _key: 'intro-span',
-        text: `${location}で話題の${title}をご紹介します。`,
+        text: `${location}の魅力的なスポットをご紹介します。YouTube動画でその魅力をお楽しみください。`,
         marks: []
       }],
       markDefs: []
     },
+    
+    // H2見出し1: 地域の魅力
     {
       _type: 'block',
       _key: 'h2-1',
@@ -180,6 +184,8 @@ function generateArticleContent(video, locationData) {
       }],
       markDefs: []
     },
+    
+    // 本文1 - 箇条書き積極活用
     {
       _type: 'block',
       _key: 'content-1',
@@ -187,11 +193,13 @@ function generateArticleContent(video, locationData) {
       children: [{
         _type: 'span',
         _key: 'content-1-span',
-        text: description || `${location}にある素晴らしいスポットです。地域の特色を活かした魅力的な場所として、多くの方に愛されています。`,
+        text: `${location}にある特色豊かなスポットです。地域の魅力を存分に感じられる場所として人気を集めています。\n\n**おすすめポイント：**\n✅ 地域の特色を活かした魅力\n✅ アクセス良好\n✅ 訪れやすい環境\n✅ SNS映えスポット`,
         marks: []
       }],
       markDefs: []
     },
+    
+    // H2見出し2: アクセス情報
     {
       _type: 'block',
       _key: 'h2-2',
@@ -204,10 +212,47 @@ function generateArticleContent(video, locationData) {
       }],
       markDefs: []
     },
+    
+    // アクセス情報 - 箇条書き形式
     {
-      _type: 'html',
-      _key: 'googlemap-' + Date.now(),
-      html: generateGoogleMapIframe(location, title)
+      _type: 'block',
+      _key: 'access-info',
+      style: 'normal',
+      children: [{
+        _type: 'span',
+        _key: 'access-span',
+        text: `📍 **所在地**: ${location}\n🚗 **駐車場**: 確認要\n🕐 **営業時間**: 店舗により異なる\n💰 **料金**: 施設により異なる`,
+        marks: []
+      }],
+      markDefs: []
+    },
+    
+    // H2まとめセクション（CLAUDE.md厳格ルール）
+    {
+      _type: 'block',
+      _key: 'h2-summary',
+      style: 'h2',
+      children: [{
+        _type: 'span',
+        _key: 'h2-summary-span',
+        text: 'まとめ',
+        marks: []
+      }],
+      markDefs: []
+    },
+    
+    // まとめ内容 - 読者への行動促進
+    {
+      _type: 'block',
+      _key: 'summary',
+      style: 'normal',
+      children: [{
+        _type: 'span',
+        _key: 'summary-span',
+        text: `${location}の魅力的なスポットをご紹介しました。動画でその魅力を感じていただき、ぜひ実際に足を運んでみてください。富山県の素晴らしい地域の魅力を体験していただけることでしょう。`,
+        marks: []
+      }],
+      markDefs: []
     }
   ];
 
@@ -242,6 +287,10 @@ async function createSanityArticle(video, locationData) {
     'おすすめ'
   ].filter(Boolean);
 
+  // 動画URLを正しい埋め込み形式に変換
+  const videoId = video.url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/)?.[1];
+  const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+  
   // 記事オブジェクト
   const article = {
     _type: 'post',
@@ -251,10 +300,11 @@ async function createSanityArticle(video, locationData) {
       current: slug
     },
     youtubeUrl: video.url,
+    videoUrl: embedUrl, // 正しい埋め込み形式
     body: articleContent,
-    excerpt: `${location}の魅力的なスポットをYouTube動画でご紹介。${video.title}`,
+    excerpt: `${location}の魅力的なスポットをYouTube動画でご紹介。地域の特色を活かした魅力をお楽しみください。`,
     tags: tags,
-    category: category,
+    category: location, // CLAUDE.mdルール: 地域名をカテゴリに使用
     publishedAt: new Date().toISOString(),
     author: {
       _type: 'reference',
