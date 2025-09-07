@@ -10,7 +10,7 @@ const sanityClient = createClient({
 
 // YouTubeチャンネルIDを設定（ささよしのチャンネル）
 // チャンネルURLから取得: https://www.youtube.com/@sasayoshi1
-const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UC_YOUR_CHANNEL_ID_HERE';
+const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UCxX3Eq8_KMl3AeYdhb5MklA';
 
 /**
  * YouTube Data APIから最新動画を取得
