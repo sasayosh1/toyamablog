@@ -146,6 +146,22 @@
   - `src/app/layout.tsx` - GAProvider読み込み
 
 ### API・データベース設定
+#### YouTube API設定
+- **YouTube Channel ID**: `UCxX3Eq8_KMl3AeYdhb5MklA` （ささよしチャンネル）
+- **YouTube API Key**: `AIzaSyAsSclg9Wq9AEMTXAp8KZW4G5vgRUTyIXY`
+- **Google Maps API Key**: `AIzaSyAH5oKyGm1EnibGH6JxlrEwMyRUIpzvEgI`
+- **チャンネル確認URL**: https://www.youtube.com/channel/UCxX3Eq8_KMl3AeYdhb5MklA
+- **使用方法**: 
+  ```bash
+  export YOUTUBE_CHANNEL_ID="UCxX3Eq8_KMl3AeYdhb5MklA"
+  export YOUTUBE_API_KEY="AIzaSyAsSclg9Wq9AEMTXAp8KZW4G5vgRUTyIXY"
+  export GOOGLE_MAPS_API_KEY="AIzaSyAH5oKyGm1EnibGH6JxlrEwMyRUIpzvEgI"
+  ```
+- **注意**: これらの値は固定。今後変更時のみ更新する
+- **関連ファイル**:
+  - `scripts/check-youtube-and-create-articles.cjs` - YouTube動画記事作成スクリプト
+  - `YOUTUBE_SYSTEM_FINAL_SETUP.md` - YouTube API設定ガイド
+
 #### Sanity CMS設定
 - **プロジェクトID**: `aoxze287`
 - **データセット**: `production`
