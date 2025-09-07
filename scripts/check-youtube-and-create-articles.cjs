@@ -404,6 +404,37 @@ async function createSanityArticle(video, locationData) {
   const videoId = video.url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/)?.[1];
   const embedUrl = `https://www.youtube.com/embed/${videoId}`;
   
+  // カテゴリ参照の作成（クラウドルール厳格準拠）
+  let categoryRef = null;
+  try {
+    // 地域名カテゴリを取得または作成
+    let regionCategory = await sanityClient.fetch(`*[_type == "category" && title == "${location}"][0]`);
+    
+    if (!regionCategory) {
+      console.log(`⚠️  「${location}」カテゴリが存在しません。作成中...`);
+      
+      regionCategory = await sanityClient.create({
+        _type: 'category',
+        title: location,
+        slug: {
+          _type: 'slug',
+          current: locationSlug
+        },
+        description: `${location}に関する記事`
+      });
+      
+      console.log(`✅ 「${location}」カテゴリを作成しました`);
+    }
+    
+    categoryRef = {
+      _type: 'reference',
+      _ref: regionCategory._id
+    };
+    
+  } catch (error) {
+    console.error(`❌ カテゴリ作成エラー（${location}）:`, error);
+  }
+
   // 記事オブジェクト
   const article = {
     _type: 'post',
@@ -417,7 +448,7 @@ async function createSanityArticle(video, locationData) {
     body: articleContent,
     excerpt: `${location}の魅力的なスポットをYouTube動画でご紹介。地域の特色を活かした魅力をお楽しみください。`,
     tags: tags,
-    category: location, // CLAUDE.mdルール: 地域名をカテゴリに使用
+    categories: categoryRef ? [categoryRef] : [], // CLAUDE.mdルール: 【】内地域名をカテゴリに使用（参照形式）
     publishedAt: new Date().toISOString(),
     author: {
       _type: 'reference',
