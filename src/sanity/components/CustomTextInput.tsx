@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Stack, Card, Text } from '@sanity/ui'
-import { StringInputProps } from 'sanity'
+import { StringInputProps, set, unset } from 'sanity'
 import LinkifyText from './LinkifyText'
 
 export default function CustomTextInput(props: StringInputProps) {
@@ -13,8 +13,8 @@ export default function CustomTextInput(props: StringInputProps) {
       <input
         type="text"
         value={value || ''}
-        onChange={(event) => onChange && onChange(event.target.value)}
-        placeholder={props.placeholder}
+        onChange={(event) => onChange && onChange(event.target.value ? set(event.target.value) : unset())}
+        placeholder={props.schemaType?.placeholder}
         style={{
           width: '100%',
           padding: '12px',

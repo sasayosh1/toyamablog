@@ -39,7 +39,8 @@
     "react-is": "^19.1.0",
     "react-linkify": "^1.0.0-alpha",
     "sanity": "^3.99.0",
-    "styled-components": "^6.1.19"
+    "styled-components": "^6.1.19",
+    "web-vitals": "^5.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

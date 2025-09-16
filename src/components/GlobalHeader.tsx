@@ -29,7 +29,7 @@ interface GlobalHeaderProps {
   categories?: string[]
 }
 
-export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeaderProps) {
+export default function GlobalHeader({ posts: _posts, categories: _categories = [] }: GlobalHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
 
@@ -48,6 +48,9 @@ export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeader
             </Link>
             <Link href="/about" className="font-medium transition-colors text-gray-800 hover:text-blue-600">
               サイトについて
+            </Link>
+            <Link href="/search" className="font-medium transition-colors text-gray-800 hover:text-blue-600">
+              検索
             </Link>
           </nav>
 
@@ -104,6 +107,16 @@ export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeader
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 サイトについて
+              </MenuLink>
+              <MenuLink
+                href="/search"
+                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
+                onMenuClick={() => setIsMenuOpen(false)}
+              >
+                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                検索
               </MenuLink>
               
             </div>

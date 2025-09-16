@@ -15,10 +15,12 @@ export const revalidate = 0
 export const dynamic = 'force-dynamic'
 
 export async function generateStaticParams() {
-  const categories = await getAllCategories()
-  return categories.map((category) => ({
-    category: encodeURIComponent(category),
-  }))
+  // Sanity認証エラー回避のため一時的にコメントアウト
+  // const categories = await getAllCategories()
+  // return categories.map((category) => ({
+  //   category: encodeURIComponent(category),
+  // }))
+  return []
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {

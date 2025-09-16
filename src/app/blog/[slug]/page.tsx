@@ -6,7 +6,7 @@ import GlobalHeader from '@/components/GlobalHeader'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import ReadingTime from '@/components/ui/ReadingTime'
 import TableOfContents from '@/components/TableOfContents'
-import { TopArticleAd, MiddleArticleAd, BottomArticleAd } from '@/components/ArticleAds'
+// import { TopArticleAd, MiddleArticleAd, BottomArticleAd } from '@/components/ArticleAds'
 import StructuredData from '@/components/StructuredData'
 import { generateArticleLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import ArticleErrorBoundary from '@/components/ui/ArticleErrorBoundary'
@@ -15,16 +15,18 @@ import type { Metadata } from 'next'
 // ISR: 詳細ページは10分キャッシュ
 export const revalidate = 600
 
-interface SanityPost {
-  slug: string;
-}
+// interface SanityPost {
+//   slug: string;
+// }
 
-// 静的パスを生成
+// 静的パスを生成 - 一時的に無効化してビルドエラーを回避
 export async function generateStaticParams() {
-  const posts = await client.fetch<SanityPost[]>(`*[_type == "post" && defined(publishedAt)]{ "slug": slug.current }`);
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+  // Sanity認証エラー回避のため一時的にコメントアウト
+  // const posts = await client.fetch<SanityPost[]>(`*[_type == "post" && defined(publishedAt)]{ "slug": slug.current }`);
+  // return posts.map((post) => ({
+  //   slug: post.slug,
+  // }));
+  return [];
 }
 
 // メタデータ生成
@@ -281,7 +283,10 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           return (
             <div className="mb-8">
               <div style={{ margin: '2rem 0', textAlign: 'center' }}>
-                <div dangerouslySetInnerHTML={{ __html: processedIframe }} />
+                <div
+                  dangerouslySetInnerHTML={{ __html: processedIframe }}
+                  suppressHydrationWarning={true}
+                />
                 {block.description && (
                   <p style={{
                     marginTop: '0.5rem',

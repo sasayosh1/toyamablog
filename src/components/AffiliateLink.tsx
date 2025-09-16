@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
 
 interface AffiliateLinkProps {
@@ -61,11 +62,15 @@ export default function AffiliateLink({
     <div className={`bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow ${className}`}>
       <div className="flex flex-col sm:flex-row">
         {imageUrl && (
-          <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
-            <img 
-              src={imageUrl} 
+          <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 relative">
+            <Image
+              src={imageUrl}
               alt={title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, 192px"
+              loading="lazy"
+              quality={75}
             />
           </div>
         )}

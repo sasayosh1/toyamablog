@@ -3,7 +3,7 @@ import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 import StructuredData from '@/components/StructuredData'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
-import { getHeroImageUrl } from '@/lib/image-utils'
+// import { getHeroImageUrl } from '@/lib/image-utils'
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 

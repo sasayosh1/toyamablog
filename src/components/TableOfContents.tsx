@@ -51,10 +51,11 @@ export default function TableOfContents({ content }: Props) {
   if (items.length === 0) return null
 
   return (
-    <section
-      className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-4 md:p-5 mb-6 md:mb-8 shadow-sm"
-      aria-label="ページの目次"
-    >
+    <div className="flex justify-center mb-6 md:mb-8">
+      <section
+        className="w-full max-w-2xl bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-4 md:p-5 shadow-sm"
+        aria-label="ページの目次"
+      >
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
@@ -90,6 +91,7 @@ export default function TableOfContents({ content }: Props) {
           </ul>
         </nav>
       )}
-    </section>
+      </section>
+    </div>
   )
 }

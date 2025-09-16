@@ -7,10 +7,12 @@ import PortableText from '@/components/PortableText'
 import TableOfContents from '@/components/TableOfContents'
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts()
-  return posts.map((post) => ({
-    slug: post.slug.current,
-  }))
+  // Sanity認証エラー回避のため一時的にコメントアウト
+  // const posts = await getAllPosts()
+  // return posts.map((post) => ({
+  //   slug: post.slug.current,
+  // }))
+  return []
 }
 
 interface PostPageProps {

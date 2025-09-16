@@ -15,49 +15,44 @@ export function AdSense() {
   useEffect(() => {
     // AdSense auto ads initialization
     try {
-      if (typeof window !== 'undefined' && window.adsbygoogle && ADSENSE_PUBLISHER_ID) {
-        (window.adsbygoogle = window.adsbygoogle || []).push({
+      if (typeof window !== 'undefined' && ADSENSE_PUBLISHER_ID) {
+        // Initialize adsbygoogle array if not exists
+        window.adsbygoogle = window.adsbygoogle || [];
+
+        // Push auto ads configuration
+        (window.adsbygoogle as unknown[]).push({
           google_ad_client: ADSENSE_PUBLISHER_ID,
           enable_page_level_ads: true
-        })
+        });
       }
     } catch (error) {
-      console.error('AdSense auto ads initialization error:', error)
+      console.error('AdSense auto ads initialization error:', error);
     }
-  }, [])
+  }, []);
 
   // Don't render if no publisher ID
   if (!ADSENSE_PUBLISHER_ID) {
     if (typeof window !== 'undefined') {
-      console.warn('AdSense publisher ID not found')
+      console.warn('AdSense publisher ID not found');
     }
-    return null
+    return null;
   }
 
   return (
-    <>
-      <Script
-        id="adsense-script"
-        async
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
-        crossOrigin="anonymous"
-        strategy="afterInteractive"
-      />
-      <Script
-        id="adsense-init"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.adsbygoogle = window.adsbygoogle || [];
-            (adsbygoogle = window.adsbygoogle || []).push({
-              google_ad_client: "${ADSENSE_PUBLISHER_ID}",
-              enable_page_level_ads: true
-            });
-          `
-        }}
-      />
-    </>
-  )
+    <Script
+      id="adsense-script"
+      async
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
+      crossOrigin="anonymous"
+      strategy="afterInteractive"
+      onLoad={() => {
+        console.log('AdSense script loaded successfully');
+      }}
+      onError={(error) => {
+        console.error('AdSense script loading error:', error);
+      }}
+    />
+  );
 }
 
 interface AdUnitProps {

@@ -3,7 +3,7 @@ interface StructuredDataProps {
 }
 
 export default function StructuredData({ data }: StructuredDataProps) {
-  const jsonLd = Array.isArray(data) 
+  const jsonLd = Array.isArray(data)
     ? data.map(item => JSON.stringify(item)).join('\n')
     : JSON.stringify(data)
 
@@ -13,6 +13,7 @@ export default function StructuredData({ data }: StructuredDataProps) {
       dangerouslySetInnerHTML={{
         __html: jsonLd
       }}
+      suppressHydrationWarning={true}
     />
   )
 }

@@ -55,8 +55,9 @@ const components = {
       }
       
       return (
-        <div 
+        <div
           dangerouslySetInnerHTML={{ __html: value.html }}
+          suppressHydrationWarning={true}
           style={{ margin: '1rem 0' }}
         />
       )
@@ -220,13 +221,6 @@ const components = {
       } 
     }) => {
       const { href, platform = 'generic', showIcon = true } = value
-      
-      const platformStyles = {
-        amazon: 'text-orange-600 hover:text-orange-700 border-b-2 border-orange-200 hover:border-orange-300',
-        rakuten: 'text-red-600 hover:text-red-700 border-b-2 border-red-200 hover:border-red-300',
-        yahoo: 'text-purple-600 hover:text-purple-700 border-b-2 border-purple-200 hover:border-purple-300',
-        generic: 'text-blue-600 hover:text-blue-700 border-b-2 border-blue-200 hover:border-blue-300'
-      }
       
       return (
         <span style={{ display: 'inline-block' }}>

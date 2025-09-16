@@ -1,4 +1,4 @@
-import { getAllCategories, getAllPosts, client } from '@/lib/sanity'
+import { getAllPosts, client } from '@/lib/sanity'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
 import CategoryCard from '@/components/ui/CategoryCard'

@@ -15,21 +15,23 @@ interface SanityTag {
   tag: string;
 }
 
-// 静的パスを生成
+// 静的パスを生成 - Sanity認証エラー回避のため一時的に無効化
 export async function generateStaticParams() {
-  const posts = await client.fetch<{ tags: string[] }[]>(`
-    *[_type == "post" && defined(publishedAt) && defined(tags)] {
-      tags
-    }
-  `);
-  
-  // すべてのタグを抽出して重複を除去
-  const allTags = posts.flatMap(post => post.tags || []);
-  const uniqueTags = [...new Set(allTags)];
-  
-  return uniqueTags.map((tag) => ({
-    tag: encodeURIComponent(tag),
-  }));
+  // Sanity認証エラー回避のため一時的にコメントアウト
+  // const posts = await client.fetch<{ tags: string[] }[]>(`
+  //   *[_type == "post" && defined(publishedAt) && defined(tags)] {
+  //     tags
+  //   }
+  // `);
+  //
+  // // すべてのタグを抽出して重複を除去
+  // const allTags = posts.flatMap(post => post.tags || []);
+  // const uniqueTags = [...new Set(allTags)];
+  //
+  // return uniqueTags.map((tag) => ({
+  //   tag: encodeURIComponent(tag),
+  // }));
+  return []
 }
 
 export default async function TagPage({ params }: { params: Promise<{ tag: string }> }) {

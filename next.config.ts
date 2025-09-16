@@ -22,6 +22,16 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@sanity/client', '@portabletext/react'],
   },
+
+  // Turbopack設定（新しい推奨設定）
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
+  },
   
   
   // コンパイル最適化
@@ -33,6 +43,18 @@ const nextConfig: NextConfig = {
   // パフォーマンス最適化
   poweredByHeader: false,
   compress: true,
+  
+  // 開発時最適化
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+        ignored: ['node_modules', '.next'],
+      };
+    }
+    return config;
+  },
   
   // リダイレクト設定
   async redirects() {
