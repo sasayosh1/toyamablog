@@ -30,11 +30,15 @@ export function AdSense() {
     }
   }, []);
 
+  // Don't render AdSense in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Development mode: AdSense script disabled');
+    return null;
+  }
+
   // Don't render if no publisher ID
   if (!ADSENSE_PUBLISHER_ID) {
-    if (typeof window !== 'undefined') {
-      console.warn('AdSense publisher ID not found');
-    }
+    console.log('AdSense publisher ID not found');
     return null;
   }
 
@@ -49,7 +53,7 @@ export function AdSense() {
         console.log('AdSense script loaded successfully');
       }}
       onError={(error) => {
-        console.error('AdSense script loading error:', error);
+        console.warn('AdSense script loading error:', error);
       }}
     />
   );
@@ -64,6 +68,11 @@ interface AdUnitProps {
 
 export function AdUnit({ slot, format = 'auto', responsive = true, className = '' }: AdUnitProps) {
   useEffect(() => {
+    // Don't load ads in development
+    if (process.env.NODE_ENV === 'development') {
+      return;
+    }
+
     const loadAd = () => {
       try {
         if (typeof window !== 'undefined' && window.adsbygoogle) {
@@ -79,7 +88,8 @@ export function AdUnit({ slot, format = 'auto', responsive = true, className = '
     return () => clearTimeout(timer)
   }, [])
 
-  if (!ADSENSE_PUBLISHER_ID) {
+  // Don't render ads in development
+  if (process.env.NODE_ENV === 'development' || !ADSENSE_PUBLISHER_ID) {
     return null
   }
 

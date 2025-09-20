@@ -6,8 +6,8 @@ import {schemaTypes} from './schemaTypes'
 import {structure} from './src/sanity/structure'
 
 export default defineConfig({
-  name: 'sasakiyoshimasa-com',
-  title: '富山のくせに',
+  name: 'toyama-blog',
+  title: '富山のくせに - ブログCMS',
 
   projectId: 'aoxze287',
   dataset: 'production',

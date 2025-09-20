@@ -1,7 +1,16 @@
 import Link from 'next/link'
+import { getHomePageContent } from '@/lib/sanity'
 
-export default function Footer() {
+export default async function Footer() {
+  const homePageContent = await getHomePageContent()
   const currentYear = new Date().getFullYear()
+  const fallbackFooterText =
+    '地域の美しい風景、グルメ、観光スポット、文化を紹介するAMAZING TOYAMAブログです。YouTube Shortsと連携して「富山のくせになかなかええやん！」をお伝えしています。'
+  const trimmedFooterText = homePageContent.footerText?.trim()
+  const footerText =
+    trimmedFooterText && trimmedFooterText.length > 0
+      ? trimmedFooterText
+      : fallbackFooterText
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -11,8 +20,7 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-xl font-bold">富山のくせに</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
-              地域の美しい風景、グルメ、観光スポット、文化を紹介するAMAZING TOYAMAブログです。
-              YouTube Shortsと連携して「富山のくせになかなかええやん！」をお伝えしています。
+              {footerText}
             </p>
             <div className="flex space-x-4">
               <Link

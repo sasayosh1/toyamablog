@@ -67,3 +67,7 @@ dist/
 *.tmp
 *.temp
 .vercel
+
+# Gemini CLI specific temporary files
+.last_pick.json
+.workflow_state.json

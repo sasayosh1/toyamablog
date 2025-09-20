@@ -1,0 +1,1302 @@
+{
+  "generatedAt": "2025-09-16T14:04:09.015Z",
+  "totalArticles": 10,
+  "articlesWithAffiliateOpportunities": 10,
+  "analysisResults": [
+    {
+      "post": {
+        "id": "mP1AnQmJIcwLieKM40UhUA",
+        "title": "【氷見市】Tシャツからグッズまで！氷見の「ヒミツノアソビバ」をご紹介！",
+        "slug": "himi-city-1757253039364",
+        "category": "自然・公園",
+        "publishedAt": "2025-09-07T13:50:39.364Z",
+        "url": "/blog/himi-city-1757253039364"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 124,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 5
+            },
+            {
+              "keyword": "立山",
+              "count": 3
+            },
+            {
+              "keyword": "氷見",
+              "count": 23
+            }
+          ]
+        },
+        {
+          "programId": "tripadvisor",
+          "programLabel": "トリップアドバイザー",
+          "category": "観光・口コミ関連",
+          "score": 27,
+          "priority": 4,
+          "foundKeywords": [
+            {
+              "keyword": "観光",
+              "count": 8
+            },
+            {
+              "keyword": "おすすめ",
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 11,
+          "blockText": "氷見市の「ヒミツノアソビバ」は、地域愛溢れるオリジナルグッズが魅力のお店です。tシャツをはじめとした12種類の限定デザイン商品や、地元クリエイターとのコラボアイテムで氷見の魅力を発信しています。年間約...",
+          "score": 30,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 3,
+          "blockText": "**氷見市の主要な魅力：**\n🐟 **天然ブリ**: 年間約1,200トンの水揚げ量\n🏔️ **立山連峰ビュー**: 海抜0mから3,000m級の山々を一望\n🍜 **氷見うどん**: 400年の...",
+          "score": 26,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 0,
+          "blockText": "氷見市で注目を集めている「ヒミツノアソビバ」をご紹介します。オリジナルtシャツから地域限定グッズまで、氷見の魅力が詰まったユニークなお店です。地元愛溢れるアイテムの数々が、訪れる人々を魅了し続けていま...",
+          "score": 19,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 9,
+          "blockText": "**主要な参加イベント・実績：**\n🎪 **氷見牛まつり**: 年2回出店（累計来場者約8万人）\n🎣 **氷見漁港まつり**: 限定商品販売（年間売上の15%を占める重要イベント）\n🎨 **富山...",
+          "score": 19,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 2,
+          "blockText": "富山県氷見市は、人口約4.8万人の美しい港町です。日本海に面し、海越しに見える立山連峰の絶景で有名な観光地として年間約15万人の観光客が訪れます。特に天然ブリの水揚げ量は日本有数を誇り、冬の寒ブリは全...",
+          "score": 18,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "post": {
+        "id": "OYjzGK4kNO9kmOILcKsUpC",
+        "title": "【富山市】落ち着いた空間で楽しむリトル上海の本格中華ランチ！日常にそっと高級感を #shorts",
+        "slug": "toyama-city-1756354795933",
+        "category": "富山市",
+        "publishedAt": "2025-08-28T04:19:55.933Z",
+        "url": "/blog/toyama-city-1756354795933"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 20,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 5
+            }
+          ]
+        },
+        {
+          "programId": "tripadvisor",
+          "programLabel": "トリップアドバイザー",
+          "category": "観光・口コミ関連",
+          "score": 3,
+          "priority": 4,
+          "foundKeywords": [
+            {
+              "keyword": "おすすめ",
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 1,
+          "blockText": "富山市にあるリトル上海は、落ち着いた雰囲気の中で本格的な中華料理が楽しめる隠れ家的なレストランです。店内は清潔感があり、日常使いにも特別な日にも適した上品な空間となっています。...",
+          "score": 4,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 7,
+          "blockText": "リトル上海は富山市の中心部に位置し、電車でもお車でもアクセスしやすい立地にあります。駐車場も完備されているため、ご家族連れでも安心してお越しいただけます。...",
+          "score": 4,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "post": {
+        "id": "OYjzGK4kNO9kmOILcKsUYU",
+        "title": "【高岡市】脱出を企(くわだ)てるペンギン",
+        "slug": "takaoka-city-1756354793286",
+        "category": "高岡市",
+        "publishedAt": "2025-08-28T04:19:53.286Z",
+        "url": "/blog/takaoka-city-1756354793286"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 60,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 1
+            },
+            {
+              "keyword": "高岡",
+              "count": 14
+            }
+          ]
+        },
+        {
+          "programId": "veltra_popular",
+          "programLabel": "ベルトラで人気のオプショナルツアーを探す",
+          "category": "オプショナルツアー・体験関連",
+          "score": 1,
+          "priority": 6,
+          "foundKeywords": [
+            {
+              "keyword": "体験",
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 6,
+          "blockText": "高岡市の魅力あふれる【高岡市】脱出を企(くわだ)てるペンギンをご紹介しました。youtube動画と合わせて、富山県の素晴らしい体験をお楽しみください。...",
+          "score": 13,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "veltra_popular",
+              "label": "ベルトラで人気のオプショナルツアーを探す",
+              "category": "オプショナルツアー・体験関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 8,
+          "blockText": "高岡古城公園動物園は高岡市古城1-6に位置し、jr高岡駅から徒歩約15分でアクセス可能です。無料駐車場も完備されているため、お車でのご来園も便利です。営業時間や入園料など詳細情報は 公式サイト でご確...",
+          "score": 12,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "veltra_popular",
+              "label": "ベルトラで人気のオプショナルツアーを探す",
+              "category": "オプショナルツアー・体験関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 0,
+          "blockText": "高岡市で話題の脱出を企てるペンギンをご紹介します。高岡古城公園動物園で愛らしいペンギンたちの様子をお楽しみください。...",
+          "score": 8,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "veltra_popular",
+              "label": "ベルトラで人気のオプショナルツアーを探す",
+              "category": "オプショナルツアー・体験関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 4,
+          "blockText": "高岡古城公園動物園は、高岡古城公園内に位置する地域密着型の動物園です。豊かな自然環境の中で、様々な動物たちがのびのびと生活しています。ペンギンをはじめ、多くの動物たちとの触れ合いを通じて、自然の大切さ...",
+          "score": 8,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "veltra_popular",
+              "label": "ベルトラで人気のオプショナルツアーを探す",
+              "category": "オプショナルツアー・体験関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 2,
+          "blockText": "高岡古城公園動物園のペンギンたちは、その愛らしい仕草と個性豊かな行動で多くの来園者を魅了しています。特に注目されるのは、まるで脱出を企てているかのような賢明な行動です。ペンギンたちの自然な行動を間近で...",
+          "score": 4,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "veltra_popular",
+              "label": "ベルトラで人気のオプショナルツアーを探す",
+              "category": "オプショナルツアー・体験関連"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "post": {
+        "id": "jKwgQNCsrs019jNuQGXsKO",
+        "title": "【氷見市】吉がけ牧場のヤギたちから見習いたいスローライフ体験",
+        "slug": "himi-city-yoshigake-farm-goat-slow-life-experience",
+        "category": "氷見市",
+        "publishedAt": "2025-08-16T11:00:29.000Z",
+        "url": "/blog/himi-city-yoshigake-farm-goat-slow-life-experience"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 64,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 3
+            },
+            {
+              "keyword": "氷見",
+              "count": 13
+            }
+          ]
+        },
+        {
+          "programId": "tripadvisor",
+          "programLabel": "トリップアドバイザー",
+          "category": "観光・口コミ関連",
+          "score": 48,
+          "priority": 4,
+          "foundKeywords": [
+            {
+              "keyword": "観光",
+              "count": 16
+            }
+          ]
+        },
+        {
+          "programId": "veltra_popular",
+          "programLabel": "ベルトラで人気のオプショナルツアーを探す",
+          "category": "オプショナルツアー・体験関連",
+          "score": 9,
+          "priority": 6,
+          "foundKeywords": [
+            {
+              "keyword": "体験",
+              "count": 9
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 23,
+          "blockText": "氷見市は富山県観光において重要な位置を占める地域として、多様な観光資源を有しています。この地域の特色ある自然環境、歴史的建造物、文化施設、地域イベントなどが相互に連携することで、訪問者に多面的な魅力を...",
+          "score": 33,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 21,
+          "blockText": "近年、氷見市では持続可能な観光開発に力を入れています。自然環境の保護と観光振興の両立を目指し、地域住民と観光客が共に楽しめる環境づくりを進めています。エコツーリズムや体験型観光プログラムの充実により、...",
+          "score": 20,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 5,
+          "blockText": "牧場は氷見市の豊かな自然に囲まれており、富山湾を望む絶好のロケーションにあります。ヤギたちと触れ合いながら、海風を感じ、鳥のさえずりに耳を傾ける時間は、日常のストレスを忘れさせてくれます。都会の喧騒か...",
+          "score": 9,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 19,
+          "blockText": "氷見市は富山県内でも独自の文化と歴史を育んできた地域です。豊かな自然環境と地域住民の温かい人柄が調和し、訪れる人々に心の安らぎを提供してくれます。季節ごとに異なる表情を見せる風景は、何度訪れても新しい...",
+          "score": 8,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 14,
+          "blockText": "氷見市に位置するこのスポットは、地域の主要な交通網からもアクセスしやすく、観光やお出かけの際にも便利です。周辺には他の見どころや飲食店なども点在しており、一日を通して楽しむことができます。駐車場や公共...",
+          "score": 7,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "post": {
+        "id": "f5IMbE4BjT3OYPNFYUOuu5",
+        "title": "【高岡市】ドリア専門店「ドリアリーボ」で行列必至の濃厚ドリアランチ！#shorts",
+        "slug": "takaoka-city-doria-libo-specialty-store",
+        "category": "高岡市",
+        "publishedAt": "2025-08-08T09:48:18.095Z",
+        "url": "/blog/takaoka-city-doria-libo-specialty-store"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 36,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 3
+            },
+            {
+              "keyword": "高岡",
+              "count": 6
+            }
+          ]
+        },
+        {
+          "programId": "tripadvisor",
+          "programLabel": "トリップアドバイザー",
+          "category": "観光・口コミ関連",
+          "score": 15,
+          "priority": 4,
+          "foundKeywords": [
+            {
+              "keyword": "観光",
+              "count": 2
+            },
+            {
+              "keyword": "おすすめ",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "programId": "veltra_popular",
+          "programLabel": "ベルトラで人気のオプショナルツアーを探す",
+          "category": "オプショナルツアー・体験関連",
+          "score": 5,
+          "priority": 6,
+          "foundKeywords": [
+            {
+              "keyword": "体験",
+              "count": 5
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 0,
+          "blockText": "高岡市にある「ドリアリーボ」は、富山県内でも珍しいドリア専門店として、地元の人々だけでなく県外からの観光客にも愛され続けている名店です。開店以来、連日多くのお客様で賑わい、特にランチタイムには行列がで...",
+          "score": 13,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 3,
+          "blockText": "ドリアリーボが高岡市で愛され続ける理由の一つは、他では決して味わえない「ドリア専門店」としてのプロフェッショナルな姿勢にあります。全国的に見ても、ドリアだけに特化した専門店は非常に珍しく、富山県内では...",
+          "score": 8,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 5,
+          "blockText": "ドリアリーボの美味しさの秘密は、厳選された高品質な食材の使用にあります。ベースとなるライスには新潟産コシヒカリを使用し、一粒一粒がふっくらと炊き上がるよう細心の注意を払っています。チーズには北海道産の...",
+          "score": 4,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 8,
+          "blockText": "ドリアリーボのメニューは、定番から季節限定まで常時15種類以上のドリアが用意されており、どのメニューを選んでも満足度の高い食事体験ができます。特に人気なのは「特製ミートドリア」で、じっくり煮込んだビー...",
+          "score": 4,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 10,
+          "blockText": "ドリアリーボでのドリア体験は、まさに五感すべてで楽しむことができる特別なものです。まず目を引くのは、表面に美しくこんがりと焼き色がついたチーズの層で、食欲をそそる見た目の美しさがあります。そして鼻をく...",
+          "score": 4,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "post": {
+        "id": "uLkO5gatk1xjPxgoNfP6II",
+        "title": "【富山市】富山の学問神社！於保多(おおた)神社で夏詣＆学業祈願",
+        "slug": "toyama-city-ooita-shrine-summer-visit",
+        "category": "富山市",
+        "publishedAt": "2025-08-08T09:48:18.095Z",
+        "url": "/blog/toyama-city-ooita-shrine-summer-visit"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 32,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 8
+            }
+          ]
+        },
+        {
+          "programId": "tripadvisor",
+          "programLabel": "トリップアドバイザー",
+          "category": "観光・口コミ関連",
+          "score": 3,
+          "priority": 4,
+          "foundKeywords": [
+            {
+              "keyword": "観光",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "programId": "veltra_popular",
+          "programLabel": "ベルトラで人気のオプショナルツアーを探す",
+          "category": "オプショナルツアー・体験関連",
+          "score": 3,
+          "priority": 6,
+          "foundKeywords": [
+            {
+              "keyword": "体験",
+              "count": 3
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 0,
+          "blockText": "富山市にある於保多（おおた）神社は、学問の神様として地元の人々に深く愛され続けている由緒ある神社です。この神社は古くから学業成就や合格祈願のご利益があるとして知られており、特に夏詣の時期には多くの参拝...",
+          "score": 9,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 3,
+          "blockText": "於保多神社は富山市内でも特に長い歴史を持つ神社の一つで、古くから学問・学業の神様として地域住民の厚い信仰を集めてきました。この神社の最大の特徴は、単なる観光地ではなく、地域コミュニティと深く結びついた...",
+          "score": 7,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 10,
+          "blockText": "富山市の於保多神社は、学問の神様として長年にわたって多くの人々の学業を見守り続けている特別な神社です。夏詣での参拝体験は、心身を清めて学業への新たな意欲を湧き起こしてくれる貴重な機会となります。...",
+          "score": 5,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "post": {
+        "id": "rtuM5GmqOByzZCRYAQl3vv",
+        "title": "【富山市】涼感MAX！環水公園サマーファウンテン2025で夏の暑さを吹き飛ばそう",
+        "slug": "toyama-city-kansui-park-summer-fountain-2025",
+        "category": "富山市",
+        "publishedAt": "2025-08-02T11:01:25.000Z",
+        "url": "/blog/toyama-city-kansui-park-summer-fountain-2025"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 56,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 13
+            },
+            {
+              "keyword": "立山",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "programId": "nippontabi_akafu",
+          "programLabel": "日本旅行「赤い風船」",
+          "category": "旅行・ツアー関連",
+          "score": 10,
+          "priority": 2,
+          "foundKeywords": [
+            {
+              "keyword": "旅行",
+              "count": 1
+            },
+            {
+              "keyword": "旅",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "programId": "tripadvisor",
+          "programLabel": "トリップアドバイザー",
+          "category": "観光・口コミ関連",
+          "score": 9,
+          "priority": 4,
+          "foundKeywords": [
+            {
+              "keyword": "観光",
+              "count": 2
+            },
+            {
+              "keyword": "おすすめ",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "programId": "veltra_popular",
+          "programLabel": "ベルトラで人気のオプショナルツアーを探す",
+          "category": "オプショナルツアー・体験関連",
+          "score": 7,
+          "priority": 6,
+          "foundKeywords": [
+            {
+              "keyword": "体験",
+              "count": 7
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 5,
+          "blockText": "富山市ならではの特色を活かした空間づくりで、訪れる人々に印象深い体験を提供しています。立山連峰を望む富山の自然や、北陸の文化的背景を感じることができ、旅行者にも地元の方にも愛される理由となっています。...",
+          "score": 23,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "nippontabi_akafu",
+              "label": "日本旅行「赤い風船」",
+              "category": "旅行・ツアー関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 0,
+          "blockText": "富山市で発見した「涼感max！環水公園サマーファウンテン2025で夏の暑さを吹き飛ばそう」は、地元で愛される魅力的なスポットです。富山市中心部からのアクセスも良好で、動画で紹介する通り、訪れる人々に特...",
+          "score": 13,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "nippontabi_akafu",
+              "label": "日本旅行「赤い風船」",
+              "category": "旅行・ツアー関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 14,
+          "blockText": "富山市に位置するこのスポットは、地域の主要な交通網からもアクセスしやすく、観光やお出かけの際にも便利です。映像でもご確認いただけるように、周辺には他の見どころや飲食店なども点在しており、一日を通して楽...",
+          "score": 10,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "nippontabi_akafu",
+              "label": "日本旅行「赤い風船」",
+              "category": "旅行・ツアー関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 12,
+          "blockText": "動画でご紹介している通り、この場所には多くの魅力的な要素があります。地域の特色を活かした空間作りや、訪れる人々への心温まるおもてなし、そして富山市ならではの独特な雰囲気など、一度体験すれば忘れられない...",
+          "score": 5,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "nippontabi_akafu",
+              "label": "日本旅行「赤い風船」",
+              "category": "旅行・ツアー関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 16,
+          "blockText": "このような地域に根ざしたスポットは、富山市の文化や歴史を肌で感じられる貴重な場所です。動画を通じてお伝えしきれない部分も含めて、実際に足を運んでいただくことで、写真や映像では伝わらない細やかな魅力を発...",
+          "score": 5,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "nippontabi_akafu",
+              "label": "日本旅行「赤い風船」",
+              "category": "旅行・ツアー関連"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "post": {
+        "id": "qszvaZusvE4KvujKB63yBo",
+        "title": "【富山市】富山駅前の隠れ家ケーキ店で至福のひととき｜シャルロッテ パティオさくら富山駅前店",
+        "slug": "toyama-city-cake-station",
+        "category": "富山市",
+        "publishedAt": "2025-07-30T21:39:22.300Z",
+        "url": "/blog/toyama-city-cake-station"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 132,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 28
+            },
+            {
+              "keyword": "立山",
+              "count": 3
+            },
+            {
+              "keyword": "黒部",
+              "count": 1
+            },
+            {
+              "keyword": "南砺",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "programId": "tripadvisor",
+          "programLabel": "トリップアドバイザー",
+          "category": "観光・口コミ関連",
+          "score": 57,
+          "priority": 4,
+          "foundKeywords": [
+            {
+              "keyword": "観光",
+              "count": 17
+            },
+            {
+              "keyword": "評価",
+              "count": 1
+            },
+            {
+              "keyword": "おすすめ",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "programId": "veltra_popular",
+          "programLabel": "ベルトラで人気のオプショナルツアーを探す",
+          "category": "オプショナルツアー・体験関連",
+          "score": 2,
+          "priority": 6,
+          "foundKeywords": [
+            {
+              "keyword": "体験",
+              "count": 2
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 19,
+          "blockText": "富山駅を中心とした市内観光は、路面電車や循環バスを活用することで効率よく回ることができます。レンタサイクルも充実しており、季節の良い時期には自転車での街巡りもおすすめです。富山湾で獲れる新鮮な海の幸や...",
+          "score": 37,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 21,
+          "blockText": "富山市は富山県観光において重要な位置を占める地域として、多様な観光資源を有しています。この地域の特色ある自然環境、歴史的建造物、文化施設、地域イベントなどが相互に連携することで、訪問者に多面的な魅力を...",
+          "score": 33,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 17,
+          "blockText": "富山市は立山連峰を望む美しい景観と、日本海の恵み豊かな食文化で知られる北陸の中核都市です。近年は北陸新幹線の開通により首都圏からのアクセスも向上し、多くの観光客が訪れています。市内には富山城址公園、富...",
+          "score": 19,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 13,
+          "blockText": "シャルロッテ パティオさくら富山駅前店は、富山駅前の賑やかなエリアにありながら、隠れ家的な落ち着いた雰囲気を持つ特別な存在です。駅前という便利な立地を活かしつつ、都市部の慌ただしさから離れた癒しの空間...",
+          "score": 18,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 0,
+          "blockText": "富山駅前エリアに佇む「シャルロッテ パティオさくら富山駅前店」は、地元の方々に愛され続けている隠れ家的なケーキ店なんです。駅からのアクセスも抜群で、職人さんが心を込めて作る絶品ケーキは、多くのスイーツ...",
+          "score": 12,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "post": {
+        "id": "95vBmVlXBxlHRIj7vD7ZQD",
+        "title": "【富山市】午前中に完売！？50個限定の極上ふわふわ食感のどら焼き「ふわどら」が美味しすぎた｜和の心 ぷちろーる",
+        "slug": "toyama-city-50",
+        "category": "富山市",
+        "publishedAt": "2025-07-30T21:39:20.868Z",
+        "url": "/blog/toyama-city-50"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 36,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 9
+            }
+          ]
+        },
+        {
+          "programId": "tripadvisor",
+          "programLabel": "トリップアドバイザー",
+          "category": "観光・口コミ関連",
+          "score": 3,
+          "priority": 4,
+          "foundKeywords": [
+            {
+              "keyword": "観光",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "programId": "veltra_popular",
+          "programLabel": "ベルトラで人気のオプショナルツアーを探す",
+          "category": "オプショナルツアー・体験関連",
+          "score": 1,
+          "priority": 6,
+          "foundKeywords": [
+            {
+              "keyword": "体験",
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 10,
+          "blockText": "富山市は長い歴史の中で培われてきた独自の文化と伝統を持ち、現代においてもその価値を継承し発展させています。この地域の歴史的建造物や伝統的な技術、年中行事などは、単なる過去の遺物ではなく、現在も地域住民...",
+          "score": 11,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 7,
+          "blockText": "「和の心 ぷちろーる」の「ふわどら」は、50個限定という希少性と極上のふわふわ食感が生み出す至福の和菓子です。午前中に完売してしまうほどの人気の理由を、一口食べれば必ず理解できることでしょう。富山市を...",
+          "score": 5,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 0,
+          "blockText": "富山市にある和菓子店「和の心 ぷちろーる」の50個限定どら焼き「ふわどら」は、極上のふわふわ食感で話題沸騰中の逸品です。午前中には完売してしまうほどの人気を誇るこの「ふわどら」は、従来のどら焼きの概念...",
+          "score": 4,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 2,
+          "blockText": "「和の心 ぷちろーる」は、富山市の住宅街に佇む隠れ家的な和菓子店です。店主は長年和菓子作りに携わってきた職人で、伝統的な製法を大切にしながらも、現代の味覚に合わせた新しい和菓子の開発に情熱を注いでいま...",
+          "score": 4,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "tripadvisor",
+              "label": "トリップアドバイザー",
+              "category": "観光・口コミ関連"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "post": {
+        "id": "95vBmVlXBxlHRIj7vD7ZMv",
+        "title": "【富山市】まるごとりんごのパリパリ食感！りんご飴専門店「代官山candy apple 富山市 MAROOT店」",
+        "slug": "toyama-city-candy-apple-maroot",
+        "category": "富山市",
+        "publishedAt": "2025-07-30T21:39:19.467Z",
+        "url": "/blog/toyama-city-candy-apple-maroot"
+      },
+      "affiliateMatches": [
+        {
+          "programId": "airtrip_plus_toyama",
+          "programLabel": "富山へ行くなら【エアトリプラス】",
+          "category": "富山県への旅行関連",
+          "score": 64,
+          "priority": 3,
+          "foundKeywords": [
+            {
+              "keyword": "富山",
+              "count": 16
+            }
+          ]
+        },
+        {
+          "programId": "veltra_popular",
+          "programLabel": "ベルトラで人気のオプショナルツアーを探す",
+          "category": "オプショナルツアー・体験関連",
+          "score": 4,
+          "priority": 6,
+          "foundKeywords": [
+            {
+              "keyword": "体験",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "programId": "tripadvisor",
+          "programLabel": "トリップアドバイザー",
+          "category": "観光・口コミ関連",
+          "score": 3,
+          "priority": 4,
+          "foundKeywords": [
+            {
+              "keyword": "観光",
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "insertionPositions": [
+        {
+          "blockIndex": 7,
+          "blockText": "代官山candy apple 富山市 maroot店は、まるごとりんごのパリパリ食感という新しいスイーツ体験を富山にもたらしました。上質な素材と洗練された製法で作られるりんご飴は、子供から大人まで楽し...",
+          "score": 14,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "veltra_popular",
+              "label": "ベルトラで人気のオプショナルツアーを探す",
+              "category": "オプショナルツアー・体験関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 0,
+          "blockText": "富山市にオープンしたりんご飴専門店「代官山candy apple 富山市 maroot店」は、まるごとりんごを使用したパリパリ食感の絶品りんご飴で話題を呼んでいます。東京・代官山発祥のこの専門店が富山...",
+          "score": 13,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "veltra_popular",
+              "label": "ベルトラで人気のオプショナルツアーを探す",
+              "category": "オプショナルツアー・体験関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 4,
+          "blockText": "富山市のmaroot店は、代官山candy appleの地方展開店舗として、地域の特色を活かした運営が行われています。店内は白を基調とした清潔感のあるデザインで、りんご飴が美しくディスプレイされた様子...",
+          "score": 12,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "veltra_popular",
+              "label": "ベルトラで人気のオプショナルツアーを探す",
+              "category": "オプショナルツアー・体験関連"
+            }
+          ]
+        },
+        {
+          "blockIndex": 10,
+          "blockText": "富山市は長い歴史の中で培われてきた独自の文化と伝統を持ち、現代においてもその価値を継承し発展させています。この地域の歴史的建造物や伝統的な技術、年中行事などは、単なる過去の遺物ではなく、現在も地域住民...",
+          "score": 11,
+          "recommendedPrograms": [
+            {
+              "id": "airtrip_plus_toyama",
+              "label": "富山へ行くなら【エアトリプラス】",
+              "category": "富山県への旅行関連"
+            },
+            {
+              "id": "veltra_popular",
+              "label": "ベルトラで人気のオプショナルツアーを探す",
+              "category": "オプショナルツアー・体験関連"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -3,4 +3,6 @@ import {categoryType} from './categoryType'
 import {postType} from './postType'
 import {authorType} from './authorType'
 
-export const schemaTypes = [blockContentType, categoryType, postType, authorType]
+import {homePageType} from './homePageType'
+
+export const schemaTypes = [blockContentType, categoryType, postType, authorType, homePageType]

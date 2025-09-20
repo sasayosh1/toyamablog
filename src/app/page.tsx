@@ -1,4 +1,4 @@
-import { getAllCategories, getPostsPaginated, getAllPosts } from '@/lib/sanity'
+import { getAllCategories, getPostsPaginated, getAllPosts, getHomePageContent } from '@/lib/sanity'
 import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 import StructuredData from '@/components/StructuredData'
@@ -59,13 +59,18 @@ export default async function Home({
   const currentPage = parseInt(params?.page || '1', 10)
   
   // ページネーション対応で記事を取得、検索用には全記事を取得
-  const [paginatedData, allPosts, categories] = await Promise.all([
+  const [paginatedData, allPosts, categories, homePageContent] = await Promise.all([
     getPostsPaginated(currentPage, 51),
     getAllPosts(),
-    getAllCategories()
+    getAllCategories(),
+    getHomePageContent()
   ])
 
   const { posts, totalPosts, totalPages, currentPage: page } = paginatedData
+  const heroTitle = homePageContent.title ?? '富山のくせに'
+  const heroSubtitle = homePageContent.subtitle ?? 'AMAZING TOYAMA'
+  const heroCtaLabel = homePageContent.ctaLabel?.trim() || null
+  const heroCtaHref = homePageContent.ctaHref?.trim() || null
 
   // 構造化データを生成
   const organizationLD = generateOrganizationLD()
@@ -86,12 +91,22 @@ export default async function Home({
             <div className="bg-black/20 backdrop-blur-sm rounded-lg px-6 py-4 shadow-lg">
               <h1 className="text-white font-bold text-center md:text-left leading-tight">
                 <div className="text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-1 sm:mb-2 drop-shadow-lg">
-                  富山のくせに
+                  {heroTitle}
                 </div>
                 <div className="text-xs sm:text-sm md:text-lg lg:text-xl font-medium drop-shadow-md">
-                  AMAZING TOYAMA
+                  {heroSubtitle}
                 </div>
               </h1>
+              {heroCtaLabel && heroCtaHref ? (
+                <div className="mt-4 text-center md:text-left">
+                  <a
+                    href={heroCtaHref}
+                    className="inline-flex items-center justify-center px-6 py-3 text-sm sm:text-base font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors rounded-lg shadow"
+                  >
+                    {heroCtaLabel}
+                  </a>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

@@ -17,7 +17,9 @@
     "env:restore": "node scripts/env-manager.js restore",
     "youtube:check": "node scripts/manual-youtube-check.cjs",
     "youtube:create": "node scripts/check-youtube-and-create-articles.cjs",
-    "youtube:test": "node scripts/test-youtube-system.cjs"
+    "youtube:test": "node scripts/test-youtube-system.cjs",
+    "bridge:baseline": "python3 tools/bridge/init_baseline.py",
+    "bridge:export": "python3 tools/bridge/export_changeset.py"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
