@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import GAProvider from "./ga-provider";
-import { AdSense } from "@/components/AdSense";
+import { AdSense, NORMALIZED_ADSENSE_PUBLISHER_ID } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -91,6 +91,12 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="富山のくせに" />
+        {NORMALIZED_ADSENSE_PUBLISHER_ID && (
+          <meta
+            name="google-adsense-account"
+            content={NORMALIZED_ADSENSE_PUBLISHER_ID}
+          />
+        )}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

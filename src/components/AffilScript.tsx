@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 
-export default function AffilScript() {
+export function AffilScript() {
   // 公開パスに置いた affiliates.json を読み込んで、data-affil を置換
   const inline = `
   (function(){
@@ -50,3 +50,5 @@ export default function AffilScript() {
 
   return <Script id="affil-inject" strategy="afterInteractive">{inline}</Script>;
 }
+
+export default AffilScript;

@@ -11,13 +11,20 @@ try {
   
   const adsenseIdMatch = envContent.match(/NEXT_PUBLIC_ADSENSE_PUBLISHER_ID=(.+)/);
   if (adsenseIdMatch) {
-    const adsenseId = adsenseIdMatch[1].trim();
-    console.log('✅ AdSense Publisher ID:', adsenseId);
-    
-    if (adsenseId === 'ca-pub-9743843249239449') {
+    const rawId = adsenseIdMatch[1].trim();
+    const normalizedId = rawId.startsWith('ca-pub-')
+      ? rawId
+      : rawId.startsWith('pub-')
+        ? `ca-${rawId}`
+        : rawId;
+
+    console.log('✅ AdSense Publisher ID (raw):', rawId);
+    console.log('✅ 正規化された Publisher ID:', normalizedId);
+
+    if (normalizedId === 'ca-pub-9743843249239449') {
       console.log('✅ 正しいクライアントID形式 (ca-pub-*)');
     } else {
-      console.log('❌ クライアントIDの形式が正しくありません');
+      console.log('❌ クライアントIDが期待値と異なります。AdSense 管理画面の ID を確認してください。');
     }
   }
 

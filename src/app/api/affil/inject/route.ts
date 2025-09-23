@@ -100,7 +100,7 @@ function injectToHtml(content: string, ids: string[]): string {
   let insertCount = 0
 
   // pタグ内でaタグが含まれていない段落を探して挿入
-  const pTagRegex = /<p[^>]*>(.*?)<\/p>/gs
+  const pTagRegex = /<p[^>]*>([\s\S]*?)<\/p>/g
 
   result = result.replace(pTagRegex, (match, innerContent) => {
     // 既にaタグやspanタグが含まれている場合はスキップ
@@ -128,11 +128,10 @@ function injectToHtml(content: string, ids: string[]): string {
 }
 
 function injectToMdx(content: string, ids: string[]): string {
-  let result = content
   let insertCount = 0
 
   // 段落を分割して処理
-  const paragraphs = result.split(/\n\s*\n/)
+  const paragraphs = content.split(/\n\s*\n/)
   const processedParagraphs = paragraphs.map((paragraph) => {
     // 既にコンポーネントやリンクが含まれている段落はスキップ
     if (paragraph.includes('<') ||

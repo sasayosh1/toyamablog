@@ -9,24 +9,37 @@ declare global {
   }
 }
 
-const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ''
+const rawPublisherId = (process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || '').trim()
+
+// Google AdSense の publisher ID は『ca-pub-xxxxxxxx』形式である必要がある。
+// Vercel の環境変数に `pub-xxxxxxxx` だけが入っているケースがあったため、
+// ここで正しいフォーマットに正規化してから利用する。
+const ADSENSE_PUBLISHER_ID = rawPublisherId.startsWith('ca-pub-')
+  ? rawPublisherId
+  : rawPublisherId.startsWith('pub-')
+    ? `ca-${rawPublisherId}`
+    : rawPublisherId
+
+export const NORMALIZED_ADSENSE_PUBLISHER_ID = ADSENSE_PUBLISHER_ID
 
 export function AdSense() {
   useEffect(() => {
     // AdSense auto ads initialization
-    try {
-      if (typeof window !== 'undefined' && ADSENSE_PUBLISHER_ID) {
-        // Initialize adsbygoogle array if not exists
-        window.adsbygoogle = window.adsbygoogle || [];
+    if (typeof window === 'undefined' || !ADSENSE_PUBLISHER_ID) {
+      return
+    }
 
-        // Push auto ads configuration
-        (window.adsbygoogle as unknown[]).push({
-          google_ad_client: ADSENSE_PUBLISHER_ID,
-          enable_page_level_ads: true
-        });
-      }
+    try {
+      window.adsbygoogle = window.adsbygoogle || []
+
+      // Auto ads の新しい推奨設定では、空オブジェクトを push するだけで OK。
+      // 既存コードとの互換性を保ちつつ、念のためクライアント ID も渡す。
+      ;(window.adsbygoogle as unknown[]).push({
+        google_ad_client: ADSENSE_PUBLISHER_ID,
+        enable_page_level_ads: true,
+      })
     } catch (error) {
-      console.error('AdSense auto ads initialization error:', error);
+      console.error('AdSense auto ads initialization error:', error)
     }
   }, []);
 
