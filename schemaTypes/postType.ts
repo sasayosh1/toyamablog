@@ -63,12 +63,6 @@ export const postType = defineType({
       }
     }),
     defineField({
-      name: 'category',
-      title: 'Primary Category',
-      type: 'string',
-      description: 'Main category for this post',
-    }),
-    defineField({
       name: 'youtubeUrl',
       title: 'YouTube URL',
       type: 'url',
@@ -87,15 +81,14 @@ export const postType = defineType({
       title: 'title',
       author: 'author.name',
       media: 'mainImage',
-      category: 'category',
       publishedAt: 'publishedAt',
     },
     prepare(selection) {
-      const {author, category, publishedAt} = selection
+      const {author, publishedAt} = selection
       const date = publishedAt ? new Date(publishedAt).toLocaleDateString('ja-JP') : ''
       return {
-        ...selection, 
-        subtitle: `${category || 'No Category'} | ${author ? `by ${author}` : 'No Author'} | ${date}`
+        ...selection,
+        subtitle: `${author ? `by ${author}` : 'No Author'} | ${date}`
       }
     },
   },

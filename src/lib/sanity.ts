@@ -12,6 +12,35 @@ export const client = createClient({
   requestTagPrefix: 'toyama-blog', // キャッシュタグ最適化
 });
 
+const isDev = process.env.NODE_ENV !== 'production';
+const DEFAULT_REVALIDATE = isDev ? 120 : 3600; // devでは2分、prdでは1時間程度
+const DEV_POST_LIMIT = Number(process.env.NEXT_PUBLIC_DEV_POST_LIMIT || 30);
+
+const POST_PROJECTION = `{
+  _id,
+  title,
+  slug,
+  description,
+  excerpt,
+  "category": coalesce(category->title, category->name, ""),
+  publishedAt,
+  youtubeUrl,
+  thumbnail {
+    asset -> {
+      _ref,
+      url
+    },
+    alt
+  },
+  author->{
+    _id,
+    name,
+    slug
+  },
+  "categories": [coalesce(category->title, category->name, "")],
+  "displayExcerpt": coalesce(excerpt, description)
+}`;
+
 export interface Author {
   _id: string;
   name: string;
@@ -93,65 +122,30 @@ export async function getHomePageContent(): Promise<HomePage> {
 }
 
 
-export async function getAllPosts(): Promise<Post[]> {
+export async function getAllPosts(options: { limit?: number; fetchAll?: boolean; revalidate?: number } = {}): Promise<Post[]> {
+  const effectiveLimit = options.fetchAll
+    ? undefined
+    : typeof options.limit === 'number'
+      ? options.limit
+      : isDev
+        ? DEV_POST_LIMIT
+        : undefined;
+
+  const rangeClause = effectiveLimit ? `[0...${effectiveLimit}]` : '';
+
   try {
-    console.log('🚀 Starting Sanity posts fetch...');
-    console.log('🔑 Token length:', process.env.SANITY_API_TOKEN?.length || 'UNDEFINED');
-    console.log('🏗️ Project ID:', process.env.NEXT_PUBLIC_SANITY_PROJECT_ID);
-    console.log('🗄️ Dataset:', process.env.NEXT_PUBLIC_SANITY_DATASET);
-
-    const posts = await client.fetch(`
-      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) {
-        _id,
-        title,
-        slug,
-        description,
-        excerpt,
-        category,
-        publishedAt,
-        youtubeUrl,
-        thumbnail {
-          asset -> {
-            _ref,
-            url
-          },
-          alt
+    return await client.fetch<Post[]>(
+      `*[_type == "post" && defined(publishedAt)] | order(publishedAt desc) ${rangeClause} ${POST_PROJECTION}`,
+      {},
+      {
+        next: {
+          tags: ['posts'],
+          revalidate: options.revalidate ?? DEFAULT_REVALIDATE,
         },
-        "categories": [category],
-        "displayExcerpt": coalesce(excerpt, description)
       }
-    `, {}, {
-      cache: 'no-store'
-    });
-
-    console.log(`📊 Sanity posts result: ${posts?.length || 0} posts found`);
-
-    if (posts && posts.length > 0) {
-      console.log('✅ SUCCESS: Returning actual Sanity posts');
-      return posts;
-    } else {
-      console.warn('⚠️ ZERO POSTS: No posts returned from Sanity');
-
-      // 認証問題の可能性をチェック
-      if (!process.env.SANITY_API_TOKEN) {
-        console.error('🚫 CRITICAL: SANITY_API_TOKEN is undefined');
-      }
-
-      // フォールバックを使用せず、空配列を返す
-      console.log('🔄 Returning empty array - NOT using fallback');
-      return [];
-    }
+    );
   } catch (error) {
-    console.error('❌ CRITICAL ERROR in Sanity posts fetch:', error);
-
-    // 認証エラーの詳細ログ
-    if (error instanceof Error && error.message.includes('Unauthorized')) {
-      console.error('🔐 AUTHENTICATION ERROR detected');
-      console.error('🔑 Current token:', process.env.SANITY_API_TOKEN ? 'EXISTS' : 'MISSING');
-    }
-
-    // フォールバックを使用せず、空配列を返す
-    console.log('🔄 Error occurred - returning empty array');
+    console.error('Sanity posts fetch error:', error);
     return [];
   }
 }
@@ -216,7 +210,7 @@ function getFallbackPosts(): Post[] {
   ];
 }
 
-export async function getPostsPaginated(page: number = 1, limit: number = 51): Promise<{
+export async function getPostsPaginated(page: number = 1, limit: number = 51, options: { revalidate?: number } = {}): Promise<{
   posts: Post[]
   totalPosts: number
   totalPages: number
@@ -225,41 +219,26 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
   const offset = (page - 1) * limit
 
   try {
-    console.log(`🔄 Paginated fetch: page ${page}, limit ${limit}, offset ${offset}`);
-
     const [posts, totalPosts] = await Promise.all([
       client.fetch(`
         *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [${offset}...${offset + limit}] {
-          _id,
-          title,
-          slug,
-          description,
-          excerpt,
-          category,
-          publishedAt,
-          youtubeUrl,
-          thumbnail {
-            asset -> {
-              _ref,
-              url
-            },
-            alt
-          },
-          "categories": [category],
-          "displayExcerpt": coalesce(excerpt, description)
+          ...${POST_PROJECTION}
         }
       `, {}, {
-        cache: 'no-store'
+        next: {
+          tags: ['posts', `posts-page-${page}`],
+          revalidate: options.revalidate ?? DEFAULT_REVALIDATE,
+        },
       }),
       client.fetch(`count(*[_type == "post" && defined(publishedAt)])`, {}, {
-        cache: 'no-store'
+        next: {
+          tags: ['posts-count'],
+          revalidate: options.revalidate ?? DEFAULT_REVALIDATE,
+        },
       })
     ])
 
-    console.log(`📊 Paginated result: ${posts?.length || 0} posts, total: ${totalPosts}`);
-
     if (posts && totalPosts > 0) {
-      console.log('✅ SUCCESS: Returning paginated Sanity posts');
       return {
         posts,
         totalPosts,
@@ -267,7 +246,6 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
         currentPage: page
       }
     } else {
-      console.warn('⚠️ ZERO POSTS: No posts found in pagination');
       return {
         posts: [],
         totalPosts: 0,
@@ -276,7 +254,7 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
       }
     }
   } catch (error) {
-    console.error('❌ CRITICAL ERROR in paginated posts fetch:', error);
+    console.error('Paginated posts fetch error:', error);
     return {
       posts: [],
       totalPosts: 0,
@@ -341,19 +319,18 @@ export async function getPost(slug: string): Promise<Post | null> {
 
 export async function getAllCategories(): Promise<string[]> {
   try {
-    console.log('Fetching categories from Sanity...');
     const categories = await client.fetch<string[]>(`
       array::unique(*[_type == "post" && defined(category)].category) | order(@)
     `, {}, {
-      cache: 'no-store' // キャッシュを完全に無効化
+      next: {
+        tags: ['categories'],
+        revalidate: DEFAULT_REVALIDATE,
+      },
     });
-
-    console.log(`Categories fetch result: ${categories?.length || 0} categories`);
 
     return categories && categories.length > 0 ? categories.filter(Boolean) : getFallbackCategories();
   } catch (error) {
     console.error('Categories fetch error:', error);
-    console.log('Using fallback categories due to error');
     return getFallbackCategories();
   }
 }
@@ -364,9 +341,6 @@ function getFallbackCategories(): string[] {
 
 export async function searchPosts(searchTerm: string): Promise<Post[]> {
   if (!searchTerm.trim()) return [];
-  
-  console.log(`Starting search for: "${searchTerm}"`);
-  
   try {
     // シンプルで高速な検索クエリ
     const posts = await client.fetch<Post[]>(`
@@ -374,93 +348,16 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
         title match "*" + $searchTerm + "*" ||
         description match "*" + $searchTerm + "*" ||
         category match "*" + $searchTerm + "*"
-      )] | order(publishedAt desc) [0...20] {
-        _id,
-        title,
-        slug,
-        description,
-        tags,
-        category,
-        publishedAt,
-        youtubeUrl,
-        thumbnail{
-          asset->{
-            _ref,
-            url
-          },
-          alt
-        },
-        author->{
-          _id,
-          name,
-          slug,
-          bio,
-          image{
-            asset->{
-              _ref,
-              url
-            }
-          }
-        },
-        excerpt,
-        "categories": [category],
-        "displayExcerpt": coalesce(excerpt, description)
-      }
+      )] | order(publishedAt desc) [0...20] ${POST_PROJECTION}
     `, { searchTerm }, { 
-      // キャッシュを無効にして即座に結果を取得
-      next: { revalidate: 0 },
-      cache: 'no-store'
+      next: { revalidate: isDev ? 60 : 300 },
     });
-    
-    console.log(`Direct search for "${searchTerm}" returned ${posts.length} results`);
     return posts;
-    
   } catch (error) {
     console.error('Direct search error:', error);
-    
     // フォールバック: 全件取得してクライアントサイドフィルタリング
     try {
-      console.log('Attempting fallback search...');
-      const fallbackPosts = await client.fetch<Post[]>(`
-        *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
-          _id,
-          title,
-          slug,
-          description,
-          tags,
-          category,
-          publishedAt,
-          youtubeUrl,
-          thumbnail{
-            asset->{
-              _ref,
-              url
-            },
-            alt
-          },
-          author->{
-            _id,
-            name,
-            slug,
-            bio,
-            image{
-              asset->{
-                _ref,
-                url
-              }
-            }
-          },
-          excerpt,
-          "categories": [category],
-          "displayExcerpt": coalesce(excerpt, description)
-        }
-      `, {}, { 
-        next: { revalidate: 0 },
-        cache: 'no-store'
-      });
-      
-      console.log(`Fetched ${fallbackPosts.length} posts for client-side filtering`);
-      
+      const fallbackPosts = await getAllPosts({ fetchAll: false, limit: 50, revalidate: isDev ? 60 : 600 });
       // クライアントサイドフィルタリング
       const filtered = fallbackPosts.filter(post => 
         post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -468,10 +365,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
         post.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         post.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
       );
-      
-      console.log(`Fallback search for "${searchTerm}" returned ${filtered.length} results`);
       return filtered;
-      
     } catch (fallbackError) {
       console.error('Fallback search error:', fallbackError);
       return [];

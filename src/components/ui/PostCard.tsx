@@ -248,16 +248,28 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
             {cleanTitle}
           </h3>
           
-          {post.categories && (
+          {post.categories && Array.isArray(post.categories) && post.categories.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-3">
-              {post.categories.slice(0, 2).map((category) => (
-                <CategoryTag
-                  key={category}
-                  className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md"
-                >
-                  {category}
-                </CategoryTag>
-              ))}
+              {post.categories.slice(0, 2)
+                .filter(category => {
+                  // 文字列のみをフィルター
+                  if (typeof category === 'string' && category.trim() !== '') {
+                    return true;
+                  }
+                  if (typeof category !== 'string') {
+                    console.warn('Non-string category detected in PostCard:', category);
+                  }
+                  return false;
+                })
+                .map((category, index) => (
+                  <CategoryTag
+                    key={`${category}-${index}`}
+                    className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md"
+                  >
+                    {String(category)}
+                  </CategoryTag>
+                ))
+              }
             </div>
           )}
 

@@ -66,7 +66,48 @@ export default async function Home({
     getHomePageContent()
   ])
 
-  const { posts, totalPosts, totalPages, currentPage: page } = paginatedData
+  const { posts: rawPosts, totalPosts, totalPages, currentPage: page } = paginatedData
+
+  // postsデータを正規化（参照オブジェクトを文字列に変換）
+  const posts = rawPosts.map(post => {
+    // カテゴリの正規化処理
+    let normalizedCategory = '';
+    let normalizedCategories: string[] = [];
+
+    // categoryフィールドの処理
+    if (post.category) {
+      if (typeof post.category === 'string') {
+        normalizedCategory = post.category;
+      } else if (typeof post.category === 'object' && post.category !== null) {
+        // 参照オブジェクトの場合、空文字列にして警告
+        console.warn('Category reference object detected:', post.category);
+        normalizedCategory = '';
+      }
+    }
+
+    // categoriesフィールドの処理
+    if (Array.isArray(post.categories)) {
+      normalizedCategories = post.categories
+        .filter(cat => {
+          if (typeof cat === 'string') {
+            return cat.trim() !== '';
+          } else if (typeof cat === 'object' && cat !== null) {
+            console.warn('Categories reference object detected:', cat);
+            return false;
+          }
+          return false;
+        })
+        .map(cat => String(cat));
+    } else if (normalizedCategory) {
+      normalizedCategories = [normalizedCategory];
+    }
+
+    return {
+      ...post,
+      category: normalizedCategory,
+      categories: normalizedCategories
+    };
+  })
   const heroTitle = homePageContent.title ?? '富山のくせに'
   const heroSubtitle = homePageContent.subtitle ?? 'AMAZING TOYAMA'
   const heroCtaLabel = homePageContent.ctaLabel?.trim() || null
