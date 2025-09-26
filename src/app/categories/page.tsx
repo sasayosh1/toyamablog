@@ -4,8 +4,8 @@ import GlobalHeader from '@/components/GlobalHeader'
 import CategoryCard from '@/components/ui/CategoryCard'
 import PageHeader from '@/components/ui/PageHeader'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const dynamic = 'force-static'
+export const revalidate = 3600
 
 export const metadata = {
   title: '地域別カテゴリー | 富山のくせに',
@@ -14,16 +14,13 @@ export const metadata = {
 
 export default async function CategoriesPage() {
   // カテゴリーページでは最新データを強制取得（キャッシュ無効化）
-  const timestamp = Date.now()
-  const forceTag = process.env.NEXT_CACHE_REVALIDATE_TAG || 'default'
   const [allCategories, posts] = await Promise.all([
     client.fetch<string[]>(`
       array::unique(*[_type == "post" && defined(category) && category != "グルメ" && category != "自然・公園"].category) | order(@)
     `, {}, { 
-      next: { revalidate: 0, tags: [`categories-${timestamp}-${forceTag}`] },
-      cache: 'no-store'
+      next: { revalidate, tags: ['category-list'] },
     }),
-    getAllPosts()
+    getAllPosts({ fetchAll: true, revalidate }),
   ])
   
   // 地域名のみを抽出（地域名以外のカテゴリーを除外）

@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.next/cache/
+dist/
+out/
+public/images/
+public/videos/
+y/
+**/*.log
+**/*.map
+.env*
+src/data/**/*.json
+.gemini/

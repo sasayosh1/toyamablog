@@ -1,0 +1,30 @@
+
+> toyama-blog@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3334
+
+   ▲ Next.js 15.5.2
+   - Local:        http://127.0.0.1:3334
+   - Network:      http://127.0.0.1:3334
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+Warning: Reverting webpack devtool to 'false'.
+Changing the webpack devtool in development mode will cause severe performance regressions.
+Read more: https://nextjs.org/docs/messages/improper-devtool
+ ✓ Ready in 3.3s
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+   ▲ Next.js 15.5.2
+   - Local:        http://127.0.0.1:3334
+   - Network:      http://127.0.0.1:3334
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+Warning: Reverting webpack devtool to 'false'.
+Changing the webpack devtool in development mode will cause severe performance regressions.
+Read more: https://nextjs.org/docs/messages/improper-devtool
+ ✓ Ready in 3.6s
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/user/toyamablog/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/user/toyamablog/.next/cache/webpack/client-development/0.pack.gz'

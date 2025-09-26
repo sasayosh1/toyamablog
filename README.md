@@ -51,6 +51,30 @@ REVALIDATE_SECRET=your_secret_here
 
 Vercel経由でデプロイ済み: https://sasakiyoshimasa.com
 
+## 開発を速く保つための手順
+
+開発サーバーの起動と HMR を高速に保つため、以下の運用を推奨します。
+
+1. **Sanity フェッチの制限**  
+   `NEXT_PUBLIC_DEV_POST_LIMIT=30` を `.env.local` に設定すると、開発時の取得件数を 30 件に制限します。必要な場合のみ `getAllPosts({ fetchAll: true })` を使用してください。
+
+2. **キャッシュ設定の活用**  
+   ページは `revalidate` による ISR を標準としています。頻繁に更新するデータのみ `no-store` を使い、通常は `npm run dev` → `Ctrl + R` で即座に反映されます。
+
+3. **Turbopack の併用**  
+   起動コマンドは `npm run dev`。必要に応じて `npm run dev -- --turbo` で Turbopack を試し、より速い構成を選択してください。
+
+4. **Codex のインデックス最適化**  
+   ルートに `.codexignore` を用意しています。インデックスの再構築は以下を順に実行します。
+   ```bash
+   codex cache clear
+   codex index --rebuild
+   ```
+   Codex を利用するときは `apps/web` など最小ディレクトリを対象にすると検索がさらに高速化します。
+
+5. **破損キャッシュの復旧**  
+   `.next/cache` は `.gitignore` 済みです。挙動が不安定な場合は `rm -rf .next` で一度削除してから `npm run dev` を実行してください。
+
 ## Sanity Studio
 
 ローカル環境: http://localhost:3000/studio

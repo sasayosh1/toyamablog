@@ -22,16 +22,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@sanity/client', '@portabletext/react'],
   },
-
-  // Turbopack設定（新しい推奨設定）
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
   
   
   // コンパイル最適化
@@ -52,6 +42,7 @@ const nextConfig: NextConfig = {
         aggregateTimeout: 300,
         ignored: ['node_modules', '.next'],
       };
+      config.devtool = 'eval-cheap-module-source-map';
     }
     return config;
   },

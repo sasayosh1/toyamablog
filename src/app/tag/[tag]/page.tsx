@@ -8,8 +8,8 @@ import StructuredData from '@/components/StructuredData'
 import { generateTagLD, generateBreadcrumbLD } from '@/lib/structured-data'
 
 // キャッシュ無効化: 常に最新を表示
-export const revalidate = 0
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
+export const dynamic = 'force-static'
 
 interface SanityTag {
   tag: string;
@@ -40,12 +40,24 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
 
   // タグで記事を検索
   const posts = await client.fetch<Post[]>(`
-    *[_type == "post" && defined(publishedAt) && "${decodedTag}" in tags] | order(publishedAt desc) {
-      _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
-      author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
-      "excerpt": description, "categories": [category]
+    *[_type == "post" && defined(publishedAt) && $tag in tags] | order(publishedAt desc) {
+      _id,
+      title,
+      slug,
+      description,
+      excerpt,
+      category,
+      publishedAt,
+      youtubeUrl,
+      author->{ _id, name, slug },
+      thumbnail{ asset->{ _ref, url }, alt },
+      tags,
+      "categories": [category],
+      "displayExcerpt": coalesce(excerpt, description)
     }
-  `)
+  `, { tag: decodedTag }, {
+    next: { revalidate, tags: [`tag-${decodedTag}`] },
+  })
 
   if (posts.length === 0) {
     notFound()
@@ -53,14 +65,8 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
 
   // 記事一覧とカテゴリーを取得（検索用）
   const [allPosts, categories] = await Promise.all([
-    client.fetch<Post[]>(`
-      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...100] {
-        _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
-        author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
-        "excerpt": description, "categories": [category]
-      }
-    `),
-    getAllCategories()
+    getAllPosts({ fetchAll: true, revalidate }),
+    getAllCategories(),
   ])
 
   // 構造化データを生成

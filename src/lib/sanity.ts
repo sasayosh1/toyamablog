@@ -272,7 +272,7 @@ export async function getPost(slug: string): Promise<Post | null> {
       slug,
       description,
       tags,
-      category,
+      "category": coalesce(category->title, category->name, ""),
       publishedAt,
       body,
       youtubeUrl,

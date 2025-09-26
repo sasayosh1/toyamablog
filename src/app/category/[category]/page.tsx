@@ -1,4 +1,4 @@
-import { getAllPosts, getAllCategories, client } from '@/lib/sanity'
+import { getAllPosts, getAllCategories } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
@@ -11,8 +11,8 @@ import { generateCategoryLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import { Metadata } from 'next'
 
 // キャッシュ無効化: 常に最新を表示
-export const revalidate = 0
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
+export const dynamic = 'force-static'
 
 export async function generateStaticParams() {
   // Sanity認証エラー回避のため一時的にコメントアウト
@@ -43,15 +43,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   const { category } = await params
   const decodedCategory = decodeURIComponent(category)
   
-  // 全記事と全カテゴリーを取得（カテゴリーは最新データを強制取得）
   const [allPosts, categories] = await Promise.all([
-    getAllPosts(),
-    client.fetch<string[]>(`
-      array::unique(*[_type == "post" && defined(category)].category) | order(@)
-    `, {}, { 
-      next: { revalidate: 0 },
-      cache: 'no-store'
-    })
+    getAllPosts({ fetchAll: true, revalidate }),
+    getAllCategories(),
   ])
   
   // 該当カテゴリーの記事をフィルター

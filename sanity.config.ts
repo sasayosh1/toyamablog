@@ -4,6 +4,7 @@ import {visionTool} from '@sanity/vision'
 
 import {schemaTypes} from './schemaTypes'
 import {structure} from './src/sanity/structure'
+import {PreviewAction} from './src/sanity/actions/PreviewAction'
 
 export default defineConfig({
   name: 'toyama-blog',
@@ -51,9 +52,11 @@ export default defineConfig({
       }
       return prev
     },
-    // 記事編集時の表示制限を解除
+    // 記事編集時のプレビューボタンを追加
     actions: (prev, context) => {
-      // デフォルトのアクションをすべて有効化
+      if (context.schemaType === 'post') {
+        return [...prev, PreviewAction]
+      }
       return prev
     },
   },

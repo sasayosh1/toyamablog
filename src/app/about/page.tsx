@@ -4,8 +4,8 @@ import { Metadata } from 'next'
 import Image from 'next/image'
 
 // キャッシュ無効化: 常に最新を表示 - 強制デプロイ
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const dynamic = 'force-static'
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: 'About - 富山のくせに',

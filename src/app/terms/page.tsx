@@ -2,8 +2,8 @@ import GlobalHeader from '@/components/GlobalHeader'
 import { client, getAllCategories, type Post } from '@/lib/sanity'
 import { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const dynamic = 'force-static'
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: '利用規約 - 富山のくせに',

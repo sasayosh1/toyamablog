@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {PreviewButton} from '../src/sanity/components/PreviewButton'
 
 export const postType = defineType({
   name: 'post',

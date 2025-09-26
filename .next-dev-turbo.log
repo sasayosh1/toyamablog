@@ -1,0 +1,187 @@
+
+> toyama-blog@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3333
+
+   ▲ Next.js 15.5.2
+   - Local:        http://127.0.0.1:3333
+   - Network:      http://127.0.0.1:3333
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+Warning: Reverting webpack devtool to 'false'.
+Changing the webpack devtool in development mode will cause severe performance regressions.
+Read more: https://nextjs.org/docs/messages/improper-devtool
+ ✓ Ready in 1328ms
+ ✓ Compiled /middleware in 378ms (114 modules)
+ ○ Compiling /categories ...
+ ✓ Compiled /categories in 2.3s (944 modules)
+Development mode: AdSense script disabled
+ ⨯ TypeError: Cannot read properties of null (reading 'includes')
+    at eval (src/app/categories/page.tsx:35:14)
+    at Array.filter (<anonymous>)
+    at CategoriesPage (src/app/categories/page.tsx:33:36)
+  33 |   const categories = allCategories.filter(category => 
+  34 |     locationCategories.includes(category) || 
+> 35 |     category.includes('市') || 
+     |              ^
+  36 |     category.includes('町') || 
+  37 |     category.includes('村')
+  38 |   ).filter(category =>  {
+  digest: '1299668559'
+}
+ GET /categories 500 in 3917ms
+ ✓ Compiled / in 284ms (683 modules)
+ ✓ Compiled in 581ms (289 modules)
+ GET /favicon.ico 200 in 1040ms
+Development mode: AdSense script disabled
+Development mode: AdSense script disabled
+Development mode: AdSense script disabled
+Development mode: AdSense script disabled
+ GET /offline 200 in 1141ms
+ GET / 200 in 1142ms
+ GET /manifest.json 404 in 1136ms
+ ⨯ TypeError: Cannot read properties of null (reading 'includes')
+    at eval (src/app/categories/page.tsx:35:14)
+    at Array.filter (<anonymous>)
+    at CategoriesPage (src/app/categories/page.tsx:33:36)
+  33 |   const categories = allCategories.filter(category => 
+  34 |     locationCategories.includes(category) || 
+> 35 |     category.includes('市') || 
+     |              ^
+  36 |     category.includes('町') || 
+  37 |     category.includes('村')
+  38 |   ).filter(category =>  {
+  digest: '4096016577'
+}
+ GET /icon.svg 404 in 1174ms
+ GET /favicon.ico 200 in 6ms
+ GET /categories 200 in 39ms
+ GET /favicon.ico 200 in 6ms
+ ⨯ [Error: Objects are not valid as a React child (found: object with keys {_ref, _type}). If you meant to render a collection of children, use an array instead.] {
+  digest: '2651175164'
+}
+Development mode: AdSense script disabled
+ ⨯ [Error: Objects are not valid as a React child (found: object with keys {_ref, _type}). If you meant to render a collection of children, use an array instead.] {
+  digest: '33314110'
+}
+ GET / 200 in 239ms
+ GET /favicon.ico 200 in 6ms
+Development mode: AdSense script disabled
+Development mode: AdSense script disabled
+ GET /offline 200 in 135ms
+ GET / 200 in 136ms
+ GET /manifest.json 404 in 133ms
+ ⨯ [Error: Objects are not valid as a React child (found: object with keys {_ref, _type}). If you meant to render a collection of children, use an array instead.] {
+  digest: '33314110'
+}
+Development mode: AdSense script disabled
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1562ms (1321 modules)
+ ✓ Compiled in 77ms (426 modules)
+ GET / 404 in 1918ms
+ ✓ Compiled /favicon.ico in 108ms (912 modules)
+ GET /favicon.ico 200 in 200ms
+Development mode: AdSense script disabled
+ ⨯ [Error: Objects are not valid as a React child (found: object with keys {_ref, _type}). If you meant to render a collection of children, use an array instead.] {
+  digest: '2651175164'
+}
+ GET / 200 in 1190ms
+ GET /favicon.ico 200 in 295ms
+Development mode: AdSense script disabled
+Development mode: AdSense script disabled
+ GET / 200 in 106ms
+ GET /manifest.json 404 in 104ms
+ ⨯ [Error: Objects are not valid as a React child (found: object with keys {_ref, _type}). If you meant to render a collection of children, use an array instead.] {
+  digest: '33314110'
+}
+ ✓ Compiled /offline in 499ms (917 modules)
+Development mode: AdSense script disabled
+ ✓ Compiled in 1350ms (1332 modules)
+ ✓ Compiled in 41ms (426 modules)
+ ✓ Compiled in 1213ms (1332 modules)
+ ✓ Compiled in 762ms (1332 modules)
+ ✓ Compiled in 199ms (426 modules)
+ ✓ Compiled in 1235ms (1332 modules)
+ ✓ Compiled in 43ms (426 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/user/toyamablog/.next/cache/webpack/server-development/0.pack.gz_' -> '/Users/user/toyamablog/.next/cache/webpack/server-development/0.pack.gz'
+ ✓ Compiled in 1231ms (1332 modules)
+ ✓ Compiled in 30ms (426 modules)
+ ✓ Compiled in 601ms (1332 modules)
+ ✓ Compiled in 47ms (426 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/user/toyamablog/.next/cache/webpack/server-development/0.pack.gz_' -> '/Users/user/toyamablog/.next/cache/webpack/server-development/0.pack.gz'
+ ✓ Compiled in 711ms (1332 modules)
+ ✓ Compiled in 138ms (426 modules)
+ ✓ Compiled in 860ms (1332 modules)
+ ✓ Compiled in 579ms (1332 modules)
+ ✓ Compiled in 117ms (426 modules)
+ ✓ Compiled in 612ms (1332 modules)
+ ✓ Compiled in 1032ms (440 modules)
+ ✓ Compiled in 216ms (426 modules)
+ ✓ Compiled in 81ms (426 modules)
+ ✓ Compiled in 48ms (426 modules)
+ ✓ Compiled in 97ms (440 modules)
+ ✓ Compiled in 696ms (440 modules)
+ ✓ Compiled in 344ms (426 modules)
+ ✓ Compiled in 47ms (426 modules)
+ ✓ Compiled in 426ms (440 modules)
+ ✓ Compiled in 1622ms (440 modules)
+ ✓ Compiled in 160ms (426 modules)
+ ✓ Compiled in 125ms (426 modules)
+ ✓ Compiled in 65ms (426 modules)
+ ✓ Compiled in 565ms (440 modules)
+ ✓ Compiled in 251ms (426 modules)
+ ✓ Compiled in 120ms (426 modules)
+ ✓ Compiled in 256ms (426 modules)
+ ✓ Compiled in 120ms (426 modules)
+ ✓ Compiled in 215ms (426 modules)
+ ✓ Compiled in 37ms (426 modules)
+ ✓ Compiled in 1537ms (440 modules)
+ ✓ Compiled in 54ms (426 modules)
+ ✓ Compiled in 1652ms (440 modules)
+ ✓ Compiled in 87ms (426 modules)
+ ✓ Compiled in 64ms (426 modules)
+ ✓ Compiled in 492ms (440 modules)
+ ✓ Compiled in 82ms (426 modules)
+ ✓ Compiled in 1223ms (440 modules)
+ ✓ Compiled in 114ms (426 modules)
+ ✓ Compiled in 63ms (426 modules)
+ ✓ Compiled in 2.3s (440 modules)
+ ✓ Compiled in 266ms (426 modules)
+ ✓ Compiled in 238ms (426 modules)
+ ✓ Compiled in 152ms (426 modules)
+ ✓ Compiled in 545ms (426 modules)
+ ✓ Compiled in 201ms (426 modules)
+ ✓ Compiled in 165ms (426 modules)
+ ✓ Compiled in 1867ms (440 modules)
+ ✓ Compiled in 76ms (426 modules)
+ ✓ Compiled in 866ms (440 modules)
+ ✓ Compiled in 185ms (426 modules)
+ ✓ Compiled in 121ms (426 modules)
+ ✓ Compiled in 194ms (426 modules)
+ ✓ Compiled in 54ms (426 modules)
+ ✓ Compiled in 2.5s (440 modules)
+ ✓ Compiled in 496ms (426 modules)
+ ✓ Compiled in 161ms (426 modules)
+ ✓ Compiled in 340ms (426 modules)
+ ✓ Compiled in 998ms (426 modules)
+ ✓ Compiled in 856ms (426 modules)
+ ✓ Compiled in 111ms (426 modules)
+ ✓ Compiled in 390ms (426 modules)
+ ✓ Compiled in 107ms (426 modules)
+ ✓ Compiled in 4.3s (440 modules)
+ ✓ Compiled in 452ms (426 modules)
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+   ▲ Next.js 15.5.2
+   - Local:        http://127.0.0.1:3333
+   - Network:      http://127.0.0.1:3333
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+Warning: Reverting webpack devtool to 'false'.
+Changing the webpack devtool in development mode will cause severe performance regressions.
+Read more: https://nextjs.org/docs/messages/improper-devtool
+ ✓ Ready in 3.6s
