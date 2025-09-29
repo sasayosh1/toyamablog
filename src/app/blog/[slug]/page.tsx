@@ -305,7 +305,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         {post.tags && post.tags.length > 0 && (
           <div className="border-t border-gray-200 pt-8 mb-8">
             <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
+              {post.tags
+                .filter((tag): tag is string => typeof tag === 'string' && tag.trim() !== '')
+                .map((tag) => (
                 <Link
                   key={tag}
                   href={`/tag/${encodeURIComponent(tag)}`}

@@ -10,6 +10,9 @@ export const client = createClient({
   // token: process.env.SANITY_API_TOKEN, // コメントアウト：パブリックアクセスを使用
   stega: false, // Stegaを無効化してパフォーマンス向上
   requestTagPrefix: 'toyama-blog', // キャッシュタグ最適化
+  ignoreBrowserTokenWarning: true, // ブラウザー警告を無視
+  // タイムアウト設定
+  timeout: 30000 // 30秒タイムアウト
 });
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -271,7 +274,7 @@ export async function getPost(slug: string): Promise<Post | null> {
       title,
       slug,
       description,
-      tags,
+      "tags": coalesce(tags[]->title, tags),
       "category": coalesce(category->title, category->name, ""),
       publishedAt,
       body,
@@ -307,13 +310,13 @@ export async function getPost(slug: string): Promise<Post | null> {
         }
       }
     }
-  `, { slug }, { 
-    next: { 
-      tags: ['post-detail', `post-detail-${slug}`], 
+  `, { slug }, {
+    next: {
+      tags: ['post-detail', `post-detail-${slug}`],
       revalidate: 600 // 10分キャッシュ
-    } 
+    }
   });
-  
+
   return post;
 }
 

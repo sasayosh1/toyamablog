@@ -71,3 +71,4 @@ dist/
 # Gemini CLI specific temporary files
 .last_pick.json
 .workflow_state.json
+\n# Log files\n.next-dev-turbo.log\n.next-dev-webpack.log

@@ -8,7 +8,7 @@ import {PreviewAction} from './src/sanity/actions/PreviewAction'
 
 export default defineConfig({
   name: 'toyama-blog',
-  title: '富山のくせに - ブログCMS',
+  title: '富山のくせに',
 
   projectId: 'aoxze287',
   dataset: 'production',

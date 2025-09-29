@@ -1,4 +1,4 @@
-import { client, type Post, getAllCategories } from '@/lib/sanity'
+import { client, type Post, getAllCategories, getAllPosts } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
@@ -40,7 +40,7 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
 
   // タグで記事を検索
   const posts = await client.fetch<Post[]>(`
-    *[_type == "post" && defined(publishedAt) && $tag in tags] | order(publishedAt desc) {
+    *[_type == "post" && defined(publishedAt) && "${decodedTag}" in tags] | order(publishedAt desc) {
       _id,
       title,
       slug,
@@ -55,9 +55,7 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
       "categories": [category],
       "displayExcerpt": coalesce(excerpt, description)
     }
-  `, { tag: decodedTag }, {
-    next: { revalidate, tags: [`tag-${decodedTag}`] },
-  })
+  `)
 
   if (posts.length === 0) {
     notFound()

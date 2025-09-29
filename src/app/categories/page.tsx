@@ -1,4 +1,4 @@
-import { getAllPosts, client } from '@/lib/sanity'
+import { getAllPosts, client, type Post } from '@/lib/sanity'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
 import CategoryCard from '@/components/ui/CategoryCard'
@@ -13,16 +13,26 @@ export const metadata = {
 }
 
 export default async function CategoriesPage() {
-  // カテゴリーページでは最新データを強制取得（キャッシュ無効化）
-  const [allCategories, posts] = await Promise.all([
-    client.fetch<string[]>(`
-      array::unique(*[_type == "post" && defined(category) && category != "グルメ" && category != "自然・公園"].category) | order(@)
-    `, {}, { 
-      next: { revalidate, tags: ['category-list'] },
-    }),
-    getAllPosts({ fetchAll: true, revalidate }),
-  ])
-  
+  let allCategories: string[] = []
+  let posts: Post[] = []
+
+  try {
+    // エラーハンドリング付きでデータを取得
+    [allCategories, posts] = await Promise.all([
+      client.fetch<string[]>(`
+        array::unique(*[_type == "post" && defined(category) && category != "グルメ" && category != "自然・公園"].category) | order(@)
+      `, {}, {
+        next: { revalidate, tags: ['category-list'] },
+      }),
+      getAllPosts({ fetchAll: true, revalidate }),
+    ])
+  } catch (error) {
+    console.error('Categories page data fetch error:', error)
+    // フォールバックデータ
+    allCategories = ['富山市', '高岡市', '氷見市', '砺波市', '南砺市']
+    posts = []
+  }
+
   // 地域名のみを抽出（地域名以外のカテゴリーを除外）
   const locationCategories = [
     '富山市', '高岡市', '魚津市', '氷見市', '滑川市', '黒部市', '砺波市', '小矢部市', '南砺市', '射水市',
@@ -30,24 +40,33 @@ export default async function CategoriesPage() {
     '高岡市福岡町', '砺波市庄川', '富山市八尾町', '富山市婦中町', '富山市山田村',
     '八尾町', '福岡町', '庄川町'
   ]
-  const categories = allCategories.filter(category => 
-    locationCategories.includes(category) || 
-    category.includes('市') || 
-    category.includes('町') || 
-    category.includes('村')
-  ).filter(category => 
-    category !== 'グルメ' && 
-    category !== '自然・公園' && 
-    category !== '観光' && 
-    category !== 'イベント' && 
+
+  // null/undefinedチェック付きでフィルタリング
+  const categories = (allCategories || []).filter(category =>
+    category && (
+      locationCategories.includes(category) ||
+      category.includes('市') ||
+      category.includes('町') ||
+      category.includes('村')
+    )
+  ).filter(category =>
+    category &&
+    category !== 'グルメ' &&
+    category !== '自然・公園' &&
+    category !== '観光' &&
+    category !== 'イベント' &&
     category !== '文化・歴史'
   )
   
-  // 各カテゴリーの記事数を計算
+  // 各カテゴリーの記事数を計算（null/undefinedチェック付き）
   const categoriesWithCounts = categories.map(category => {
-    const count = posts.filter(post => 
-      post.categories?.includes(category) || post.category === category
-    ).length
+    const count = (posts || []).filter(post => {
+      if (!post) return false
+      return (
+        (Array.isArray(post.categories) && post.categories.includes(category)) ||
+        post.category === category
+      )
+    }).length
     return { name: category, count }
   }).sort((a, b) => b.count - a.count)
 

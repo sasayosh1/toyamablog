@@ -1,4 +1,5 @@
-import { getAllCategories, getPostsPaginated, getAllPosts, getHomePageContent } from '@/lib/sanity'
+import { getAllCategories, getPostsPaginated, getAllPosts, getHomePageContent, type Post } from '@/lib/sanity'
+import { type HomePage } from '@/sanity/queries/home'
 import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 import StructuredData from '@/components/StructuredData'
@@ -52,19 +53,49 @@ interface Props {
   searchParams?: Promise<{ page?: string }>
 }
 
-export default async function Home({ 
-  searchParams 
+export default async function Home({
+  searchParams
 }: Props) {
   const params = searchParams ? await searchParams : {}
   const currentPage = parseInt(params?.page || '1', 10)
-  
-  // ページネーション対応で記事を取得、検索用には全記事を取得
-  const [paginatedData, allPosts, categories, homePageContent] = await Promise.all([
-    getPostsPaginated(currentPage, 51),
-    getAllPosts(),
-    getAllCategories(),
-    getHomePageContent()
-  ])
+
+  // エラーハンドリング付きでデータを取得
+  let paginatedData: {
+    posts: Post[]
+    totalPosts: number
+    totalPages: number
+    currentPage: number
+  }
+  let allPosts: Post[]
+  let categories: string[]
+  let homePageContent: HomePage
+
+  try {
+    [paginatedData, allPosts, categories, homePageContent] = await Promise.all([
+      getPostsPaginated(currentPage, 51),
+      getAllPosts(),
+      getAllCategories(),
+      getHomePageContent()
+    ])
+  } catch (error) {
+    console.error('Data fetch error:', error)
+    // フォールバックデータで継続
+    paginatedData = {
+      posts: [],
+      totalPosts: 0,
+      totalPages: 0,
+      currentPage: 1
+    }
+    allPosts = []
+    categories = ['富山市', '高岡市', '氷見市', '砺波市', '南砺市']
+    homePageContent = {
+      title: "富山のくせに",
+      subtitle: "AMAZING TOYAMA",
+      ctaLabel: null,
+      ctaHref: null,
+      footerText: "富山県の観光・グルメ・文化をお届けします",
+    }
+  }
 
   const { posts: rawPosts, totalPosts, totalPages, currentPage: page } = paginatedData
 

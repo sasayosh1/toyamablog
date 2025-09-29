@@ -28,14 +28,14 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  
-  
+
+
   // パフォーマンス最適化
   poweredByHeader: false,
   compress: true,
-  
-  // 開発時最適化
-  webpack: (config, { dev }) => {
+
+  // 開発時最適化 + Sanity Studio対応
+  webpack: (config, { dev, isServer }) => {
     if (dev) {
       config.watchOptions = {
         poll: 1000,
@@ -44,6 +44,23 @@ const nextConfig: NextConfig = {
       };
       config.devtool = 'eval-cheap-module-source-map';
     }
+
+    // Sanity Studio用の最適化
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+      };
+    }
+
+    // web-vitalsモジュール解決の問題を修正
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'web-vitals': require.resolve('web-vitals'),
+    };
+
     return config;
   },
   

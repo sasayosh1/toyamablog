@@ -6,8 +6,11 @@ const STATIC_CACHE = 'toyama-static-v1.2.0'
 const RUNTIME_CACHE = 'toyama-runtime-v1.2.0'
 const IMAGE_CACHE = 'toyama-images-v1.2.0'
 
-// キャッシュする重要なリソース
-const STATIC_ASSETS = [
+// キャッシュする重要なリソース（開発環境では最小限に）
+const STATIC_ASSETS = self.location.hostname === 'localhost' ? [
+  '/',
+  '/offline'
+] : [
   '/',
   '/offline',
   '/manifest.json',
@@ -23,9 +26,20 @@ self.addEventListener('install', (event) => {
 
   event.waitUntil(
     Promise.all([
-      // 静的アセットをキャッシュ
-      caches.open(STATIC_CACHE).then((cache) => {
-        return cache.addAll(STATIC_ASSETS)
+      // 静的アセットをキャッシュ（エラー処理付き）
+      caches.open(STATIC_CACHE).then(async (cache) => {
+        try {
+          const results = await Promise.allSettled(
+            STATIC_ASSETS.map(url => cache.add(url))
+          )
+          results.forEach((result, index) => {
+            if (result.status === 'rejected') {
+              console.warn(`キャッシュ失敗: ${STATIC_ASSETS[index]}`, result.reason)
+            }
+          })
+        } catch (error) {
+          console.warn('キャッシュ処理エラー:', error)
+        }
       }),
       // 即座にアクティブ化
       self.skipWaiting()
@@ -61,10 +75,13 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Sanity Studio や外部APIは通常通り
+  // 開発環境では制限的に、Sanity Studio や外部API、Next.js開発リソースは通常通り
   if (url.pathname.startsWith('/studio') ||
+      url.pathname.startsWith('/_next/') ||
+      url.pathname.startsWith('/__nextjs') ||
       url.hostname !== self.location.hostname ||
-      request.method !== 'GET') {
+      request.method !== 'GET' ||
+      (self.location.hostname === 'localhost' && url.pathname.includes('webpack'))) {
     return
   }
 
@@ -288,21 +305,23 @@ self.addEventListener('notificationclick', (event) => {
   }
 })
 
-// キャッシュ統計の定期報告
-setInterval(() => {
-  if (self.clients) {
-    self.clients.matchAll().then((clients) => {
-      clients.forEach((client) => {
-        caches.keys().then((cacheNames) => {
-          client.postMessage({
-            type: 'CACHE_STATS',
-            caches: cacheNames.length,
-            version: CACHE_NAME
+// キャッシュ統計の定期報告（開発環境では無効化）
+if (self.location.hostname !== 'localhost') {
+  setInterval(() => {
+    if (self.clients) {
+      self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          caches.keys().then((cacheNames) => {
+            client.postMessage({
+              type: 'CACHE_STATS',
+              caches: cacheNames.length,
+              version: CACHE_NAME
+            })
           })
         })
       })
-    })
-  }
-}, 60000) // 1分ごと
+    }
+  }, 60000) // 1分ごと
+}
 
 console.log('🚀 Service Worker: 富山のくせに ブログ - 準備完了!')

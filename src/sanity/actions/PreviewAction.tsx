@@ -1,7 +1,7 @@
 import {EyeOpenIcon} from '@sanity/icons'
-import {DocumentActionComponent} from '@sanity/types'
+import { DocumentActionProps } from 'sanity'
 
-export const PreviewAction: DocumentActionComponent = (props) => {
+export const PreviewAction = (props: DocumentActionProps) => {
   const {draft, published} = props
   const doc = draft || published
 
@@ -9,7 +9,7 @@ export const PreviewAction: DocumentActionComponent = (props) => {
     return null
   }
 
-  const slug = doc.slug?.current
+  const slug = doc.slug && typeof doc.slug === 'object' && 'current' in doc.slug ? doc.slug.current : undefined
 
   const handlePreview = () => {
     if (!slug) {
@@ -29,6 +29,6 @@ export const PreviewAction: DocumentActionComponent = (props) => {
     label: 'プレビュー',
     icon: EyeOpenIcon,
     onHandle: handlePreview,
-    tone: 'primary'
+    tone: 'primary' as const
   }
 }
