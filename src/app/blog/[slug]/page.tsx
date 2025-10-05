@@ -233,75 +233,40 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         <>
 
-        {/* Googleマップセクション（クラウドルール：記事本文の後、タグより上に配置） */}
-        {post.body && Array.isArray(post.body) && (() => {
-          // 最初に見つかったマップブロック1つのみを表示（重複防止）
-          const firstMapBlock = post.body
-            .filter((block: unknown) => {
-              if (typeof block !== 'object' || block === null || !('_type' in block)) return false;
-              const blockType = (block as { _type: string })._type;
-              
-              // googleMapsタイプの場合
-              if (blockType === 'googleMaps') {
-                return !!(block as { iframe?: string }).iframe;
-              }
-              
-              // htmlタイプでGoogleマップの場合
-              if (blockType === 'html') {
-                const html = (block as { html?: string }).html;
-                return html?.includes('google.com/maps/embed') || false;
-              }
-              
-              return false;
-            })
-            .slice(0, 1)[0]; // 最初の1つのみを取得
+        {/* Googleマップセクション */}
+        {(() => {
+          // タイトルから地域名を抽出
+          const locationMatch = cleanTitle.match(/【(.+?)】/);
+          const location = locationMatch ? locationMatch[1] : '';
 
-          if (!firstMapBlock) return null;
+          if (!location) return null;
 
-          const block = firstMapBlock as { _type: string; iframe?: string; html?: string; description?: string };
-          
-          let processedIframe = '';
-          
-          // googleMapsタイプの場合
-          if (block._type === 'googleMaps' && block.iframe) {
-            processedIframe = block.iframe
-              .replace(/width="[^"]*"/g, 'width="100%"')
-              .replace(/height="[^"]*"/g, 'height="300"')
-              .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
-          }
-          
-          // htmlタイプの場合
-          if (block._type === 'html' && block.html) {
-            processedIframe = block.html
-              .replace(/width="[^"]*"/g, 'width="100%"')
-              .replace(/height="[^"]*"/g, 'height="300"')
-              .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
-          }
-          
-          if (!processedIframe) return null;
-          
+          // Google Maps Embed API URL
+          const mapsUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=富山県${encodeURIComponent(location)}`;
+
           return (
-            <div className="mb-8">
-              <div style={{ margin: '2rem 0', textAlign: 'center' }}>
-                <div
-                  dangerouslySetInnerHTML={{ __html: processedIframe }}
-                  suppressHydrationWarning={true}
+            <div className="mb-12 border-t border-gray-200 pt-8">
+              {/* Googleマップ */}
+              <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden shadow-md">
+                <iframe
+                  src={mapsUrl}
+                  width="100%"
+                  height="450"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full h-full"
                 />
-                {block.description && (
-                  <p style={{
-                    marginTop: '0.5rem',
-                    fontSize: '0.875rem',
-                    color: '#666',
-                    fontStyle: 'italic'
-                  }}>
-                    {block.description}
-                  </p>
-                )}
               </div>
             </div>
           );
         })()}
 
+        {/* 記事下部広告 - 一時的に無効化（スロットID未設定のため） */}
+        {/* <BottomArticleAd /> */}
+
+        {/* タグセクション */}
         {post.tags && post.tags.length > 0 && (
           <div className="border-t border-gray-200 pt-8 mb-8">
             <div className="flex flex-wrap gap-2">
@@ -319,9 +284,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </div>
           </div>
         )}
-
-        {/* 記事下部広告 - 一時的に無効化（スロットID未設定のため） */}
-        {/* <BottomArticleAd /> */}
 
         {/* ナビゲーションボタン */}
         <div className="border-t border-gray-200 pt-8">
