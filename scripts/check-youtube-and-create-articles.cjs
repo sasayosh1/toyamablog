@@ -429,6 +429,130 @@ async function createSanityArticle(video, locationData) {
 }
 
 /**
+ * AdSense設定ファイルの検証
+ */
+async function validateAdSenseFiles() {
+  const { exec } = require('child_process');
+  const util = require('util');
+  const execPromise = util.promisify(exec);
+
+  const files = [
+    'src/components/AdSense.tsx',
+    'src/app/layout.tsx',
+    '.env.local'
+  ];
+
+  const results = [];
+
+  for (const file of files) {
+    try {
+      const { stdout } = await execPromise(`test -f ${file} && echo "exists" || echo "missing"`);
+      results.push({
+        file,
+        exists: stdout.trim() === 'exists'
+      });
+    } catch (error) {
+      results.push({
+        file,
+        exists: false,
+        error: error.message
+      });
+    }
+  }
+
+  return results;
+}
+
+/**
+ * AdSense自動修繕機能
+ */
+async function autoRepairAdSense(healthCheckResult) {
+  const { exec } = require('child_process');
+  const util = require('util');
+  const execPromise = util.promisify(exec);
+
+  console.log('\n🔧 AdSense自動修繕を開始...');
+
+  const repairs = [];
+
+  try {
+    // 1. キャッシュクリア（Next.jsビルドキャッシュ）
+    if (!healthCheckResult.checks.adSenseScriptLoaded) {
+      console.log('  🔄 Next.jsキャッシュをクリア中...');
+      try {
+        await execPromise('rm -rf .next');
+        repairs.push({ action: 'cache_clear', status: 'success', message: '.nextキャッシュを削除しました' });
+        console.log('  ✅ キャッシュクリア完了');
+      } catch (error) {
+        repairs.push({ action: 'cache_clear', status: 'failed', error: error.message });
+        console.log('  ❌ キャッシュクリアに失敗:', error.message);
+      }
+    }
+
+    // 2. 環境変数の確認と診断
+    if (!healthCheckResult.checks.publisherIdFound) {
+      console.log('  🔍 環境変数を確認中...');
+      const envCheck = await validateAdSenseFiles();
+
+      const missingFiles = envCheck.filter(f => !f.exists);
+      if (missingFiles.length > 0) {
+        console.log('  ⚠️ 以下のファイルが見つかりません:');
+        missingFiles.forEach(f => console.log(`    - ${f.file}`));
+        repairs.push({
+          action: 'file_check',
+          status: 'warning',
+          message: `${missingFiles.length}個のファイルが見つかりません`,
+          missingFiles: missingFiles.map(f => f.file)
+        });
+      } else {
+        console.log('  ✅ 必要なファイルは全て存在します');
+        console.log('  💡 提案: .env.localのNEXT_PUBLIC_ADSENSE_PUBLISHER_IDを確認してください');
+        repairs.push({
+          action: 'file_check',
+          status: 'success',
+          suggestion: '.env.localの環境変数を確認してください'
+        });
+      }
+    }
+
+    // 3. 再ビルドの提案（自動実行はしない - 安全性のため）
+    if (repairs.some(r => r.action === 'cache_clear' && r.status === 'success')) {
+      console.log('\n  💡 推奨アクション:');
+      console.log('    1. npm run build を実行してサイトを再ビルド');
+      console.log('    2. デプロイ環境で環境変数を確認');
+      console.log('    3. 数分後に再度ヘルスチェックを実行');
+
+      repairs.push({
+        action: 'rebuild_suggestion',
+        status: 'info',
+        message: '手動での再ビルドを推奨します'
+      });
+    }
+
+    // 4. 修繕結果のサマリー
+    console.log('\n📋 自動修繕サマリー:');
+    repairs.forEach(repair => {
+      const icon = repair.status === 'success' ? '✅' : repair.status === 'failed' ? '❌' : '💡';
+      console.log(`  ${icon} ${repair.action}: ${repair.message || repair.suggestion || '完了'}`);
+    });
+
+    return {
+      status: repairs.some(r => r.status === 'success') ? 'repaired' : 'diagnosed',
+      repairs,
+      timestamp: new Date().toISOString()
+    };
+
+  } catch (error) {
+    console.error('\n❌ 自動修繕エラー:', error.message);
+    return {
+      status: 'error',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+/**
  * Google AdSenseヘルスチェック
  */
 async function checkAdSenseHealth() {
@@ -483,6 +607,10 @@ async function checkAdSenseHealth() {
       console.log('\n✅ Google AdSenseは正常に動作しています');
     } else {
       console.log('\n⚠️ Google AdSenseの設定に問題がある可能性があります');
+
+      // 自動修繕を実行
+      const repairResult = await autoRepairAdSense(result);
+      result.repair = repairResult;
     }
 
     return result;
@@ -584,6 +712,8 @@ module.exports = {
   checkExistingArticles,
   extractLocationAndCategory,
   createSanityArticle,
+  validateAdSenseFiles,
+  autoRepairAdSense,
   checkAdSenseHealth,
   main
 };
