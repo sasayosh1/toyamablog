@@ -429,18 +429,87 @@ async function createSanityArticle(video, locationData) {
 }
 
 /**
+ * Google AdSenseヘルスチェック
+ */
+async function checkAdSenseHealth() {
+  const SITE_URL = 'https://sasakiyoshimasa.com';
+  const ADSENSE_PUBLISHER_ID = 'ca-pub-9743843249239449';
+
+  try {
+    console.log('\n🔍 Google AdSenseヘルスチェック開始...');
+
+    const response = await fetch(SITE_URL, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; AdSenseHealthCheck/1.0)'
+      }
+    });
+
+    if (!response.ok) {
+      console.log(`⚠️ サイトへのアクセスに失敗: ${response.status}`);
+      return {
+        status: 'error',
+        message: `HTTP ${response.status}`,
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    const html = await response.text();
+
+    // AdSenseスクリプトの存在確認
+    const hasAdSenseScript = html.includes('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js');
+    const hasPublisherId = html.includes(ADSENSE_PUBLISHER_ID);
+    const hasAdSenseAccount = html.includes('google-adsense-account');
+
+    const result = {
+      status: hasAdSenseScript && hasPublisherId ? 'success' : 'warning',
+      checks: {
+        siteAccessible: true,
+        adSenseScriptLoaded: hasAdSenseScript,
+        publisherIdFound: hasPublisherId,
+        metaTagFound: hasAdSenseAccount
+      },
+      publisherId: ADSENSE_PUBLISHER_ID,
+      timestamp: new Date().toISOString()
+    };
+
+    // 結果表示
+    console.log('\n📊 AdSenseヘルスチェック結果:');
+    console.log(`  ✅ サイトアクセス: OK`);
+    console.log(`  ${hasAdSenseScript ? '✅' : '❌'} AdSenseスクリプト読み込み: ${hasAdSenseScript ? 'OK' : 'NG'}`);
+    console.log(`  ${hasPublisherId ? '✅' : '❌'} Publisher ID (${ADSENSE_PUBLISHER_ID}): ${hasPublisherId ? 'OK' : 'NG'}`);
+    console.log(`  ${hasAdSenseAccount ? '✅' : '❌'} google-adsense-accountメタタグ: ${hasAdSenseAccount ? 'OK' : 'NG'}`);
+
+    if (result.status === 'success') {
+      console.log('\n✅ Google AdSenseは正常に動作しています');
+    } else {
+      console.log('\n⚠️ Google AdSenseの設定に問題がある可能性があります');
+    }
+
+    return result;
+
+  } catch (error) {
+    console.error('\n❌ AdSenseヘルスチェックエラー:', error.message);
+    return {
+      status: 'error',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+/**
  * メイン実行関数
  */
 async function main() {
   console.log('🔍 YouTubeチャンネルの最新動画をチェック中...');
-  
+
   // 1ヶ月前の日付を取得（過去の動画も記事化するため）
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 30);
-  
+
   // YouTubeから最新動画を取得
   const latestVideos = await fetchLatestYouTubeVideos();
-  
+
   if (latestVideos.length === 0) {
     console.log('新しい動画が見つかりませんでした。');
     return;
@@ -465,41 +534,44 @@ async function main() {
     }
 
     console.log(`🔍 動画チェック中: ${video.title} (${videoDate.toLocaleDateString()})`);
-    
+
     // 既存記事があるかチェック
     const exists = await checkExistingArticles(video.videoId);
     if (exists) {
       console.log(`⏭️ 既に記事が存在します: ${video.title}`);
       continue;
     }
-    
+
     // 地域とカテゴリを抽出
     const locationData = extractLocationAndCategory(video.title, video.description);
-    
+
     if (!locationData.location) {
       console.log(`⏭️ 富山県の地域が特定できませんでした: ${video.title}`);
       continue;
     }
-    
+
     console.log(`📍 検出した地域: ${locationData.location} (カテゴリ: ${locationData.category})`);
-    
+
     // 記事を作成
     const newArticle = await createSanityArticle(video, locationData);
-    
+
     if (newArticle) {
       newArticlesCount++;
       console.log(`✅ 記事作成完了: ${newArticle.title}`);
-      
+
       // APIレート制限を考慮して少し待機
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
-  
+
   console.log(`\n🎉 処理完了: ${newArticlesCount}件の新しい記事を作成しました`);
-  
+
   if (newArticlesCount > 0) {
     console.log('📝 作成された記事はhttps://sasakiyoshimasa.comで確認できます');
   }
+
+  // Google AdSenseヘルスチェックを実行
+  await checkAdSenseHealth();
 }
 
 // スクリプトが直接実行された場合にmain関数を実行
@@ -512,5 +584,6 @@ module.exports = {
   checkExistingArticles,
   extractLocationAndCategory,
   createSanityArticle,
+  checkAdSenseHealth,
   main
 };
