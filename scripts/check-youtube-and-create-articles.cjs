@@ -1,3 +1,30 @@
+const path = require('path');
+const fs = require('fs');
+
+// .env.localのパスを探す
+const envPaths = [
+  path.join(__dirname, '..', '.env.local'),
+  path.join(process.cwd(), '.env.local'),
+  '/Users/user/toyamablog/.env.local'
+];
+
+let envLoaded = false;
+for (const envPath of envPaths) {
+  if (fs.existsSync(envPath)) {
+    const result = require('dotenv').config({ path: envPath });
+    if (!result.error) {
+      console.log(`✅ 環境変数を読み込みました: ${envPath}`);
+      console.log(`✅ SANITY_API_TOKEN: ${process.env.SANITY_API_TOKEN ? '設定済み' : '未設定'}`);
+      envLoaded = true;
+      break;
+    }
+  }
+}
+
+if (!envLoaded) {
+  console.error('エラー: .env.local が見つかりません');
+  console.error('確認したパス:', envPaths);
+}
 const { createClient } = require('@sanity/client');
 
 const sanityClient = createClient({
@@ -8,7 +35,7 @@ const sanityClient = createClient({
   token: process.env.SANITY_API_TOKEN
 });
 
-// YouTubeチャンネルIDを設定（ささよしのチャンネル）
+// YouTubeチャンネルIDを設定（富山のくせにのチャンネル）
 // チャンネルURLから取得: https://www.youtube.com/@sasayoshi1
 const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UCxX3Eq8_KMl3AeYdhb5MklA';
 
@@ -17,14 +44,22 @@ const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UCxX3Eq8_KMl3AeYdh
  */
 async function fetchLatestYouTubeVideos() {
   const API_KEY = process.env.YOUTUBE_API_KEY;
+
+  if (!API_KEY) {
+    console.error('エラー: YOUTUBE_API_KEY環境変数が設定されていません');
+    console.log('利用可能な環境変数:', Object.keys(process.env).filter(k => k.includes('YOUTUBE')));
+    return [];
+  }
+
   const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${YOUTUBE_CHANNEL_ID}&part=snippet,id&order=date&maxResults=10&type=video`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
-    
+
     if (data.error) {
       console.error('YouTube API Error:', data.error.message);
+      console.error('詳細:', JSON.stringify(data.error, null, 2));
       return [];
     }
 
@@ -132,33 +167,40 @@ function extractLocationAndCategory(title, description) {
 function generateGoogleMapIframe(location, title) {
   // 実際のプロジェクトではGoogle Places APIを使用して正確な座標を取得
   const searchQuery = encodeURIComponent(`${location} ${title}`);
-  
+
+  // 実際の記事構成に準拠したマップタイトル（📍 ○○の場所）
   return `<div style="margin: 20px 0; text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
     <h4 style="margin-bottom: 15px; color: #333; font-size: 18px;">📍 ${location}の場所</h4>
-    <iframe src="https://www.google.com/maps/embed/v1/search?key=${process.env.GOOGLE_MAPS_API_KEY}&q=${searchQuery}&zoom=15" 
-            width="100%" 
-            height="300" 
-            style="border:0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" 
-            allowfullscreen="" 
-            loading="lazy" 
+    <iframe src="https://www.google.com/maps/embed/v1/search?key=${process.env.GOOGLE_MAPS_API_KEY}&q=${searchQuery}&zoom=15"
+            width="100%"
+            height="300"
+            style="border:0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+            allowfullscreen=""
+            loading="lazy"
             referrerpolicy="no-referrer-when-downgrade">
     </iframe>
-    <p style="margin-top: 10px; font-size: 14px; color: #666;">${location}の魅力的なスポットです</p>
+    <p style="margin-top: 10px; font-size: 14px; color: #666;">アクセス情報は上記の地図をご確認ください</p>
   </div>`;
 }
 
 /**
- * CLAUDE.md クラウドルール厳格準拠の記事コンテンツを生成
- * 新基準: 1,500-2,000文字（スマホ読みやすさ最優先）
- * 構成: H1タイトル → 動画 → H2本文記事 → まとめ → マップ → タグ
+ * vibecoding テンプレート準拠の記事コンテンツを生成
+ * 構成: 導入文(200-300字) → H2本文(2〜3セクション、各300〜500字) → まとめ
+ * ※マップ・関連記事・タグはpage.tsxで自動生成
  */
 function generateArticleContent(video, locationData) {
   const { title, description } = video;
   const { location, category } = locationData;
 
-  // 新クラウドルール準拠（1,500-2,000文字）の記事構造
+  // タイトルから#shortsを削除
+  const cleanTitle = title.replace(/\s*#shorts\s*/gi, '').trim();
+
+  // 動画タイトルから見出しのヒントを抽出
+  const titleWithoutLocation = cleanTitle.replace(/【.+?】/, '').trim();
+
+  // vibecoding テンプレート: 実用的で分かりやすい構成
   const articleBlocks = [
-    // 導入文（充実版 - 2-3行で記事の魅力を簡潔に）
+    // 導入文（200-300字）- 実用的で分かりやすい表現
     {
       _type: 'block',
       _key: 'intro',
@@ -166,181 +208,69 @@ function generateArticleContent(video, locationData) {
       children: [{
         _type: 'span',
         _key: 'intro-span',
-        text: `${location}で注目を集めているスポットをご紹介します。富山県の魅力が詰まった素晴らしい場所で、地域の特色を存分に感じられます。YouTube動画でその魅力をお楽しみいただき、実際に足を運ぶきっかけにしていただければと思います。`,
+        text: `${location}にある「${titleWithoutLocation}」は、地元の方や観光客に人気のスポットです。週末には多くの人が訪れ、写真撮影や散策を楽しんでいます。\n\nこの記事では、実際に訪れた際の様子や見どころ、アクセス方法などを分かりやすくまとめました。観光やお出かけの際の参考になれば幸いです。`,
         marks: []
       }],
       markDefs: []
     },
-    
-    // H2見出し1: 地域について
+
+    // H2見出し1: スポットの特徴と魅力
     {
       _type: 'block',
-      _key: 'h2-about-region',
+      _key: 'h2-section1',
       style: 'h2',
       children: [{
         _type: 'span',
-        _key: 'h2-about-region-span',
-        text: `${location}について`,
+        _key: 'h2-section1-span',
+        text: `${titleWithoutLocation}の特徴`,
         marks: []
       }],
       markDefs: []
     },
-    
-    // 地域の詳細説明
+
+    // 本文1（300〜400字）
     {
       _type: 'block',
-      _key: 'region-detail',
+      _key: 'content1',
       style: 'normal',
       children: [{
         _type: 'span',
-        _key: 'region-detail-span',
-        text: `${location}は富山県を代表する魅力的な地域のひとつです。豊かな自然環境と歴史ある文化が調和し、多くの観光客が訪れる人気のエリアとなっています。地域ならではの特色を活かした様々なスポットやグルメが楽しめます。`,
+        _key: 'content1-span',
+        text: `${location}にあるこのスポットは、富山県ならではの魅力が詰まった場所です。地域の特色を活かした独特な雰囲気があり、訪れる人々に特別な体験を提供しています。\n\n昼と夜でまったく違う表情を見せるのも特徴のひとつです。昼間はのんびり散策を楽しみ、夜はライトアップされた幻想的な景色を堪能できます。地元の人々にも愛され続けている、${location}を代表するスポットと言えるでしょう。`,
         marks: []
       }],
       markDefs: []
     },
-    
-    // 地域の特徴（箇条書き）
+
+    // H2見出し2: 楽しみ方とおすすめポイント
     {
       _type: 'block',
-      _key: 'region-features',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'features-span',
-        text: `**${location}の主な特徴：**\n🏞️ 豊かな自然環境と四季折々の美しい景観\n🍽️ 地元の食材を活かした絶品グルメ\n🏛️ 歴史ある建造物や文化施設\n🚗 富山市からアクセス良好な立地\n📸 SNS映えする絶景スポット多数\n👥 地元の人々の温かいおもてなし`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // H2見出し2: スポットの魅力
-    {
-      _type: 'block',
-      _key: 'h2-spot-appeal',
+      _key: 'h2-section2',
       style: 'h2',
       children: [{
         _type: 'span',
-        _key: 'h2-spot-appeal-span',
-        text: 'スポットの魅力',
+        _key: 'h2-section2-span',
+        text: '楽しみ方とおすすめポイント',
         marks: []
       }],
       markDefs: []
     },
-    
-    // スポット詳細説明
+
+    // 本文2（300〜400字）
     {
       _type: 'block',
-      _key: 'spot-detail',
+      _key: 'content2',
       style: 'normal',
       children: [{
         _type: 'span',
-        _key: 'spot-detail-span',
-        text: `今回ご紹介するスポットは、${location}の中でも特に注目を集めている魅力的な場所です。地域の特色を活かした独特な魅力があり、訪れる人々に特別な体験を提供しています。地元の人々にも愛され続けているこの場所は、観光客にとっても必見のスポットとなっています。`,
+        _key: 'content2-span',
+        text: `${location}を訪れたらぜひ体験していただきたい魅力をご紹介します。豊かな自然環境と四季折々の美しい景観は、写真撮影にも最適です。\n\n地元の食材を活かしたグルメや、歴史ある建造物、文化施設なども充実しています。家族連れからカップル、友人同士まで、幅広い層が楽しめる魅力的なスポットです。週末や休日には、ぜひ${location}の魅力を体感してみてください。`,
         marks: []
       }],
       markDefs: []
     },
-    
-    // おすすめポイント
-    {
-      _type: 'block',
-      _key: 'recommendations',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'recommendations-span',
-        text: `**おすすめポイント：**\n✅ 地域の特色を活かした独特な魅力\n✅ 四季を通じて楽しめる多彩な体験\n✅ 家族連れからカップルまで幅広く楽しめる\n✅ 地元グルメや特産品も楽しめる\n✅ 写真撮影にも最適なスポット\n✅ 地域の歴史や文化に触れられる`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // H2見出し3: 楽しみ方・体験内容
-    {
-      _type: 'block',
-      _key: 'h2-experience',
-      style: 'h2',
-      children: [{
-        _type: 'span',
-        _key: 'h2-experience-span',
-        text: '楽しみ方・体験内容',
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // 体験内容詳細
-    {
-      _type: 'block',
-      _key: 'experience-detail',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'experience-detail-span',
-        text: `このスポットでは様々な楽しみ方ができます。季節ごとに異なる魅力を発見でき、何度訪れても新しい発見があります。地域の自然や文化を肌で感じながら、充実した時間を過ごすことができるでしょう。`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // 季節別の楽しみ方
-    {
-      _type: 'block',
-      _key: 'seasonal-activities',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'seasonal-span',
-        text: `**季節別おすすめ体験：**\n🌸 **春**: 新緑の中での散策と地元の山菜グルメ\n🌻 **夏**: 爽やかな風を感じながらの屋外活動\n🍁 **秋**: 美しい紅葉と秋の味覚狩り体験\n❄️ **冬**: 雪景色の絶景と温かい地元料理\n📅 **通年**: 地域の歴史や文化を学ぶ体験プログラム\n🎁 **特別**: 地元特産品のお土産選び`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // H2見出し4: アクセス・利用情報
-    {
-      _type: 'block',
-      _key: 'h2-access',
-      style: 'h2',
-      children: [{
-        _type: 'span',
-        _key: 'h2-access-span',
-        text: 'アクセス・利用情報',
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // アクセス詳細情報
-    {
-      _type: 'block',
-      _key: 'access-detail',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'access-detail-span',
-        text: `${location}の中心部からアクセスしやすい立地にあり、公共交通機関でも自家用車でも便利にお越しいただけます。周辺には駐車場も完備されており、ゆっくりと楽しんでいただける環境が整っています。`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // 詳細な利用情報
-    {
-      _type: 'block',
-      _key: 'usage-info',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'usage-info-span',
-        text: `📍 **所在地**: 富山県${location}内\n🚗 **駐車場**: 無料駐車場完備（詳細は現地確認）\n🚌 **公共交通**: 最寄り駅からバスまたは徒歩\n🕐 **利用時間**: 季節や施設により異なる\n💰 **料金**: 施設により異なる（事前確認推奨）\n📱 **お問い合わせ**: 地域観光案内所まで\n🎫 **予約**: 事前予約推奨（繁忙期は特に）`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // H2まとめセクション（CLAUDE.md厳格ルール）
+
+    // H2まとめ
     {
       _type: 'block',
       _key: 'h2-summary',
@@ -353,8 +283,8 @@ function generateArticleContent(video, locationData) {
       }],
       markDefs: []
     },
-    
-    // まとめ内容 - 読者への行動促進
+
+    // まとめ本文（200字程度）
     {
       _type: 'block',
       _key: 'summary',
@@ -362,7 +292,7 @@ function generateArticleContent(video, locationData) {
       children: [{
         _type: 'span',
         _key: 'summary-span',
-        text: `${location}の魅力的なスポットをご紹介しました。地域ならではの特色を活かした素晴らしい場所で、四季を通じて様々な楽しみ方ができます。YouTube動画でその魅力を感じていただき、ぜひ実際に足を運んでみてください。きっと特別な思い出となる体験ができるでしょう。富山県${location}の素晴らしい魅力を存分に味わい、地域の文化や自然を肌で感じる貴重な時間をお過ごしください。`,
+        text: `${location}には、自然・グルメ・文化などさまざまな魅力があります。観光の合間に立ち寄るのはもちろん、日帰りドライブにもおすすめです。\n\n気になる方は、ぜひ一度足を運んでみてください。YouTube動画で雰囲気を感じていただき、実際に訪れてみてはいかがでしょうか。`,
         marks: []
       }],
       markDefs: []
@@ -370,6 +300,48 @@ function generateArticleContent(video, locationData) {
   ];
 
   return articleBlocks;
+}
+
+/**
+ * 記事内容に基づいたタグを生成
+ */
+function generateTags(video, locationData) {
+  const { title } = video;
+  const { location, category } = locationData;
+
+  // 基本タグ（必須）
+  const tags = ['富山県', location];
+
+  // タイトルから特徴的なキーワードを抽出
+  const cleanTitle = title.replace(/\s*#shorts\s*/gi, '').replace(/【.+?】/, '').trim();
+
+  // カテゴリに基づいた追加タグ
+  if (category.includes('グルメ') || cleanTitle.includes('グルメ') || cleanTitle.includes('食')) {
+    tags.push('富山グルメ', '地元グルメ', '観光スポット');
+  } else if (category.includes('自然') || cleanTitle.includes('自然') || cleanTitle.includes('公園')) {
+    tags.push('自然', '観光スポット', '富山観光');
+  } else if (category.includes('歴史') || cleanTitle.includes('歴史') || cleanTitle.includes('寺')) {
+    tags.push('歴史', '観光スポット', '富山観光');
+  } else {
+    tags.push('観光スポット', '富山観光');
+  }
+
+  // タイトルの主要部分を追加
+  const mainPart = cleanTitle.substring(0, 15);
+  if (mainPart && !tags.includes(mainPart)) {
+    tags.push(mainPart);
+  }
+
+  // 富山湾や立山連峰などの地理的特徴
+  tags.push('富山の魅力');
+
+  // カテゴリ名も追加
+  if (category && !tags.includes(category)) {
+    tags.push(category);
+  }
+
+  // 10個程度に調整
+  return tags.slice(0, 10);
 }
 
 /**
@@ -386,19 +358,9 @@ async function createSanityArticle(video, locationData) {
     : `【${location}】${video.title}`;
   
   const articleContent = generateArticleContent(video, locationData);
-  
-  // タグ生成
-  const tags = [
-    '富山',
-    '富山県',
-    'TOYAMA',
-    '#shorts',
-    'YouTube Shorts',
-    location,
-    category,
-    '動画',
-    'おすすめ'
-  ].filter(Boolean);
+
+  // タグ生成（記事内容に基づいた10個程度）
+  const tags = generateTags(video, locationData);
 
   // 動画URLを正しい埋め込み形式に変換
   const videoId = video.url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/)?.[1];
@@ -472,9 +434,9 @@ async function createSanityArticle(video, locationData) {
 async function main() {
   console.log('🔍 YouTubeチャンネルの最新動画をチェック中...');
   
-  // 1週間前の日付を取得
+  // 1ヶ月前の日付を取得（過去の動画も記事化するため）
   const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 30);
   
   // YouTubeから最新動画を取得
   const latestVideos = await fetchLatestYouTubeVideos();
@@ -485,18 +447,24 @@ async function main() {
   }
 
   console.log(`📺 ${latestVideos.length}件の動画を確認中...`);
-  
+  console.log('\n取得した動画一覧:');
+  latestVideos.forEach((video, index) => {
+    console.log(`${index + 1}. ${video.title}`);
+  });
+  console.log('');
+
   let newArticlesCount = 0;
-  
+
   for (const video of latestVideos) {
     const videoDate = new Date(video.publishedAt);
-    
+
     // 1週間以内の動画のみ処理
     if (videoDate < oneWeekAgo) {
+      console.log(`⏭️ 1週間より古い動画をスキップ: ${video.title} (${videoDate.toLocaleDateString()})`);
       continue;
     }
-    
-    console.log(`🔍 動画チェック中: ${video.title}`);
+
+    console.log(`🔍 動画チェック中: ${video.title} (${videoDate.toLocaleDateString()})`);
     
     // 既存記事があるかチェック
     const exists = await checkExistingArticles(video.videoId);
