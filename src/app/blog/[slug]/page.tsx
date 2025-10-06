@@ -11,6 +11,8 @@ import StructuredData from '@/components/StructuredData'
 import { generateArticleLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import ArticleErrorBoundary from '@/components/ui/ArticleErrorBoundary'
 import type { Metadata } from 'next'
+import { makeLodgingLink } from '@/lib/lodgingLink'
+import { extractAreaFromTitle } from '@/lib/extractArea'
 
 // ISR: 詳細ページは10分キャッシュ
 export const revalidate = 600
@@ -101,19 +103,29 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
 
   // 軽量化：検索用データのみ取得
-  const [posts, categories] = await Promise.all([
+  const [posts, categories, relatedPosts] = await Promise.all([
     client.fetch<Post[]>(`
       *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
         _id, title, slug, category, publishedAt,
         "categories": [category]
       }
-    `, {}, { 
-      next: { 
-        tags: ['search-posts'], 
-        revalidate: 600 
-      } 
+    `, {}, {
+      next: {
+        tags: ['search-posts'],
+        revalidate: 600
+      }
     }),
-    getAllCategories()
+    getAllCategories(),
+    // 関連記事取得（同じカテゴリの記事を2件）
+    client.fetch<Post[]>(`
+      *[_type == "post" && category == $category && _id != $postId && defined(slug.current)]
+      | order(publishedAt desc) [0...2] {
+        title,
+        slug
+      }
+    `, { category: post.category, postId: post._id }, {
+      next: { tags: ['related-posts'], revalidate: 600 }
+    })
   ])
 
   // 構造化データを生成
@@ -236,13 +248,12 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         {/* Googleマップセクション */}
         {(() => {
           // タイトルから地域名を抽出
-          const locationMatch = cleanTitle.match(/【(.+?)】/);
-          const location = locationMatch ? locationMatch[1] : '';
+          const area = extractAreaFromTitle(cleanTitle, { fallback: '' });
 
-          if (!location) return null;
+          if (!area) return null;
 
           // Google Maps Embed API URL
-          const mapsUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=富山県${encodeURIComponent(location)}`;
+          const mapsUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=富山県${encodeURIComponent(area)}`;
 
           return (
             <div className="mb-12 border-t border-gray-200 pt-8">
@@ -263,8 +274,56 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           );
         })()}
 
+        {/* 宿泊リンクセクション（Googleマップ直後） */}
+        {(() => {
+          // タイトルから地域名を抽出
+          const area = extractAreaFromTitle(cleanTitle, { fallback: '' });
+
+          if (!area) return null;
+
+          // 宿泊リンクを生成
+          const lodgingLink = makeLodgingLink({ area });
+
+          return (
+            <div className="mb-12 border-t border-gray-200 pt-8">
+              <div className="lodging-link-block bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 shadow-sm">
+                <p className="text-lg font-medium text-gray-800 mb-3">
+                  📍{area}の宿泊先を探している方はこちら
+                </p>
+                <a
+                  href={lodgingLink.url}
+                  target="_blank"
+                  rel="nofollow noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                >
+                  <span className="mr-2">👉</span>
+                  {lodgingLink.label}で宿泊プランをチェックする
+                </a>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* 記事下部広告 - 一時的に無効化（スロットID未設定のため） */}
         {/* <BottomArticleAd /> */}
+
+        {/* 関連記事セクション */}
+        {relatedPosts && relatedPosts.length > 0 && (
+          <div className="border-t border-gray-200 pt-8 mb-8">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">関連記事</h3>
+            <div className="space-y-2">
+              {relatedPosts.map((relatedPost) => (
+                <Link
+                  key={relatedPost.slug.current}
+                  href={`/blog/${relatedPost.slug.current}`}
+                  className="block text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  ・{relatedPost.title.replace(/\s*#shorts\s*/gi, '').trim()}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* タグセクション */}
         {post.tags && post.tags.length > 0 && (

@@ -5,19 +5,19 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
     .items([
-      // Authors section
+      // Posts section
       S.listItem()
-        .title('Author')
+        .title('Posts')
         .child(
           S.documentList()
-            .title('Authors')
-            .filter('_type == "author"')
-            .defaultOrdering([{field: 'name', direction: 'asc'}])
+            .title('Posts')
+            .filter('_type == "post"')
+            .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
         ),
 
       // Categories section
       S.listItem()
-        .title('Category')
+        .title('Categories')
         .child(
           S.documentList()
             .title('Categories')
@@ -25,13 +25,13 @@ export const structure: StructureResolver = (S) =>
             .defaultOrdering([{field: 'title', direction: 'asc'}])
         ),
 
-      // Posts section
+      // Authors section
       S.listItem()
-        .title('Post')
+        .title('Authors')
         .child(
           S.documentList()
-            .title('All Posts')
-            .filter('_type == "post"')
-            .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
+            .title('Authors')
+            .filter('_type == "author"')
+            .defaultOrdering([{field: 'name', direction: 'asc'}])
         ),
     ])

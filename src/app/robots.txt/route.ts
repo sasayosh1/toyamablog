@@ -6,26 +6,19 @@ export async function GET() {
   const robotsTxt = `User-agent: *
 Allow: /
 
-# SEO optimization
-Allow: /blog
-Allow: /categories
-Allow: /tags
-Allow: /about
-
 # Sitemaps
 Sitemap: ${baseUrl}/sitemap.xml
 Sitemap: ${baseUrl}/feed.xml
 
 # Block admin areas
 Disallow: /studio
-Disallow: /api
-Disallow: /_next
 Disallow: /admin
+Disallow: /api
+Disallow: /api/
 
 # Block sensitive files
 Disallow: /*.json$
 Disallow: /*.log$
-Disallow: /.*
 
 # Crawl-delay for respectful crawling
 Crawl-delay: 1

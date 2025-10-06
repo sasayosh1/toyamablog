@@ -1,0 +1,62 @@
+[2025-10-04 07:59:01] =========================================
+[2025-10-04 07:59:01] YouTube自動同期スクリプト開始
+[2025-10-04 07:59:01] =========================================
+[2025-10-04 07:59:01] .env.local を読み込み中...
+[2025-10-04 07:59:02] 環境変数チェック完了
+[2025-10-04 07:59:02] チャンネルID: UCxX3Eq8_KMl3AeYdhb5MklA
+[2025-10-04 07:59:02] YouTube動画チェック開始...
+[dotenv@17.2.2] injecting env (0) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+🔍 YouTubeチャンネルの最新動画をチェック中...
+📺 10件の動画を確認中...
+🔍 動画チェック中: 子うさぎに触れてはいけないそうです(説明欄で一言解説) #shorts
+既存記事チェックエラー: ClientError: Unauthorized - Session not found
+    at onResponse (/Users/user/toyamablog/node_modules/@sanity/client/dist/index.cjs:97:13)
+    at /Users/user/toyamablog/node_modules/get-it/dist/index.cjs:1:757
+    at /Users/user/toyamablog/node_modules/get-it/dist/index.cjs:1:974
+    at /Users/user/toyamablog/node_modules/get-it/dist/index.cjs:1:1083
+    at u (/Users/user/toyamablog/node_modules/get-it/dist/_chunks-cjs/node-request.cjs:1:5051)
+    at /Users/user/toyamablog/node_modules/get-it/dist/_chunks-cjs/node-request.cjs:1:9164
+    at Transform.<anonymous> (/Users/user/toyamablog/node_modules/get-it/dist/_chunks-cjs/node-request.cjs:1:8998)
+    at Object.onceWrapper (node:events:621:28)
+    at Transform.emit (node:events:507:28)
+    at endReadableNT (/Users/user/toyamablog/node_modules/through2/node_modules/readable-stream/lib/_stream_readable.js:1003:12) {
+  response: {
+    body: {
+      statusCode: 401,
+      error: 'Unauthorized',
+      errorCode: 'SIO-401-ANF',
+      message: 'Session not found'
+    },
+    url: 'https://aoxze287.api.sanity.io/v2024-01-01/data/query/production?query=%0A++++++*%5B_type+%3D%3D+%22post%22+%26%26+youtubeUrl+match+%22*S3dhStTOWho*%22%5D+%7B%0A++++++++_id%2C+title%2C+youtubeUrl%0A++++++%7D%0A++++&returnQuery=false',
+    method: 'GET',
+    headers: {
+      date: 'Fri, 03 Oct 2025 22:59:02 GMT',
+      'content-type': 'application/json; charset=utf-8',
+      'x-sanity-error-code': 'SIO-401-ANF',
+      'content-length': '97',
+      vary: 'origin',
+      'sanity-gateway': 'k8s-gcp-as-s1-prod-ing-01',
+      'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
+      xkey: 'project-aoxze287',
+      via: '1.1 google',
+      'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    },
+    statusCode: 401,
+    statusMessage: 'Unauthorized'
+  },
+  statusCode: 401,
+  responseBody: '{\n' +
+    '  "statusCode": 401,\n' +
+    '  "error": "Unauthorized",\n' +
+    '  "errorCode": "SIO-401-ANF",\n' +
+    '  "message": "Session not found"\n' +
+    '}',
+  details: undefined
+}
+⏭️ 富山県の地域が特定できませんでした: 子うさぎに触れてはいけないそうです(説明欄で一言解説) #shorts
+
+🎉 処理完了: 0件の新しい記事を作成しました
+[2025-10-04 07:59:02] =========================================
+[2025-10-04 07:59:02] YouTube自動同期完了
+[2025-10-04 07:59:02] =========================================
+[2025-10-04 07:59:02] ログファイル: ./logs/youtube-sync-20251004-075901.log

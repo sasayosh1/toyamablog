@@ -6,7 +6,6 @@ import { AdSense, NORMALIZED_ADSENSE_PUBLISHER_ID } from "@/components/AdSense";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import WebVitalsMonitor from "@/components/WebVitalsMonitor";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import AffilScript from "@/components/AffilScript";
 import { Suspense } from "react";
@@ -105,7 +104,6 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <GAProvider />
             <AdSense />
-            <WebVitalsMonitor />
           </Suspense>
           {children}
           <Footer />

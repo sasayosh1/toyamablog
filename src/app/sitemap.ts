@@ -55,44 +55,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const uniqueTags = [...new Set(allTags)]
 
     const sitemap: MetadataRoute.Sitemap = [
-      // ホームページ
       {
         url: baseUrl,
         lastModified: new Date(),
         changeFrequency: 'daily',
         priority: 1.0,
       },
-      // aboutページ
       {
         url: `${baseUrl}/about`,
         lastModified: new Date(),
         changeFrequency: 'monthly',
         priority: 0.7,
       },
-      // 記事一覧ページ
-      {
-        url: `${baseUrl}/blog`,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.9,
-      },
-      // カテゴリ一覧ページ
       {
         url: `${baseUrl}/categories`,
         lastModified: new Date(),
         changeFrequency: 'weekly',
         priority: 0.8,
       },
-      // タグ一覧ページ
-      {
-        url: `${baseUrl}/tags`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.8,
-      },
     ]
 
-    // 個別記事ページ
     posts.forEach((post: SanityPost) => {
       sitemap.push({
         url: `${baseUrl}/blog/${post.slug}`,
@@ -102,28 +84,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     })
 
-    // 個別カテゴリページ
-    categories.forEach((category: SanityCategory) => {
-      sitemap.push({
-        url: `${baseUrl}/categories/${category.slug}`,
-        lastModified: new Date(category._updatedAt),
-        changeFrequency: 'weekly',
-        priority: 0.7,
+    categories
+      .filter(
+        (category: SanityCategory | null | undefined): category is SanityCategory & { slug: string } =>
+          typeof category?.slug === 'string' && category.slug.trim() !== ''
+      )
+      .forEach((category: SanityCategory) => {
+        sitemap.push({
+          url: `${baseUrl}/category/${encodeURIComponent(category.slug)}`,
+          lastModified: new Date(category._updatedAt),
+          changeFrequency: 'weekly',
+          priority: 0.7,
+        })
       })
-    })
 
-    // 個別タグページ
-    uniqueTags.forEach((tag: string) => {
-      const encodedTag = encodeURIComponent(tag)
-      sitemap.push({
-        url: `${baseUrl}/tags/${encodedTag}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.6,
+    uniqueTags
+      .filter((tag): tag is string => typeof tag === 'string' && tag.trim() !== '')
+      .forEach((tag) => {
+        sitemap.push({
+          url: `${baseUrl}/tag/${encodeURIComponent(tag)}`,
+          lastModified: new Date(),
+          changeFrequency: 'weekly',
+          priority: 0.6,
+        })
       })
-    })
 
-    console.log(`Sitemap generated with ${sitemap.length} URLs`)
     return sitemap
 
   } catch (error) {

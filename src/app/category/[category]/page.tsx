@@ -42,11 +42,25 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
 export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
   const { category } = await params
   const decodedCategory = decodeURIComponent(category)
-  
-  const [allPosts, categories] = await Promise.all([
-    getAllPosts({ fetchAll: true, revalidate }),
-    getAllCategories(),
-  ])
+
+  if (!decodedCategory) {
+    notFound()
+  }
+
+  let allPosts = [] as Awaited<ReturnType<typeof getAllPosts>>
+  let categories: string[] = []
+
+  try {
+    const [postsData, categoryData] = await Promise.all([
+      getAllPosts({ fetchAll: true, revalidate }),
+      getAllCategories(),
+    ])
+    allPosts = postsData
+    categories = categoryData
+  } catch (error) {
+    console.error('Category page fetch failed', decodedCategory, error)
+    notFound()
+  }
   
   // 該当カテゴリーの記事をフィルター
   const categoryPosts = allPosts.filter(post => post.category === decodedCategory)

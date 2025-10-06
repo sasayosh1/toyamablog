@@ -42,7 +42,8 @@ const nextConfig: NextConfig = {
         aggregateTimeout: 300,
         ignored: ['node_modules', '.next'],
       };
-      config.devtool = 'eval-cheap-module-source-map';
+      // devtoolを無効化してエラーを回避
+      config.devtool = false;
     }
 
     // Sanity Studio用の最適化
@@ -52,14 +53,29 @@ const nextConfig: NextConfig = {
         fs: false,
         path: false,
         crypto: false,
+        stream: false,
+        assert: false,
+        http: false,
+        https: false,
+        os: false,
+        url: false,
       };
     }
 
-    // web-vitalsモジュール解決の問題を修正
+    // web-vitalsモジュール解決の問題を修正（複数の方法で対応）
     config.resolve.alias = {
       ...config.resolve.alias,
       'web-vitals': require.resolve('web-vitals'),
+      'web-vitals/dist/web-vitals.js': require.resolve('web-vitals'),
     };
+
+    // vendor-chunksエラーを回避
+    config.externals = config.externals || [];
+    if (!isServer) {
+      config.externals.push({
+        'web-vitals': 'web-vitals'
+      });
+    }
 
     return config;
   },

@@ -39,6 +39,94 @@ const sanityClient = createClient({
 // チャンネルURLから取得: https://www.youtube.com/@sasayoshi1
 const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UCxX3Eq8_KMl3AeYdhb5MklA';
 
+// 北陸地方の地域辞書
+const AREA_DICTIONARY = [
+  "富山", "氷見", "高岡", "射水", "砺波", "南砺", "魚津", "黒部",
+  "滑川", "立山", "舟橋", "上市", "小矢部",
+  "金沢", "白山", "野々市", "七尾", "輪島", "珠洲", "加賀",
+  "能美", "羽咋", "かほく",
+  "福井", "あわら", "坂井", "永平寺", "勝山", "大野", "鯖江",
+  "越前", "敦賀", "小浜"
+];
+
+/**
+ * タイトルから地域名を抽出
+ */
+function extractAreaFromTitle(title, fallback = "この周辺") {
+  // 【】内の地域名を最優先
+  const bracketMatch = title.match(/【(.+?)】/);
+  if (bracketMatch) {
+    return bracketMatch[1];
+  }
+
+  // 辞書からマッチング
+  for (const area of AREA_DICTIONARY) {
+    if (title.includes(area)) {
+      // 接尾辞付き形式をチェック
+      const withSuffixRegex = new RegExp(`(${area}[市区町村])`);
+      const withSuffix = title.match(withSuffixRegex);
+      if (withSuffix) {
+        return withSuffix[1];
+      }
+      return area;
+    }
+  }
+
+  // 正規表現で地名パターンを抽出
+  const areaPattern = /([一-龠々ぁ-んァ-ヶ]+(?:市|区|町|村|郡|県))/g;
+  const matches = title.match(areaPattern);
+  if (matches && matches.length > 0) {
+    return matches[0];
+  }
+
+  return fallback;
+}
+
+/**
+ * 宿泊リンクを生成（JTB既定）
+ */
+function makeLodgingLink(area) {
+  const provider = process.env.NEXT_PUBLIC_DEFAULT_TRAVEL_PROVIDER || 'JTB';
+  const encodedArea = encodeURIComponent(area);
+
+  let url = '';
+  let label = '';
+
+  switch (provider) {
+    case 'RAKUTEN':
+      const rakutenSid = process.env.NEXT_PUBLIC_RAKUTEN_SID || '';
+      url = `https://hotel.travel.rakuten.co.jp/hotelinfo/search/area/keyword?f_teikei=&f_query=${encodedArea}&scid=${rakutenSid}`;
+      label = '楽天トラベル';
+      break;
+    case 'JALAN':
+      const jalanVos = process.env.NEXT_PUBLIC_JALAN_VOS || '';
+      url = `https://www.jalan.net/uw/uwp1700/uww1701.do?keyword=${encodedArea}&vos=${jalanVos}`;
+      label = 'じゃらん';
+      break;
+    case 'IKKYU':
+      const ikkyuAid = process.env.NEXT_PUBLIC_IKKYU_AID || '';
+      url = `https://www.ikyu.com/search/?st=${encodedArea}&aid=${ikkyuAid}`;
+      label = '一休.com';
+      break;
+    case 'JTB':
+    default:
+      const jtbId = process.env.NEXT_PUBLIC_JTB_AFFILIATE_ID || '';
+      url = `https://www.jtb.co.jp/search/hotel.aspx?keyword=${encodedArea}&va=${jtbId}`;
+      label = 'JTB';
+      break;
+  }
+
+  return {
+    url,
+    label,
+    md: `📍${area}の宿泊先を探している方はこちら\n👉 [${label}で宿泊プランをチェックする](${url})`,
+    html: `<div class="lodging-link-block" data-area="${area}" data-provider="${provider}">
+  <p>📍${area}の宿泊先を探している方はこちら</p>
+  <p>👉 <a href="${url}" target="_blank" rel="nofollow noopener noreferrer">${label}で宿泊プランをチェックする</a></p>
+</div>`
+  };
+}
+
 /**
  * YouTube Data APIから最新動画を取得
  */
@@ -298,24 +386,8 @@ function generateArticleContent(video, locationData) {
       markDefs: []
     },
 
-    // アフィリエイトリンク（宿泊予約）
-    {
-      _type: 'block',
-      _key: 'affil-lodging',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'affil-lodging-span',
-        text: '',
-        marks: []
-      }],
-      markDefs: []
-    },
-    {
-      _type: 'html',
-      _key: 'affil-lodging-html',
-      code: '<div data-affil="jtb_hotel"></div>'
-    }
+    // アフィリエイトリンク（宿泊予約） - JTB固定を削除し、地域別リンクに置き換え
+    // 宿泊リンクはGoogleマップの直後に配置されるため、ここでは生成しない
   ];
 
   return articleBlocks;

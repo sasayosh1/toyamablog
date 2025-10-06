@@ -75,13 +75,23 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // 開発環境では制限的に、Sanity Studio や外部API、Next.js開発リソースは通常通り
+  // 開発環境では大部分のリクエストを通常通り処理
+  if (self.location.hostname === 'localhost') {
+    // 開発環境では極限定的にのみServiceWorkerを使用
+    if (url.pathname.startsWith('/offline') ||
+        url.pathname === '/manifest.json' ||
+        url.pathname === '/favicon.ico') {
+      event.respondWith(handleRequest(request))
+    }
+    return
+  }
+
+  // 本番環境では通常のServiceWorker処理
   if (url.pathname.startsWith('/studio') ||
       url.pathname.startsWith('/_next/') ||
       url.pathname.startsWith('/__nextjs') ||
       url.hostname !== self.location.hostname ||
-      request.method !== 'GET' ||
-      (self.location.hostname === 'localhost' && url.pathname.includes('webpack'))) {
+      request.method !== 'GET') {
     return
   }
 

@@ -1,0 +1,44 @@
+[2025-10-04 07:55:46] =========================================
+[2025-10-04 07:55:46] YouTube自動同期スクリプト開始
+[2025-10-04 07:55:46] =========================================
+[2025-10-04 07:55:46] .env.local を読み込み中...
+[2025-10-04 07:55:46] 環境変数チェック完了
+[2025-10-04 07:55:46] チャンネルID: UCxX3Eq8_KMl3AeYdhb5MklA
+[2025-10-04 07:55:46] YouTube動画チェック開始...
+[dotenv@17.2.2] injecting env (0) from .env.local -- tip: 📡 version env with Radar: https://dotenvx.com/radar
+🔍 YouTubeチャンネルの最新動画をチェック中...
+YouTube API Error: Requests from referer <empty> are blocked.
+詳細: {
+  "code": 403,
+  "message": "Requests from referer <empty> are blocked.",
+  "errors": [
+    {
+      "message": "Requests from referer <empty> are blocked.",
+      "domain": "global",
+      "reason": "forbidden"
+    }
+  ],
+  "status": "PERMISSION_DENIED",
+  "details": [
+    {
+      "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+      "reason": "API_KEY_HTTP_REFERRER_BLOCKED",
+      "domain": "googleapis.com",
+      "metadata": {
+        "service": "youtube.googleapis.com",
+        "httpReferrer": "<empty>",
+        "consumer": "projects/294203301002"
+      }
+    },
+    {
+      "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+      "locale": "en-US",
+      "message": "Requests from referer <empty> are blocked."
+    }
+  ]
+}
+新しい動画が見つかりませんでした。
+[2025-10-04 07:55:47] =========================================
+[2025-10-04 07:55:47] YouTube自動同期完了
+[2025-10-04 07:55:47] =========================================
+[2025-10-04 07:55:47] ログファイル: ./logs/youtube-sync-20251004-075546.log

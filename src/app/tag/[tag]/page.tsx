@@ -11,10 +11,6 @@ import { generateTagLD, generateBreadcrumbLD } from '@/lib/structured-data'
 export const revalidate = 3600
 export const dynamic = 'force-static'
 
-interface SanityTag {
-  tag: string;
-}
-
 // 静的パスを生成 - Sanity認証エラー回避のため一時的に無効化
 export async function generateStaticParams() {
   // Sanity認証エラー回避のため一時的にコメントアウト
@@ -38,9 +34,14 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
   const { tag } = await params
   const decodedTag = decodeURIComponent(tag)
 
-  // タグで記事を検索
-  const posts = await client.fetch<Post[]>(`
-    *[_type == "post" && defined(publishedAt) && "${decodedTag}" in tags] | order(publishedAt desc) {
+  if (!decodedTag) {
+    notFound()
+  }
+
+  let posts: Post[] = []
+
+  try {
+    const query = `*[_type == "post" && defined(publishedAt) && $tag in tags] | order(publishedAt desc) {
       _id,
       title,
       slug,
@@ -54,10 +55,16 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
       tags,
       "categories": [category],
       "displayExcerpt": coalesce(excerpt, description)
-    }
-  `)
+    }`
+    const params: Record<string, unknown> = { tag: decodedTag }
 
-  if (posts.length === 0) {
+    posts = await client.fetch<Post[]>(query, params)
+  } catch (error) {
+    console.error('Tag page fetch failed', decodedTag, error)
+    notFound()
+  }
+
+  if (!posts || posts.length === 0) {
     notFound()
   }
 
