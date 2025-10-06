@@ -39,24 +39,25 @@ const components = {
     // Googleマップを完全にスキップ（クラウドルール：専用セクションで表示）
     googleMaps: () => null,
     // HTMLタイプの処理（Googleマップは完全除外）
-    html: ({ value }: { value: { html: string } }) => {
-      if (!value?.html) return null
-      
+    html: ({ value }: { value: { html?: string; code?: string } }) => {
+      const htmlContent = value?.html || value?.code
+      if (!htmlContent) return null
+
       // Googleマップ関連のHTMLを完全に除外（クラウドルール：専用セクションで表示）
-      const isGoogleMap = value.html.includes('google.com/maps/embed') ||
-                         value.html.includes('maps.google.com') ||
-                         value.html.includes('www.google.com/maps') ||
-                         value.html.toLowerCase().includes('iframe') && 
-                         (value.html.includes('maps') || value.html.includes('embed'))
-      
+      const isGoogleMap = htmlContent.includes('google.com/maps/embed') ||
+                         htmlContent.includes('maps.google.com') ||
+                         htmlContent.includes('www.google.com/maps') ||
+                         htmlContent.toLowerCase().includes('iframe') &&
+                         (htmlContent.includes('maps') || htmlContent.includes('embed'))
+
       if (isGoogleMap) {
-        console.log('PortableText: Googleマップを検出し、表示をスキップしました', value.html.substring(0, 100))
+        console.log('PortableText: Googleマップを検出し、表示をスキップしました', htmlContent.substring(0, 100))
         return null
       }
-      
+
       return (
         <div
-          dangerouslySetInnerHTML={{ __html: value.html }}
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
           suppressHydrationWarning={true}
           style={{ margin: '1rem 0' }}
         />

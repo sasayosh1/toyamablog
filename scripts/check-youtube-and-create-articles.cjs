@@ -296,6 +296,25 @@ function generateArticleContent(video, locationData) {
         marks: []
       }],
       markDefs: []
+    },
+
+    // アフィリエイトリンク（宿泊予約）
+    {
+      _type: 'block',
+      _key: 'affil-lodging',
+      style: 'normal',
+      children: [{
+        _type: 'span',
+        _key: 'affil-lodging-span',
+        text: '',
+        marks: []
+      }],
+      markDefs: []
+    },
+    {
+      _type: 'html',
+      _key: 'affil-lodging-html',
+      code: '<div data-affil="jtb_hotel"></div>'
     }
   ];
 
