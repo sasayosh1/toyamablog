@@ -260,16 +260,16 @@
 
 ## 自動実行スケジュール
 
-### 1. YouTube記事自動生成
-- **実行時刻**: 毎週土曜日 21:00 JST (土曜日 12:00 UTC)
-- **実行頻度**: 週1回
-- **ワークフロー**: `.github/workflows/youtube-check.yml`
+### 1. YouTube記事自動生成 ⚠️ **現在停止中**
+- **状態**: 🔴 **停止**（2025-10-27 - Gemini API費用削減のため）
+- **実行時刻**: ~~毎週土曜日 21:00 JST (土曜日 12:00 UTC)~~ → **停止中**
+- **実行頻度**: ~~週1回~~ → **停止中**
+- **ワークフロー**: `.github/workflows/youtube-check.yml.disabled`（リネームして無効化）
 - **内容**: YouTubeチャンネルの新着動画を検出し、自動でブログ記事を生成
 - **スクリプト**: `scripts/check-youtube-and-create-articles.cjs`
-- **必要な環境変数**:
-  - `YOUTUBE_API_KEY` - YouTube Data API v3キー
-  - `SANITY_API_TOKEN` - Sanity書き込みトークン
-  - `GOOGLE_MAPS_API_KEY` - Google Maps埋め込み用キー
+- **停止理由**: Google Cloud費用が月¥519に達したため、コスト削減のため停止
+- **代替方法**: 必要に応じて手動で記事作成を実行
+- **再開方法**: `.github/workflows/youtube-check.yml.disabled` を `.github/workflows/youtube-check.yml` にリネーム
 
 ### 2. 週次メンテナンスチェック
 - **実行時刻**: 毎週月曜日 AM 3:00 JST (日曜日 18:00 UTC)
