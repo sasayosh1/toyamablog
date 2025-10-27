@@ -1,0 +1,73 @@
+name: Weekly Maintenance Check
+
+on:
+  schedule:
+    # 毎週月曜日 AM 3:00 JST (日曜日 18:00 UTC)
+    - cron: '0 18 * * 0'
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run maintenance check
+      env:
+        SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
+      run: node scripts/maintenance.js report
+
+    - name: Create issue if problems found
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const title = '🔧 Weekly Maintenance: 品質問題を検出しました';
+          const body = `## 自動メンテナンスチェック結果
+
+記事の品質チェックで問題が検出されました。
+
+**実行日時**: ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
+
+### 確認事項
+- [ ] \`node scripts/maintenance.js report\` を実行して詳細を確認
+- [ ] \`node scripts/maintenance.js autofix\` で自動修正を試行
+- [ ] 修正できない問題は手動で対応
+
+### トラブルシューティング
+- Sanity APIトークンエラーの場合は、新しいトークンを生成してGitHub Secretsを更新してください
+- 詳細は CLAUDE.md の「重要な設定値」セクションを参照
+
+---
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+`;
+
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'maintenance'
+          });
+
+          const existingIssue = issues.data.find(issue => issue.title === title);
+
+          if (!existingIssue) {
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['maintenance', 'automated']
+            });
+          }
