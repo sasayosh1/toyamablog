@@ -1,6 +1,46 @@
 # ブログ記事作成ガイドライン
 
 ## 重大インシデント記録
+### 2025年10月27日: Sanity APIトークン期限切れと自動メンテナンスシステム実装
+- **問題**: Sanity APIトークンが期限切れ（Unauthorized - Session not found エラー）
+- **発見経緯**: prorenataプロジェクトから移行作業中、記事分析スクリプト実行時に検出
+- **影響範囲**:
+  - ローカルスクリプトからのSanity API アクセスが不可能
+  - GitHub Actions の SANITY_API_TOKEN も確認が必要
+  - 自動記事作成ワークフロー（週次YouTube連携）も影響を受ける可能性
+- **即座の対応**:
+  - 包括的メンテナンスシステムを実装（prorenataプロジェクトのベストプラクティスを移植）
+  - 新規スクリプト作成:
+    - `scripts/maintenance.js` - 全記事品質チェック・自動修正機能
+    - `scripts/analyze-current-state.cjs` - 記事分布・品質分析
+  - 新規ワークフロー追加:
+    - `.github/workflows/weekly-maintenance.yml` - 週次品質チェック（月曜 AM3:00 JST）
+- **実装した機能**:
+  - **品質レポート生成** (`maintenance.js report`):
+    - カテゴリ分布分析
+    - 必須フィールドチェック（excerpt, metaDescription, tags）
+    - 文字数統計
+    - CLAUDE.mdルール違反検出（【地域名】形式、汎用カテゴリ使用など）
+  - **自動修正機能** (`maintenance.js autofix`):
+    - excerpt 自動生成（地域の魅力を伝える自然な文体）
+    - metaDescription 自動生成（SEO最適化、100-160文字）
+    - タグ最適化（10個程度、記事内容に基づく）
+    - カテゴリ自動修正（地域名カテゴリへの変更）
+  - **総合メンテナンス** (`maintenance.js all`):
+    - report + autofix を順次実行
+    - 週次自動実行で品質維持
+- **今後の対応（必須）**:
+  1. Sanity Studio（https://toyamablog.sanity.studio/ または npx sanity dev）にアクセス
+  2. 新しいAPIトークン（書き込み権限）を生成
+  3. `.env.local` の SANITY_API_TOKEN を更新
+  4. GitHub Secrets の SANITY_API_TOKEN を更新
+  5. `~/.env_keys` の SANITY_API_TOKEN を更新（存在する場合）
+- **予防策**:
+  - トークンに有効期限がある場合は定期的な更新スケジュールを設定
+  - トークンエラー時は自動でGitHub Issue作成（週次メンテナンスワークフローに実装済み）
+- **教訓**: **複数プロジェクト間でベストプラクティスを水平展開することで品質を維持**
+- **参考**: prorenataプロジェクトの包括的自動化システムを参考に実装
+
 ### 2025年9月3日: Sanity API Token 権限誤判定インシデント
 - **問題**: 正常に設定済みのSanity API Token（`.env.local`内に存在）を「権限不足」と誤判定し、手動編集が必要と虚偽報告
 - **原因**: 環境変数の適切な読み込み処理の不備（`export SANITY_API_TOKEN`の未実行）
@@ -188,15 +228,21 @@
 - **プロジェクトID**: `aoxze287`
 - **データセット**: `production`
 - **API バージョン**: `2024-01-01`
-- **API Token**: `skkTjwpdrsjKKpaDxKVShzCSI7GMWE1r5TQdwl0b7LTylVPoAxzBg0oPqhtUQyfPjyvtZW2mu6nfUMNUJ`
-- **使用方法**: 
+- **API Token**: ⚠️  **期限切れ（2025-10-27確認）** - 新しいトークンの生成が必要
+  - 旧トークン: `skkTjwpdrsjKKpaDxKVShzCSI7GMWE1r5TQdwl0b7LTylVPoAxzBg0oPqhtUQyfPjyvtZW2mu6nfUMNUJ`
+  - 新トークン生成手順:
+    1. `npx sanity dev` でSanity Studioを起動
+    2. 管理画面から新しいAPIトークン（書き込み権限）を生成
+    3. `.env.local`, GitHub Secrets, `~/.env_keys` を更新
+- **使用方法**:
   ```bash
-  export SANITY_API_TOKEN="skkTjwpdrsjKKpaDxKVShzCSI7GMWE1r5TQdwl0b7LTylVPoAxzBg0oPqhtUQyfPjyvtZW2mu6nfUMNUJ"
+  export SANITY_API_TOKEN="[新しいトークンをここに設定]"
   ```
 - **関連ファイル**:
   - `.env.local` - 環境変数設定
   - `src/lib/sanity.ts` - Sanityクライアント設定
   - `sanity.config.ts` - Sanity設定
+  - `scripts/maintenance.js` - メンテナンススクリプト（書き込み権限必要）
 
 #### Supabase設定（設定済み・未接続）
 - **URL**: `https://toyama-blog-project.supabase.co` (デモURL)
@@ -211,6 +257,41 @@
 #### その他の重要な環境変数
 - **Revalidation Secret**: `REVALIDATE_SECRET=blog_revalidate_secret_2025_secure_token_xyz`
 - **Database URL**: `DATABASE_URL=postgresql://postgres:password@localhost:54322/postgres`
+
+## 自動実行スケジュール
+
+### 1. YouTube記事自動生成
+- **実行時刻**: 毎週土曜日 21:00 JST (土曜日 12:00 UTC)
+- **実行頻度**: 週1回
+- **ワークフロー**: `.github/workflows/youtube-check.yml`
+- **内容**: YouTubeチャンネルの新着動画を検出し、自動でブログ記事を生成
+- **スクリプト**: `scripts/check-youtube-and-create-articles.cjs`
+- **必要な環境変数**:
+  - `YOUTUBE_API_KEY` - YouTube Data API v3キー
+  - `SANITY_API_TOKEN` - Sanity書き込みトークン
+  - `GOOGLE_MAPS_API_KEY` - Google Maps埋め込み用キー
+
+### 2. 週次メンテナンスチェック
+- **実行時刻**: 毎週月曜日 AM 3:00 JST (日曜日 18:00 UTC)
+- **実行頻度**: 週1回
+- **ワークフロー**: `.github/workflows/weekly-maintenance.yml`
+- **内容**: 全記事の品質チェック（必須フィールド、SEO、CLAUDE.mdルール準拠など）
+- **スクリプト**: `scripts/maintenance.js report`
+- **必要な環境変数**:
+  - `SANITY_API_TOKEN` - Sanity読み取りトークン
+- **エラー時の動作**: GitHub Issueを自動作成
+
+### 3. メンテナンススクリプトコマンド
+```bash
+# 品質レポート生成（問題検出のみ）
+node scripts/maintenance.js report
+
+# 自動修正実行（修正可能な問題を自動修正）
+node scripts/maintenance.js autofix
+
+# 総合メンテナンス（report + autofix）
+node scripts/maintenance.js all
+```
 
 ## 記事作成基本方針
 
