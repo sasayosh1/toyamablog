@@ -1,10 +1,17 @@
-name: YouTube Channel Check and Article Creation
+# ⚠️ DISABLED: Gemini API usage suspended to reduce costs
+# Disabled on: 2025-10-27
+# Reason: High Google Cloud costs (¥519/month)
+# To re-enable: Remove this file and rename back to youtube-check.yml
+#
+# Alternative: Manually create articles from YouTube videos when needed
+
+name: YouTube Channel Check and Article Creation (DISABLED)
 
 on:
-  schedule:
-    # 毎週土曜日21:00 JST (土曜日12:00 UTC)
-    - cron: '0 12 * * 6'
-  workflow_dispatch: # 手動実行も可能
+  # schedule:
+  #   # 毎週土曜日21:00 JST (土曜日12:00 UTC)
+  #   - cron: '0 12 * * 6'
+  workflow_dispatch: # 手動実行のみ可能（スケジュール実行は無効）
 
 jobs:
   check-youtube-and-create-articles:
