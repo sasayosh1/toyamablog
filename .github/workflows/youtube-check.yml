@@ -1,0 +1,42 @@
+name: YouTube記事自動生成
+
+on:
+  schedule:
+    # 毎週土曜日 12:00 UTC (日本時間 21:00) に実行
+    - cron: '0 12 * * 6'
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  generate-articles:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 依存関係インストール
+        run: npm ci
+
+      - name: YouTube記事自動生成
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
+          SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ARTICLES_PER_RUN: '3' # 初期3ヶ月: 3件、その後: 2件に変更
+        run: node scripts/check-youtube-and-create-articles.cjs
+
+      - name: 進捗ファイルコミット
+        if: success()
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add .last-processed-video.json
+          git diff --staged --quiet || git commit -m "📝 YouTube記事生成進捗を更新"
+          git push
