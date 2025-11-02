@@ -1,5 +1,16 @@
 const { createClient } = require('@sanity/client');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fs = require('fs');
+const path = require('path');
 
+// ===== 設定 =====
+const PROGRESS_FILE = path.join(__dirname, '..', '.last-processed-video.json');
+const ARTICLES_PER_RUN = parseInt(process.env.ARTICLES_PER_RUN || '3', 10); // 初期3ヶ月: 3件、その後: 2件に変更
+
+// Gemini API設定（コスト最適化）
+const GEMINI_MODEL = 'gemini-2.5-flash-lite'; // 最安・高品質（¥0.19/記事、月¥3-4）
+
+// Sanity Client
 const sanityClient = createClient({
   projectId: 'aoxze287',
   dataset: 'production',
@@ -8,412 +19,125 @@ const sanityClient = createClient({
   token: process.env.SANITY_API_TOKEN
 });
 
-// YouTubeチャンネルIDを設定（ささよしのチャンネル）
-// チャンネルURLから取得: https://www.youtube.com/@sasayoshi1
+// Gemini AI Client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+
+// YouTube設定
 const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UCxX3Eq8_KMl3AeYdhb5MklA';
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+
+// ===== 進捗管理 =====
 
 /**
- * YouTube Data APIから最新動画を取得
+ * 進捗ファイルを読み込み
  */
-async function fetchLatestYouTubeVideos() {
-  const API_KEY = process.env.YOUTUBE_API_KEY;
-  const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${YOUTUBE_CHANNEL_ID}&part=snippet,id&order=date&maxResults=10&type=video`;
+function loadProgress() {
+  if (!fs.existsSync(PROGRESS_FILE)) {
+    return {
+      lastProcessedVideoId: null,
+      lastProcessedDate: null,
+      totalProcessed: 0,
+      lastProcessedIndex: -1
+    };
+  }
+
+  try {
+    const data = fs.readFileSync(PROGRESS_FILE, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('⚠️  進捗ファイル読み込みエラー:', error);
+    return {
+      lastProcessedVideoId: null,
+      lastProcessedDate: null,
+      totalProcessed: 0,
+      lastProcessedIndex: -1
+    };
+  }
+}
+
+/**
+ * 進捗ファイルを保存
+ */
+function saveProgress(progress) {
+  try {
+    fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2), 'utf-8');
+    console.log(`✅ 進捗を保存しました: ${progress.lastProcessedVideoId}`);
+  } catch (error) {
+    console.error('❌ 進捗ファイル保存エラー:', error);
+  }
+}
+
+// ===== YouTube API =====
+
+/**
+ * YouTube Data APIから全動画を取得（日付順）
+ */
+async function fetchAllYouTubeVideos() {
+  const url = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${YOUTUBE_CHANNEL_ID}&part=snippet,id&order=date&maxResults=50&type=video`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
-    
+
     if (data.error) {
-      console.error('YouTube API Error:', data.error.message);
+      console.error('❌ YouTube API Error:', data.error.message);
       return [];
     }
 
-    return data.items?.map(item => ({
+    const videos = data.items?.map(item => ({
       videoId: item.id.videoId,
       title: item.snippet.title,
       description: item.snippet.description,
       publishedAt: item.snippet.publishedAt,
       thumbnails: item.snippet.thumbnails,
-      channelTitle: item.snippet.channelTitle,
       url: `https://youtu.be/${item.id.videoId}`
     })) || [];
+
+    return videos;
   } catch (error) {
-    console.error('YouTube APIでのエラー:', error);
+    console.error('❌ YouTube API Fetch Error:', error);
     return [];
   }
 }
 
+// ===== Sanity API =====
+
 /**
- * 既存の記事をチェックして、動画が既に使用されているかを確認
+ * 既存記事の動画IDリストを取得
  */
-async function checkExistingArticles(videoId) {
+async function getExistingVideoIds() {
   try {
-    const existingArticles = await sanityClient.fetch(`
-      *[_type == "post" && youtubeUrl match "*${videoId}*"] {
-        _id, title, youtubeUrl
+    const posts = await sanityClient.fetch(`
+      *[_type == "post" && defined(youtubeVideo.videoId)] {
+        "videoId": youtubeVideo.videoId
       }
     `);
-    
-    return existingArticles.length > 0;
+
+    return new Set(posts.map(p => p.videoId).filter(Boolean));
   } catch (error) {
-    console.error('既存記事チェックエラー:', error);
-    return false;
+    console.error('❌ Sanity記事取得エラー:', error);
+    return new Set();
   }
 }
 
 /**
- * 動画タイトルから記事のカテゴリと地域を推定
+ * カテゴリ参照を取得または作成
  */
-function extractLocationAndCategory(title, description) {
-  const fullText = `${title} ${description}`.toLowerCase();
-  
-  // 富山県の市町村マッピング
-  const locationMap = {
-    '富山市': 'toyama-city',
-    '高岡市': 'takaoka-city',
-    '射水市': 'imizu-city',
-    '氷見市': 'himi-city',
-    '砺波市': 'tonami-city',
-    '小矢部市': 'oyabe-city',
-    '南砺市': 'nanto-city',
-    '魚津市': 'uozu-city',
-    '黒部市': 'kurobe-city',
-    '滑川市': 'namerikawa-city',
-    '上市町': 'kamiichi-town',
-    '立山町': 'tateyama-town',
-    '入善町': 'nyuzen-town',
-    '朝日町': 'asahi-town',
-    '舟橋村': 'funahashi-village'
-  };
-
-  // カテゴリマッピング
-  const categoryMap = {
-    '寺院|神社|お寺': '神社・寺院',
-    'グルメ|食べ物|レストラン|カフェ|ラーメン|寿司|ランチ|中華|パティスリー|ドリア': 'グルメ',
-    '公園|桜|花|自然|山|海|川|ペンギン|ヤギ|アザラシ|動物|牧場': '自然・公園',
-    '温泉|ホテル|宿泊': '温泉・宿泊',
-    'イベント|祭り|花火|イルミネーション|噴水|ファウンテン|鬼滅': 'イベント・祭り',
-    '観光|名所|スポット': '観光スポット'
-  };
-
-  // 地域を特定
-  let detectedLocation = '';
-  let locationSlug = '';
-  
-  for (const [location, slug] of Object.entries(locationMap)) {
-    if (fullText.includes(location.toLowerCase())) {
-      detectedLocation = location;
-      locationSlug = slug;
-      break;
-    }
-  }
-
-  // カテゴリを特定
-  let detectedCategory = 'その他';
-  
-  for (const [keywords, category] of Object.entries(categoryMap)) {
-    const keywordList = keywords.split('|');
-    if (keywordList.some(keyword => fullText.includes(keyword))) {
-      detectedCategory = category;
-      break;
-    }
-  }
-
-  return {
-    location: detectedLocation,
-    locationSlug: locationSlug,
-    category: detectedCategory
-  };
-}
-
-/**
- * Google Maps用のiframeを生成（場所に基づく）
- */
-function generateGoogleMapIframe(location, title) {
-  // 実際のプロジェクトではGoogle Places APIを使用して正確な座標を取得
-  const searchQuery = encodeURIComponent(`${location} ${title}`);
-  
-  return `<div style="margin: 20px 0; text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-    <h4 style="margin-bottom: 15px; color: #333; font-size: 18px;">📍 ${location}の場所</h4>
-    <iframe src="https://www.google.com/maps/embed/v1/search?key=${process.env.GOOGLE_MAPS_API_KEY}&q=${searchQuery}&zoom=15" 
-            width="100%" 
-            height="300" 
-            style="border:0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" 
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade">
-    </iframe>
-    <p style="margin-top: 10px; font-size: 14px; color: #666;">${location}の魅力的なスポットです</p>
-  </div>`;
-}
-
-/**
- * CLAUDE.md クラウドルール厳格準拠の記事コンテンツを生成
- * 新基準: 1,500-2,000文字（スマホ読みやすさ最優先）
- * 構成: H1タイトル → 動画 → H2本文記事 → まとめ → マップ → タグ
- */
-function generateArticleContent(video, locationData) {
-  const { title, description } = video;
-  const { location, category } = locationData;
-
-  // 新クラウドルール準拠（1,500-2,000文字）の記事構造
-  const articleBlocks = [
-    // 導入文（充実版 - 2-3行で記事の魅力を簡潔に）
-    {
-      _type: 'block',
-      _key: 'intro',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'intro-span',
-        text: `${location}で注目を集めているスポットをご紹介します。富山県の魅力が詰まった素晴らしい場所で、地域の特色を存分に感じられます。YouTube動画でその魅力をお楽しみいただき、実際に足を運ぶきっかけにしていただければと思います。`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // H2見出し1: 地域について
-    {
-      _type: 'block',
-      _key: 'h2-about-region',
-      style: 'h2',
-      children: [{
-        _type: 'span',
-        _key: 'h2-about-region-span',
-        text: `${location}について`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // 地域の詳細説明
-    {
-      _type: 'block',
-      _key: 'region-detail',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'region-detail-span',
-        text: `${location}は富山県を代表する魅力的な地域のひとつです。豊かな自然環境と歴史ある文化が調和し、多くの観光客が訪れる人気のエリアとなっています。地域ならではの特色を活かした様々なスポットやグルメが楽しめます。`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // 地域の特徴（箇条書き）
-    {
-      _type: 'block',
-      _key: 'region-features',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'features-span',
-        text: `**${location}の主な特徴：**\n🏞️ 豊かな自然環境と四季折々の美しい景観\n🍽️ 地元の食材を活かした絶品グルメ\n🏛️ 歴史ある建造物や文化施設\n🚗 富山市からアクセス良好な立地\n📸 SNS映えする絶景スポット多数\n👥 地元の人々の温かいおもてなし`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // H2見出し2: スポットの魅力
-    {
-      _type: 'block',
-      _key: 'h2-spot-appeal',
-      style: 'h2',
-      children: [{
-        _type: 'span',
-        _key: 'h2-spot-appeal-span',
-        text: 'スポットの魅力',
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // スポット詳細説明
-    {
-      _type: 'block',
-      _key: 'spot-detail',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'spot-detail-span',
-        text: `今回ご紹介するスポットは、${location}の中でも特に注目を集めている魅力的な場所です。地域の特色を活かした独特な魅力があり、訪れる人々に特別な体験を提供しています。地元の人々にも愛され続けているこの場所は、観光客にとっても必見のスポットとなっています。`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // おすすめポイント
-    {
-      _type: 'block',
-      _key: 'recommendations',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'recommendations-span',
-        text: `**おすすめポイント：**\n✅ 地域の特色を活かした独特な魅力\n✅ 四季を通じて楽しめる多彩な体験\n✅ 家族連れからカップルまで幅広く楽しめる\n✅ 地元グルメや特産品も楽しめる\n✅ 写真撮影にも最適なスポット\n✅ 地域の歴史や文化に触れられる`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // H2見出し3: 楽しみ方・体験内容
-    {
-      _type: 'block',
-      _key: 'h2-experience',
-      style: 'h2',
-      children: [{
-        _type: 'span',
-        _key: 'h2-experience-span',
-        text: '楽しみ方・体験内容',
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // 体験内容詳細
-    {
-      _type: 'block',
-      _key: 'experience-detail',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'experience-detail-span',
-        text: `このスポットでは様々な楽しみ方ができます。季節ごとに異なる魅力を発見でき、何度訪れても新しい発見があります。地域の自然や文化を肌で感じながら、充実した時間を過ごすことができるでしょう。`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // 季節別の楽しみ方
-    {
-      _type: 'block',
-      _key: 'seasonal-activities',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'seasonal-span',
-        text: `**季節別おすすめ体験：**\n🌸 **春**: 新緑の中での散策と地元の山菜グルメ\n🌻 **夏**: 爽やかな風を感じながらの屋外活動\n🍁 **秋**: 美しい紅葉と秋の味覚狩り体験\n❄️ **冬**: 雪景色の絶景と温かい地元料理\n📅 **通年**: 地域の歴史や文化を学ぶ体験プログラム\n🎁 **特別**: 地元特産品のお土産選び`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // H2見出し4: アクセス・利用情報
-    {
-      _type: 'block',
-      _key: 'h2-access',
-      style: 'h2',
-      children: [{
-        _type: 'span',
-        _key: 'h2-access-span',
-        text: 'アクセス・利用情報',
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // アクセス詳細情報
-    {
-      _type: 'block',
-      _key: 'access-detail',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'access-detail-span',
-        text: `${location}の中心部からアクセスしやすい立地にあり、公共交通機関でも自家用車でも便利にお越しいただけます。周辺には駐車場も完備されており、ゆっくりと楽しんでいただける環境が整っています。`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // 詳細な利用情報
-    {
-      _type: 'block',
-      _key: 'usage-info',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'usage-info-span',
-        text: `📍 **所在地**: 富山県${location}内\n🚗 **駐車場**: 無料駐車場完備（詳細は現地確認）\n🚌 **公共交通**: 最寄り駅からバスまたは徒歩\n🕐 **利用時間**: 季節や施設により異なる\n💰 **料金**: 施設により異なる（事前確認推奨）\n📱 **お問い合わせ**: 地域観光案内所まで\n🎫 **予約**: 事前予約推奨（繁忙期は特に）`,
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // H2まとめセクション（CLAUDE.md厳格ルール）
-    {
-      _type: 'block',
-      _key: 'h2-summary',
-      style: 'h2',
-      children: [{
-        _type: 'span',
-        _key: 'h2-summary-span',
-        text: 'まとめ',
-        marks: []
-      }],
-      markDefs: []
-    },
-    
-    // まとめ内容 - 読者への行動促進
-    {
-      _type: 'block',
-      _key: 'summary',
-      style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: 'summary-span',
-        text: `${location}の魅力的なスポットをご紹介しました。地域ならではの特色を活かした素晴らしい場所で、四季を通じて様々な楽しみ方ができます。YouTube動画でその魅力を感じていただき、ぜひ実際に足を運んでみてください。きっと特別な思い出となる体験ができるでしょう。富山県${location}の素晴らしい魅力を存分に味わい、地域の文化や自然を肌で感じる貴重な時間をお過ごしください。`,
-        marks: []
-      }],
-      markDefs: []
-    }
-  ];
-
-  return articleBlocks;
-}
-
-/**
- * Sanityに新しい記事を作成
- */
-async function createSanityArticle(video, locationData) {
-  const { location, locationSlug, category } = locationData;
-  const timestamp = new Date().toISOString().slice(0, 10);
-  
-  const slug = `${locationSlug}-${Date.now()}`;
-  // タイトルに既に地域名が含まれている場合は重複を避ける
-  const articleTitle = video.title.includes(`【${location}】`) 
-    ? video.title 
-    : `【${location}】${video.title}`;
-  
-  const articleContent = generateArticleContent(video, locationData);
-  
-  // タグ生成
-  const tags = [
-    '富山',
-    '富山県',
-    'TOYAMA',
-    '#shorts',
-    'YouTube Shorts',
-    location,
-    category,
-    '動画',
-    'おすすめ'
-  ].filter(Boolean);
-
-  // 動画URLを正しい埋め込み形式に変換
-  const videoId = video.url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/)?.[1];
-  const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-  
-  // カテゴリ参照の作成（クラウドルール厳格準拠）
-  let categoryRef = null;
+async function getCategoryReference(location) {
   try {
-    // 地域名カテゴリを取得または作成
-    let regionCategory = await sanityClient.fetch(`*[_type == "category" && title == "${location}"][0]`);
-    
-    if (!regionCategory) {
-      console.log(`⚠️  「${location}」カテゴリが存在しません。作成中...`);
-      
-      regionCategory = await sanityClient.create({
+    let category = await sanityClient.fetch(`*[_type == "category" && title == "${location}"][0]`);
+
+    if (!category) {
+      console.log(`📝 「${location}」カテゴリを作成中...`);
+
+      const locationSlug = location
+        .toLowerCase()
+        .replace(/市$/, '-city')
+        .replace(/町$/, '-town')
+        .replace(/村$/, '-village');
+
+      category = await sanityClient.create({
         _type: 'category',
         title: location,
         slug: {
@@ -422,127 +146,346 @@ async function createSanityArticle(video, locationData) {
         },
         description: `${location}に関する記事`
       });
-      
+
       console.log(`✅ 「${location}」カテゴリを作成しました`);
     }
-    
-    categoryRef = {
+
+    return {
       _type: 'reference',
-      _ref: regionCategory._id
+      _ref: category._id
     };
-    
   } catch (error) {
-    console.error(`❌ カテゴリ作成エラー（${location}）:`, error);
-  }
-
-  // 記事オブジェクト
-  const article = {
-    _type: 'post',
-    title: articleTitle,
-    slug: {
-      _type: 'slug',
-      current: slug
-    },
-    youtubeUrl: video.url,
-    videoUrl: embedUrl, // 正しい埋め込み形式
-    body: articleContent,
-    excerpt: `${location}の魅力的なスポットをYouTube動画でご紹介。地域の特色を活かした魅力をお楽しみください。`,
-    tags: tags,
-    categories: categoryRef ? [categoryRef] : [], // CLAUDE.mdルール: 【】内地域名をカテゴリに使用（参照形式）
-    publishedAt: new Date().toISOString(),
-    author: {
-      _type: 'reference',
-      _ref: '95vBmVlXBxlHRIj7vD7uCv' // 既存のささよしAuthor ID
-    }
-  };
-
-  try {
-    const result = await sanityClient.create(article);
-    console.log('✅ 新しい記事を作成しました:', result.title);
-    return result;
-  } catch (error) {
-    console.error('記事作成エラー:', error);
+    console.error(`❌ カテゴリ取得/作成エラー（${location}）:`, error);
     return null;
   }
 }
 
+// ===== 地域・カテゴリ抽出 =====
+
 /**
- * メイン実行関数
+ * 動画タイトルから富山県の地域を抽出
  */
+function extractLocation(title) {
+  const locations = [
+    '富山市', '高岡市', '射水市', '氷見市', '砺波市',
+    '小矢部市', '南砺市', '魚津市', '黒部市', '滑川市',
+    '上市町', '立山町', '入善町', '朝日町', '舟橋村'
+  ];
+
+  const bracketMatch = title.match(/【(.+?)】/);
+  if (bracketMatch) {
+    const extracted = bracketMatch[1];
+    if (locations.includes(extracted)) {
+      return extracted;
+    }
+  }
+
+  for (const location of locations) {
+    if (title.includes(location)) {
+      return location;
+    }
+  }
+
+  return null;
+}
+
+// ===== Gemini AI記事生成 =====
+
+/**
+ * Gemini APIで高品質な記事本文を生成
+ */
+async function generateArticleWithGemini(video, location) {
+  const prompt = `あなたは富山県の魅力を伝えるブログ「富山のくせに」のライターです。以下のYouTube動画から、親しみやすく読みやすいブログ記事を作成してください。
+
+【動画情報】
+タイトル: ${video.title}
+説明: ${video.description || '（説明なし）'}
+地域: ${location}
+
+【記事作成ルール】
+1. **文字数**: 1,500〜2,000文字（スマホ読みやすさ最優先）
+2. **構成**: 導入文（2-3行） → H2見出し3つ → まとめ
+3. **H2見出し**: 3つの主要セクション
+4. **H3見出し**: 必須ではなく、文章上どうしても必要な場合のみ使用
+5. **箇条書き**: 積極的に活用（読みやすさ向上）
+6. **数字**: 具体的な情報を提供する際に積極的に使用
+7. **まとめ**: 読者の行動を促す結び
+
+【記事タイトル】
+${video.title.includes('【') ? video.title : `【${location}】${video.title}`}
+
+【記事本文】（Markdown形式で出力）`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    return text;
+  } catch (error) {
+    console.error('❌ Gemini API記事生成エラー:', error);
+    throw error;
+  }
+}
+
+/**
+ * Markdown本文をSanity Portable Text形式に変換
+ */
+function markdownToPortableText(markdown) {
+  const lines = markdown.split('\n');
+  const blocks = [];
+  let currentBlock = null;
+
+  for (const line of lines) {
+    if (!line.trim()) continue;
+
+    // H2見出し
+    if (line.startsWith('## ')) {
+      blocks.push({
+        _type: 'block',
+        _key: `h2-${blocks.length}`,
+        style: 'h2',
+        children: [{
+          _type: 'span',
+          _key: `span-${blocks.length}`,
+          text: line.replace(/^## /, ''),
+          marks: []
+        }],
+        markDefs: []
+      });
+      currentBlock = null;
+      continue;
+    }
+
+    // H3見出し
+    if (line.startsWith('### ')) {
+      blocks.push({
+        _type: 'block',
+        _key: `h3-${blocks.length}`,
+        style: 'h3',
+        children: [{
+          _type: 'span',
+          _key: `span-${blocks.length}`,
+          text: line.replace(/^### /, ''),
+          marks: []
+        }],
+        markDefs: []
+      });
+      currentBlock = null;
+      continue;
+    }
+
+    // 通常段落
+    blocks.push({
+      _type: 'block',
+      _key: `p-${blocks.length}`,
+      style: 'normal',
+      children: [{
+        _type: 'span',
+        _key: `span-${blocks.length}`,
+        text: line,
+        marks: []
+      }],
+      markDefs: []
+    });
+  }
+
+  return blocks;
+}
+
+// ===== 記事作成 =====
+
+/**
+ * Sanityに新しい記事を作成
+ */
+async function createArticle(video, location) {
+  console.log(`\n📝 記事作成中: ${video.title}`);
+
+  try {
+    // Gemini APIで記事本文を生成
+    console.log('🤖 Gemini APIで記事を生成中...');
+    const markdownContent = await generateArticleWithGemini(video, location);
+    const bodyBlocks = markdownToPortableText(markdownContent);
+
+    // カテゴリ参照を取得
+    const categoryRef = await getCategoryReference(location);
+
+    // タイトル整形（#shortsを削除）
+    const cleanTitle = video.title
+      .replace(/#shorts/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const articleTitle = cleanTitle.includes('【') ? cleanTitle : `【${location}】${cleanTitle}`;
+
+    // Slug生成
+    const timestamp = Date.now();
+    const locationSlug = location
+      .toLowerCase()
+      .replace(/市$/, '-city')
+      .replace(/町$/, '-town')
+      .replace(/村$/, '-village');
+    const slug = `${locationSlug}-${timestamp}`;
+
+    // タグ生成
+    const tags = [
+      '富山',
+      '富山県',
+      'TOYAMA',
+      location,
+      'YouTube',
+      '動画',
+      'おすすめ'
+    ].filter(Boolean);
+
+    // Excerpt生成（最初の段落から）
+    const firstParagraph = markdownContent.split('\n').find(line => line.trim() && !line.startsWith('#'));
+    const excerpt = firstParagraph ? firstParagraph.slice(0, 150) + '...' : `${location}の魅力的なスポットをご紹介します。`;
+
+    // 記事オブジェクト
+    const article = {
+      _type: 'post',
+      title: articleTitle,
+      slug: {
+        _type: 'slug',
+        current: slug
+      },
+      youtubeVideo: {
+        _type: 'youtubeVideo',
+        videoId: video.videoId,
+        title: video.title,
+        url: video.url
+      },
+      body: bodyBlocks,
+      excerpt: excerpt,
+      metaDescription: excerpt.slice(0, 160),
+      tags: tags,
+      categories: categoryRef ? [categoryRef] : [],
+      publishedAt: new Date().toISOString(),
+      author: {
+        _type: 'reference',
+        _ref: '95vBmVlXBxlHRIj7vD7uCv' // ささよしAuthor ID
+      }
+    };
+
+    // Sanityに作成
+    const result = await sanityClient.create(article);
+    console.log(`✅ 記事作成完了: ${result.title}`);
+
+    return result;
+  } catch (error) {
+    console.error(`❌ 記事作成エラー:`, error);
+    return null;
+  }
+}
+
+// ===== メイン処理 =====
+
 async function main() {
-  console.log('🔍 YouTubeチャンネルの最新動画をチェック中...');
-  
-  // 1週間前の日付を取得
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  
-  // YouTubeから最新動画を取得
-  const latestVideos = await fetchLatestYouTubeVideos();
-  
-  if (latestVideos.length === 0) {
-    console.log('新しい動画が見つかりませんでした。');
+  console.log('🚀 YouTube記事自動生成を開始します\n');
+  console.log(`📊 設定:`);
+  console.log(`  - モデル: ${GEMINI_MODEL} (Gemini 2.5 Flash-Lite)`);
+  console.log(`  - 処理件数: ${ARTICLES_PER_RUN}件/回\n`);
+
+  // 進捗を読み込み
+  const progress = loadProgress();
+  console.log(`📁 進捗状況:`);
+  console.log(`  - 前回処理動画ID: ${progress.lastProcessedVideoId || '（初回実行）'}`);
+  console.log(`  - 総処理済み: ${progress.totalProcessed}件\n`);
+
+  // YouTube動画を全件取得
+  console.log('📺 YouTube動画を取得中...');
+  const allVideos = await fetchAllYouTubeVideos();
+  console.log(`  取得完了: ${allVideos.length}件\n`);
+
+  if (allVideos.length === 0) {
+    console.log('⚠️  動画が取得できませんでした');
     return;
   }
 
-  console.log(`📺 ${latestVideos.length}件の動画を確認中...`);
-  
-  let newArticlesCount = 0;
-  
-  for (const video of latestVideos) {
-    const videoDate = new Date(video.publishedAt);
-    
-    // 1週間以内の動画のみ処理
-    if (videoDate < oneWeekAgo) {
-      continue;
-    }
-    
-    console.log(`🔍 動画チェック中: ${video.title}`);
-    
-    // 既存記事があるかチェック
-    const exists = await checkExistingArticles(video.videoId);
-    if (exists) {
-      console.log(`⏭️ 既に記事が存在します: ${video.title}`);
-      continue;
-    }
-    
-    // 地域とカテゴリを抽出
-    const locationData = extractLocationAndCategory(video.title, video.description);
-    
-    if (!locationData.location) {
-      console.log(`⏭️ 富山県の地域が特定できませんでした: ${video.title}`);
-      continue;
-    }
-    
-    console.log(`📍 検出した地域: ${locationData.location} (カテゴリ: ${locationData.category})`);
-    
-    // 記事を作成
-    const newArticle = await createSanityArticle(video, locationData);
-    
-    if (newArticle) {
-      newArticlesCount++;
-      console.log(`✅ 記事作成完了: ${newArticle.title}`);
-      
-      // APIレート制限を考慮して少し待機
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  // 既存記事の動画IDを取得
+  console.log('📄 既存記事をチェック中...');
+  const existingVideoIds = await getExistingVideoIds();
+  console.log(`  既存記事: ${existingVideoIds.size}件\n`);
+
+  // 前回の次から処理対象を特定
+  let startIndex = 0;
+  if (progress.lastProcessedVideoId) {
+    const lastIndex = allVideos.findIndex(v => v.videoId === progress.lastProcessedVideoId);
+    if (lastIndex !== -1) {
+      startIndex = lastIndex + 1;
+      console.log(`▶️  前回の続きから処理: ${startIndex + 1}番目の動画から\n`);
     }
   }
-  
-  console.log(`\n🎉 処理完了: ${newArticlesCount}件の新しい記事を作成しました`);
-  
-  if (newArticlesCount > 0) {
-    console.log('📝 作成された記事はhttps://sasakiyoshimasa.comで確認できます');
+
+  // 未記事化動画を抽出（前回の次からN件）
+  const videosToProcess = [];
+  for (let i = startIndex; i < allVideos.length && videosToProcess.length < ARTICLES_PER_RUN; i++) {
+    const video = allVideos[i];
+
+    // 既に記事化済みかチェック
+    if (existingVideoIds.has(video.videoId)) {
+      console.log(`⏭️  スキップ（既存）: ${video.title}`);
+      continue;
+    }
+
+    // 地域を抽出
+    const location = extractLocation(video.title);
+    if (!location) {
+      console.log(`⏭️  スキップ（地域不明）: ${video.title}`);
+      continue;
+    }
+
+    videosToProcess.push({ video, location, index: i });
   }
+
+  console.log(`\n✨ 処理対象動画: ${videosToProcess.length}件\n`);
+
+  if (videosToProcess.length === 0) {
+    console.log('✅ 処理対象動画がありません');
+    return;
+  }
+
+  // 記事作成
+  let successCount = 0;
+  let lastProcessedVideoId = progress.lastProcessedVideoId;
+
+  for (const { video, location, index } of videosToProcess) {
+    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`📍 ${location} | ${video.title}`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+
+    const result = await createArticle(video, location);
+
+    if (result) {
+      successCount++;
+      lastProcessedVideoId = video.videoId;
+
+      // 進捗を保存
+      saveProgress({
+        lastProcessedVideoId: video.videoId,
+        lastProcessedDate: new Date().toISOString(),
+        totalProcessed: progress.totalProcessed + successCount,
+        lastProcessedIndex: index
+      });
+
+      // APIレート制限対策
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+
+  console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`🎉 処理完了`);
+  console.log(`  - 成功: ${successCount}件`);
+  console.log(`  - 総処理済み: ${progress.totalProcessed + successCount}件`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
 }
 
-// スクリプトが直接実行された場合にmain関数を実行
+// 実行
 if (require.main === module) {
-  main().catch(console.error);
+  main().catch(error => {
+    console.error('❌ エラーが発生しました:', error);
+    process.exit(1);
+  });
 }
 
-module.exports = {
-  fetchLatestYouTubeVideos,
-  checkExistingArticles,
-  extractLocationAndCategory,
-  createSanityArticle,
-  main
-};
+module.exports = { main };
