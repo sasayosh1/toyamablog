@@ -11,28 +11,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Run maintenance check
-      env:
-        SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
-      run: node scripts/maintenance.cjs report
+      - name: Run maintenance check
+        env:
+          SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
+        run: node scripts/maintenance.cjs report
 
-    - name: Create issue if problems found
-      if: failure()
-      uses: actions/github-script@v7
-      with:
-        script: |
+      - name: Create issue if problems found
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
           const title = '🔧 Weekly Maintenance: 品質問題を検出しました';
           const body = `## 自動メンテナンスチェック結果
 
