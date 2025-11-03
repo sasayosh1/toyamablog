@@ -477,7 +477,7 @@ switch (command) {
 📋 toyamablog メンテナンススクリプト
 
 使い方:
-  node scripts/maintenance.js <command>
+  node scripts/maintenance.cjs <command>
 
 コマンド:
   report   - 全記事の品質問題を検出・レポート
@@ -485,9 +485,9 @@ switch (command) {
   all      - report + autofix を順次実行
 
 例:
-  node scripts/maintenance.js report
-  node scripts/maintenance.js autofix
-  node scripts/maintenance.js all
+  node scripts/maintenance.cjs report
+  node scripts/maintenance.cjs autofix
+  node scripts/maintenance.cjs all
 
 注意:
   - SANITY_API_TOKEN 環境変数が必要です
