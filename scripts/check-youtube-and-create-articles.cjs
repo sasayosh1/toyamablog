@@ -27,6 +27,35 @@ const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UCxX3Eq8_KMl3AeYdhb5MklA';
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
+// ===== 文章整形ユーティリティ =====
+
+const POLITE_PREFIXES = [
+  'はい、承知いたしました',
+  '承知いたしました',
+  'はい、了解しました',
+  '了解しました',
+  'かしこまりました',
+  'はい、承知しました',
+];
+
+function shouldRemovePoliteIntro(line) {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed === '---') return true;
+  return POLITE_PREFIXES.some(prefix => trimmed.startsWith(prefix));
+}
+
+function sanitizeMarkdownResponse(markdown = '') {
+  const lines = markdown
+    .split('\n')
+    .map(line => line.replace(/\s+$/u, '')); // trailing spaces除去
+
+  while (lines.length && shouldRemovePoliteIntro(lines[0])) {
+    lines.shift();
+  }
+
+  return lines.join('\n').trim();
+}
+
 // ===== 進捗管理 =====
 
 /**
@@ -74,25 +103,70 @@ function saveProgress(progress) {
  * YouTube Data APIから全動画を取得（日付順）
  */
 async function fetchAllYouTubeVideos() {
-  const url = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${YOUTUBE_CHANNEL_ID}&part=snippet,id&order=date&maxResults=50&type=video`;
+  if (!YOUTUBE_API_KEY) {
+    console.error('❌ YouTube APIキーが設定されていません');
+    return [];
+  }
 
   try {
-    const response = await fetch(url);
-    const data = await response.json();
+    // 1. チャンネルの uploads プレイリストIDを取得
+    const channelRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${YOUTUBE_CHANNEL_ID}&key=${YOUTUBE_API_KEY}`
+    );
+    const channelData = await channelRes.json();
 
-    if (data.error) {
-      console.error('❌ YouTube API Error:', data.error.message);
+    if (channelData.error) {
+      console.error('❌ YouTube Channels API Error:', channelData.error.message);
       return [];
     }
 
-    const videos = data.items?.map(item => ({
-      videoId: item.id.videoId,
-      title: item.snippet.title,
-      description: item.snippet.description,
-      publishedAt: item.snippet.publishedAt,
-      thumbnails: item.snippet.thumbnails,
-      url: `https://youtu.be/${item.id.videoId}`
-    })) || [];
+    const uploadsPlaylistId = channelData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+    if (!uploadsPlaylistId) {
+      console.error('❌ uploads プレイリストIDを取得できませんでした');
+      return [];
+    }
+
+    // 2. uploads プレイリストから動画一覧をページング取得
+    const videos = [];
+    let nextPageToken = undefined;
+    const maxItems = 120; // 念のため十分多めに取得
+
+    do {
+      const playlistUrl = new URL('https://www.googleapis.com/youtube/v3/playlistItems');
+      playlistUrl.searchParams.set('part', 'snippet,contentDetails');
+      playlistUrl.searchParams.set('playlistId', uploadsPlaylistId);
+      playlistUrl.searchParams.set('maxResults', '50');
+      playlistUrl.searchParams.set('key', YOUTUBE_API_KEY);
+      if (nextPageToken) {
+        playlistUrl.searchParams.set('pageToken', nextPageToken);
+      }
+
+      const playlistRes = await fetch(playlistUrl);
+      const playlistData = await playlistRes.json();
+
+      if (playlistData.error) {
+        console.error('❌ YouTube PlaylistItems API Error:', playlistData.error.message);
+        break;
+      }
+
+      const items = playlistData.items || [];
+      for (const item of items) {
+        const snippet = item.snippet;
+        const details = item.contentDetails;
+        if (!snippet || !details) continue;
+
+        videos.push({
+          videoId: details.videoId,
+          title: snippet.title,
+          description: snippet.description,
+          publishedAt: details.videoPublishedAt || snippet.publishedAt,
+          thumbnails: snippet.thumbnails,
+          url: `https://youtu.be/${details.videoId}`
+        });
+      }
+
+      nextPageToken = playlistData.nextPageToken;
+    } while (nextPageToken && videos.length < maxItems);
 
     return videos;
   } catch (error) {
@@ -220,7 +294,7 @@ ${video.title.includes('【') ? video.title : `【${location}】${video.title}`}
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    return text;
+    return sanitizeMarkdownResponse(text);
   } catch (error) {
     console.error('❌ Gemini API記事生成エラー:', error);
     throw error;
@@ -339,7 +413,12 @@ async function createArticle(video, location) {
 
     // Excerpt生成（最初の段落から）
     const firstParagraph = markdownContent.split('\n').find(line => line.trim() && !line.startsWith('#'));
-    const excerpt = firstParagraph ? firstParagraph.slice(0, 150) + '...' : `${location}の魅力的なスポットをご紹介します。`;
+    const cleanedFirstParagraph = firstParagraph
+      ? sanitizeMarkdownResponse(firstParagraph)
+      : '';
+    const excerpt = cleanedFirstParagraph
+      ? `${cleanedFirstParagraph.slice(0, 150)}...`
+      : `${location}の魅力的なスポットをご紹介します。`;
 
     // 記事オブジェクト
     const article = {

@@ -26,7 +26,7 @@ jobs:
     - name: Run maintenance check
       env:
         SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
-      run: node scripts/maintenance.js report
+      run: node scripts/maintenance.cjs report
 
     - name: Create issue if problems found
       if: failure()
