@@ -52,7 +52,7 @@ function extractVideoInfo(post) {
 
 async function main() {
   console.log('🔧 Slug 修正スクリプトを開始します...');
-  const posts = await sanityClient.fetch(`*[_type == "post" && (!slug.current match '^[a-z0-9-]+$' || slug.current match '-[0-9]{6,}$')]{_id, title, slug, youtubeVideo, youtubeUrl}`);
+  const posts = await sanityClient.fetch(`*[_type == "post" && (!slug.current match '^[a-z0-9-]+$' || slug.current match '-[0-9]+$')]{_id, title, slug, youtubeVideo, youtubeUrl}`);
   if (!posts.length) {
     console.log('✅ 修正対象はありません。');
     return;
