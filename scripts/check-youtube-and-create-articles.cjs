@@ -29,6 +29,24 @@ const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
 // ===== 文章整形ユーティリティ =====
 
+const LOCATION_SLUG_PREFIX = {
+  '富山市': 'toyama-toyamashi',
+  '高岡市': 'toyama-takaokashi',
+  '射水市': 'toyama-imizushi',
+  '氷見市': 'toyama-himishi',
+  '砺波市': 'toyama-tonamishi',
+  '小矢部市': 'toyama-oyabeshi',
+  '南砺市': 'toyama-nantoshi',
+  '魚津市': 'toyama-uozushi',
+  '黒部市': 'toyama-kurobeshi',
+  '滑川市': 'toyama-namerikawashi',
+  '上市町': 'toyama-kamiichimachi',
+  '立山町': 'toyama-tateyamamachi',
+  '入善町': 'toyama-nyuzenmachi',
+  '朝日町': 'toyama-asahimachi',
+  '舟橋村': 'toyama-funahashimura',
+};
+
 const POLITE_PREFIXES = [
   'はい、承知いたしました',
   '承知いたしました',
@@ -54,6 +72,75 @@ function sanitizeMarkdownResponse(markdown = '') {
   }
 
   return lines.join('\n').trim();
+}
+
+function fallbackSlugKeywords(video) {
+  const title = (video.title || '')
+    .normalize('NFKD')
+    .replace(/[^\w\s-]/g, ' ');
+  const words = title
+    .split(/\s+/)
+    .map(word => word.toLowerCase().replace(/[^a-z0-9]/g, ''))
+    .filter(Boolean);
+  const unique = [...new Set(words)];
+  const selected = unique.filter(word => word.length > 2).slice(0, 4);
+  const fallback = ['local', 'travel', 'guide', 'highlights'];
+  while (selected.length < 4) {
+    selected.push(fallback[selected.length % fallback.length]);
+  }
+  return selected.slice(0, 4).join('-');
+}
+
+async function generateSlugKeywords(video, location) {
+  const prompt = `Generate 3 to 4 concise lowercase English keywords for a blog post slug.
+Context:
+- Location: ${location}
+- Video title: ${video.title}
+- Description: ${video.description || 'N/A'}
+
+Rules:
+- Use only lowercase English letters and hyphens.
+- Do not include numbers.
+- Do not include the location prefix (already handled).
+- Output only the hyphen-delimited keywords, e.g. travel-festival-lanterns.
+`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text().trim().toLowerCase().split(/\s+/)[0];
+    text = text.replace(/[^a-z-]/g, '-').replace(/--+/g, '-').replace(/^-|-$/g, '');
+    const words = text.split('-').filter(Boolean);
+    if (words.length >= 3 && words.length <= 5 && words.every(word => /^[a-z]+$/.test(word))) {
+      return words.slice(0, 4).join('-');
+    }
+  } catch (error) {
+    console.error('⚠️  スラッグキーワード生成に失敗しました（フォールバックを使用）:', error.message || error);
+  }
+
+  return fallbackSlugKeywords(video);
+}
+
+async function slugExists(slug) {
+  const count = await sanityClient.fetch('count(*[_type == "post" && slug.current == $slug])', { slug });
+  return count > 0;
+}
+
+async function generateSlug(video, location) {
+  const prefix = LOCATION_SLUG_PREFIX[location] || 'toyama-general';
+  const keywords = await generateSlugKeywords(video, location);
+  let baseSlug = `${prefix}-${keywords}`;
+  baseSlug = baseSlug.replace(/[^a-z0-9-]/g, '-').replace(/--+/g, '-').replace(/^-|-$/g, '');
+  if (!baseSlug) {
+    baseSlug = `${prefix}-local-travel-guide`;
+  }
+
+  let uniqueSlug = baseSlug;
+  let counter = 2;
+  while (await slugExists(uniqueSlug)) {
+    uniqueSlug = `${baseSlug}-${counter++}`;
+  }
+  return uniqueSlug;
 }
 
 // ===== 進捗管理 =====
@@ -392,13 +479,7 @@ async function createArticle(video, location) {
     const articleTitle = cleanTitle.includes('【') ? cleanTitle : `【${location}】${cleanTitle}`;
 
     // Slug生成
-    const timestamp = Date.now();
-    const locationSlug = location
-      .toLowerCase()
-      .replace(/市$/, '-city')
-      .replace(/町$/, '-town')
-      .replace(/村$/, '-village');
-    const slug = `${locationSlug}-${timestamp}`;
+    const slug = await generateSlug(video, location);
 
     // タグ生成
     const tags = [
@@ -412,13 +493,16 @@ async function createArticle(video, location) {
     ].filter(Boolean);
 
     // Excerpt生成（最初の段落から）
-    const firstParagraph = markdownContent.split('\n').find(line => line.trim() && !line.startsWith('#'));
-    const cleanedFirstParagraph = firstParagraph
-      ? sanitizeMarkdownResponse(firstParagraph)
+    const firstBodyBlock = bodyBlocks.find(
+      block => (block.style || 'normal') === 'normal' && !block.listItem
+    );
+    const firstParagraph = firstBodyBlock
+      ? firstBodyBlock.children.map(child => child.text || '').join('').trim()
       : '';
-    const excerpt = cleanedFirstParagraph
-      ? `${cleanedFirstParagraph.slice(0, 150)}...`
+    const excerpt = firstParagraph
+      ? `${firstParagraph.slice(0, 150)}...`
       : `${location}の魅力的なスポットをご紹介します。`;
+    const metaDescription = excerpt.slice(0, 160);
 
     // 記事オブジェクト
     const article = {
@@ -436,7 +520,7 @@ async function createArticle(video, location) {
       },
       body: bodyBlocks,
       excerpt: excerpt,
-      metaDescription: excerpt.slice(0, 160),
+      metaDescription,
       tags: tags,
       categories: categoryRef ? [categoryRef] : [],
       publishedAt: new Date().toISOString(),
@@ -567,4 +651,10 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main };
+module.exports = {
+  main,
+  extractLocation,
+  generateSlugForVideo: generateSlug,
+  sanitizeMarkdownResponse,
+  LOCATION_SLUG_PREFIX,
+};
