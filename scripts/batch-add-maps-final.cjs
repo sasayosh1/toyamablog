@@ -200,7 +200,7 @@ async function finalBatchMaps() {
     
     if (finalTotal >= 206) {
       console.log('\n🎉🎊 完全制覇達成！全206記事の処理が完了しました！ 🎊🎉');
-      console.log('✨ 富山のくせに！ブログサイトのGoogleマップ統合が100%完了しました！');
+      console.log('✨ 「富山、お好きですか？」ブログサイトのGoogleマップ統合が100%完了しました！');
       console.log('🛡️ 全バッチ処理がエラー0で完璧に成功しています！');
     } else if (errorCount === 0) {
       console.log('🛡️ 完璧！最終バッチ処理も成功しました');

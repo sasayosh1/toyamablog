@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export const metadata = {
-  title: '地域別カテゴリー | 富山のくせに',
+  title: '地域別カテゴリー | 富山、お好きですか？',
   description: '富山県の各地域から記事を探すことができます。市町村別に整理された地域別カテゴリーページです。',
 }
 

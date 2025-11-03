@@ -187,7 +187,7 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
         <circle cx="200" cy="112" r="40" fill="${categoryColor.text}" opacity="0.1"/>
         <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" 
               fill="${categoryColor.text}" font-size="16" font-family="system-ui, -apple-system, sans-serif" font-weight="600">
-          ${post.categories?.[0] || '富山のくせに'}
+          ${post.categories?.[0] || '富山、お好きですか？'}
         </text>
         <text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" 
               fill="${categoryColor.text}" font-size="11" font-family="system-ui, -apple-system, sans-serif" opacity="0.9">

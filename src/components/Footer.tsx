@@ -9,10 +9,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* サイト情報 */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold">富山のくせに</h3>
+            <h3 className="text-xl font-bold">富山、お好きですか？</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
               地域の美しい風景、グルメ、観光スポット、文化を紹介するAMAZING TOYAMAブログです。
-              YouTube Shortsと連携して「富山のくせになかなかええやん！」をお伝えしています。
+              YouTube Shortsと連携して、富山をもっと好きになる視点をお届けしています。
             </p>
             <div className="flex space-x-4">
               <Link
@@ -68,7 +68,7 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-gray-400">
-              © {currentYear} 富山のくせに - AMAZING TOYAMA. All rights reserved.
+              © {currentYear} 富山、お好きですか？ - AMAZING TOYAMA. All rights reserved.
             </p>
             <div className="flex flex-wrap gap-4 text-sm">
               <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors py-2 px-1 min-h-[44px] flex items-center rounded hover:bg-gray-800">

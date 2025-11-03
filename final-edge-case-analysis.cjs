@@ -159,7 +159,7 @@ async function runFinalEdgeCaseAnalysis() {
     
     if (issues.length === 0) {
       console.log('🎉 全てのエッジケースチェックをクリア！');
-      console.log('✨ 「富山のくせに」は最高品質状態を維持中');
+      console.log('✨ 「富山、お好きですか？」は最高品質状態を維持中');
       return true;
     } else {
       console.log('⚠️ 検出された問題:');

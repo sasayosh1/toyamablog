@@ -10,7 +10,7 @@ const client = createClient({
 
 async function runFinalSiteHealthCheck() {
   try {
-    console.log('🏥 「富山のくせに」最終ヘルスチェック実行中...');
+    console.log('🏥 「富山、お好きですか？」最終ヘルスチェック実行中...');
     
     // 1. 基本統計の取得
     console.log('\n📊 基本統計:');
@@ -93,7 +93,7 @@ async function runFinalSiteHealthCheck() {
     });
     
     // 6. 総合評価
-    console.log('\n🏆 「富山のくせに」総合評価:');
+    console.log('\n🏆 「富山、お好きですか？」総合評価:');
     
     if (overallQuality >= 0.9 && totalErrors === 0) {
       console.log('   🌟 【EXCELLENT】最高品質レベル達成！');
@@ -117,7 +117,7 @@ async function runFinalSiteHealthCheck() {
     console.log(`   🚨 エラー件数: ${totalErrors}件`);
     console.log(`   🏆 総合品質: ${(overallQuality * 100).toFixed(1)}%`);
     
-    console.log('\n🎉 「富山のくせに」ヘルスチェック完了！');
+    console.log('\n🎉 「富山、お好きですか？」ヘルスチェック完了！');
     
     return {
       totalPosts,

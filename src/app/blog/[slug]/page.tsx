@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: cleanTitle,
       description: post.excerpt || post.description || `${cleanTitle}の詳細情報を紹介しています。`,
       url: `https://sasakiyoshimasa.com/blog/${slug}`,
-      siteName: '富山のくせに',
+      siteName: '富山、お好きですか？',
       images: [{
         url: thumbnailUrl,
         width: 1200,

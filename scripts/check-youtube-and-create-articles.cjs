@@ -359,7 +359,7 @@ function extractLocation(title) {
  * Gemini APIで高品質な記事本文を生成
  */
 async function generateArticleWithGemini(video, location) {
-  const prompt = `あなたは富山県の魅力を伝えるブログ「富山のくせに」のライターです。以下のYouTube動画から、親しみやすく読みやすいブログ記事を作成してください。
+  const prompt = `あなたは富山県の魅力を伝えるブログ「富山、お好きですか？」のライターです。以下のYouTube動画から、親しみやすく読みやすいブログ記事を作成してください。
 
 【動画情報】
 タイトル: ${video.title}

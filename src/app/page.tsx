@@ -20,18 +20,18 @@ export const revalidate = 300
 
 // メタデータ最適化
 export const metadata = {
-  title: '富山のくせに - AMAZING TOYAMA',
-  description: '富山県の観光スポット、グルメ情報、文化を紹介するYouTube Shorts連携ブログ',
+  title: '富山、お好きですか？ - AMAZING TOYAMA',
+  description: '富山県の観光スポットやグルメ、文化を紹介するYouTube Shorts連携ブログ。もっと富山を好きになるヒントをお届けします。',
   keywords: '富山, 観光, グルメ, YouTube, Shorts, 富山県',
   openGraph: {
-    title: '富山のくせに - AMAZING TOYAMA',
-    description: '富山県の観光スポット、グルメ情報、文化を紹介するYouTube Shorts連携ブログ',
+    title: '富山、お好きですか？ - AMAZING TOYAMA',
+    description: '富山県の観光スポットやグルメ、文化を紹介するYouTube Shorts連携ブログ。もっと富山を好きになるヒントをお届けします。',
     type: 'website',
     locale: 'ja_JP',
   },
   twitter: {
     card: 'summary_large_image',
-    title: '富山のくせに - AMAZING TOYAMA',
+    title: '富山、お好きですか？ - AMAZING TOYAMA',
     description: '富山県の観光スポット、グルメ情報、文化を紹介',
   },
 }
@@ -86,7 +86,7 @@ export default async function Home({
             <div className="bg-black/20 backdrop-blur-sm rounded-lg px-6 py-4 shadow-lg">
               <h1 className="text-white font-bold text-center md:text-left leading-tight">
                 <div className="text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-1 sm:mb-2 drop-shadow-lg">
-                  富山のくせに
+                  富山、お好きですか？
                 </div>
                 <div className="text-xs sm:text-sm md:text-lg lg:text-xl font-medium drop-shadow-md">
                   AMAZING TOYAMA

@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export const metadata: Metadata = {
-  title: '利用規約 - 富山のくせに',
-  description: '富山のくせにの利用規約について説明しています。',
+  title: '利用規約 - 富山、お好きですか？',
+  description: '「富山、お好きですか？」の利用規約について説明しています。',
   openGraph: {
-    title: '利用規約 - 富山のくせに',
-    description: '富山のくせにの利用規約について',
+    title: '利用規約 - 富山、お好きですか？',
+    description: '「富山、お好きですか？」の利用規約について',
     type: 'website',
     url: 'https://sasakiyoshimasa.com/terms',
   },
@@ -44,7 +44,7 @@ export default async function TermsPage() {
                 1. 適用
               </h2>
               <p className="leading-relaxed">
-                この利用規約（以下「本規約」）は、「富山のくせに」（以下「当サイト」）が提供するサービスの利用条件を定めるものです。
+                この利用規約（以下「本規約」）は、「富山、お好きですか？」（以下「当サイト」）が提供するサービスの利用条件を定めるものです。
                 当サイトをご利用になる方（以下「利用者」）は、本規約に同意したものとみなします。
               </p>
             </section>
@@ -146,7 +146,7 @@ export default async function TermsPage() {
                 本規約に関するお問い合わせは、以下の連絡先までお願いいたします。
               </p>
               <div className="bg-blue-50 rounded-lg p-6 mt-4">
-                <p className="font-medium">富山のくせに</p>
+                <p className="font-medium">富山、お好きですか？</p>
                 <p>Email: ptb875pmj49@gmail.com</p>
                 <p>X: @sasayoshi_tym</p>
               </div>

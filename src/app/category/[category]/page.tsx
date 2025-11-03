@@ -26,10 +26,10 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   const decodedCategory = decodeURIComponent(category)
   
   return {
-    title: `${decodedCategory} - 富山のくせに`,
+    title: `${decodedCategory} - 富山、お好きですか？`,
     description: `富山県の${decodedCategory}に関する記事一覧。YouTube Shortsと連携した地域情報をお届けします。`,
     openGraph: {
-      title: `${decodedCategory} - 富山のくせに`,
+      title: `${decodedCategory} - 富山、お好きですか？`,
       description: `富山県の${decodedCategory}に関する記事一覧`,
       type: 'website',
       url: `https://sasakiyoshimasa.com/category/${category}`,

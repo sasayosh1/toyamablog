@@ -8,10 +8,10 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export const metadata: Metadata = {
-  title: 'About - 富山のくせに',
+  title: 'About - 富山、お好きですか？',
   description: '富山県の魅力を動画で発信するローカルブロガーのプロフィールページ。YouTube Shortsで富山県内の観光スポット、グルメ、文化を紹介しています。',
   openGraph: {
-    title: 'About - 富山のくせに', 
+    title: 'About - 富山、お好きですか？', 
     description: '富山県の魅力を動画で発信するローカルブロガーのプロフィールページ',
     type: 'website',
     url: 'https://sasakiyoshimasa.com/about',
@@ -41,7 +41,7 @@ export default async function AboutPage() {
           <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden shadow-lg border-4 border-pink-200">
             <Image
               src="/profile.png"
-              alt="ささよしアバター - 富山のくせにブロガー"
+              alt="ささよしアバター - 富山、お好きですか？ブロガー"
               width={128}
               height={128}
               className="w-full h-full object-cover pixelated"
@@ -214,7 +214,7 @@ export default async function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:富山のくせに <ptb875pmj49@gmail.com>"
+              href="mailto:富山、お好きですか？ <ptb875pmj49@gmail.com>"
               className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
