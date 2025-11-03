@@ -267,19 +267,21 @@
   - `YOUTUBE_SYSTEM_FINAL_SETUP.md` - YouTube API設定ガイド
 
 #### Gemini API設定（記事生成用）
-- **API Key**: `AIzaSyAtApZzg0mozgdERJ-Dih0-io0oljpsatY` （prorenataプロジェクトと共有）
+- **API Key**: （セキュリティのため記載なし。`.env.local`とGitHub Secretsに設定済み）
 - **使用モデル**: `gemini-2.5-flash-lite` （コスト最適化モデル）
 - **価格**: $0.10/1M input + $0.40/1M output
 - **月間コスト**: ¥3-4（toyamablog: 8-12件/月 + prorenata: 8件/月の合計）
 - **コスト削減率**: 従来の月¥519から約99%削減
 - **使用方法**:
   ```bash
-  export GEMINI_API_KEY="AIzaSyAtApZzg0mozgdERJ-Dih0-io0oljpsatY"
+  export GEMINI_API_KEY="[環境変数から取得]"
   ```
-- **注意**: prorenataプロジェクトと共有使用、月間予算¥100以内で運用
+- **注意**:
+  - APIキーはGitHubに公開しない（セキュリティ重要）
+  - prorenataプロジェクトと共有使用、月間予算¥100以内で運用
 - **関連ファイル**:
   - `scripts/check-youtube-and-create-articles.cjs` - 記事生成スクリプト（Gemini API使用）
-  - `.env.local` - 環境変数設定
+  - `.env.local` - 環境変数設定（Gitignore対象）
   - `.github/workflows/youtube-check.yml` - 自動実行ワークフロー
 
 #### Sanity CMS設定
