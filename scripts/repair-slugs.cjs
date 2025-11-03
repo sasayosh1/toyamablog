@@ -39,6 +39,9 @@ function extractVideoInfo(post) {
       videoId = match[1];
     }
   }
+  if (!videoId) {
+    videoId = `manual-${post._id}`;
+  }
   return {
     videoId,
     title: video.title || post.title || '',
@@ -49,7 +52,11 @@ function extractVideoInfo(post) {
 
 async function main() {
   console.log('🔧 Slug 修正スクリプトを開始します...');
-  const posts = await sanityClient.fetch(`*[_type == "post"]{_id, title, slug, youtubeVideo, youtubeUrl}`);
+  const posts = await sanityClient.fetch(`*[_type == "post" && (!slug.current match '^[a-z0-9-]+$' || slug.current match '-[0-9]{6,}$')]{_id, title, slug, youtubeVideo, youtubeUrl}`);
+  if (!posts.length) {
+    console.log('✅ 修正対象はありません。');
+    return;
+  }
   let updated = 0;
 
   for (const post of posts) {
@@ -64,11 +71,6 @@ async function main() {
     }
 
     const video = extractVideoInfo(post);
-    if (!video.videoId) {
-      console.log(`⚠️  スキップ（動画ID不明）: ${post.title}`);
-      continue;
-    }
-
     const newSlug = await generateSlugForVideo(video, location);
     if (!newSlug || newSlug === currentSlug) {
       continue;
