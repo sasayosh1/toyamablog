@@ -135,10 +135,13 @@ async function generateSlug(video, location) {
     baseSlug = `${prefix}-local-travel-guide`;
   }
 
+  const suffixes = ['journey', 'story', 'insight', 'chronicle', 'legends', 'vibes', 'memoir'];
   let uniqueSlug = baseSlug;
-  let counter = 2;
+  let index = 0;
   while (await slugExists(uniqueSlug)) {
-    uniqueSlug = `${baseSlug}-${counter++}`;
+    const suffix = index < suffixes.length ? suffixes[index] : `variant${index - suffixes.length + 1}`;
+    uniqueSlug = `${baseSlug}-${suffix}`.replace(/--+/g, '-').replace(/^-|-$/g, '');
+    index++;
   }
   return uniqueSlug;
 }
