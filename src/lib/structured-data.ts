@@ -5,7 +5,7 @@ export function generateOrganizationLD() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: '富山のくせに',
+    name: '富山、お好きですか？',
     alternateName: 'AMAZING TOYAMA',
     url: 'https://sasakiyoshimasa.com',
     logo: {
@@ -23,7 +23,7 @@ export function generateOrganizationLD() {
       addressRegion: '富山県',
       addressCountry: 'JP'
     },
-    description: '富山県の観光スポット、グルメ情報、文化を紹介するYouTube Shorts連携ブログ。地元の魅力を発信し「富山のくせになかなかええやん！」をお届けします。'
+    description: '富山県の観光スポット、グルメ情報、文化を紹介するYouTube Shorts連携ブログ。もっと富山を好きになる視点をお届けします。'
   }
 }
 
@@ -32,7 +32,7 @@ export function generateWebSiteLD() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: '富山のくせに',
+    name: '富山、お好きですか？',
     alternateName: 'AMAZING TOYAMA',
     url: 'https://sasakiyoshimasa.com',
     description: '富山県の観光スポット、グルメ情報、文化を紹介するYouTube Shorts連携ブログ',
@@ -47,7 +47,7 @@ export function generateWebSiteLD() {
     },
     publisher: {
       '@type': 'Organization',
-      name: '富山のくせに',
+      name: '富山、お好きですか？',
       logo: {
         '@type': 'ImageObject',
         url: 'https://sasakiyoshimasa.com/images/logo.png'
@@ -103,7 +103,7 @@ export function generateArticleLD(post: Post, slug: string) {
     },
     publisher: {
       '@type': 'Organization',
-      name: '富山のくせに',
+      name: '富山、お好きですか？',
       logo: {
         '@type': 'ImageObject',
         url: 'https://sasakiyoshimasa.com/images/logo.png',
@@ -121,7 +121,7 @@ export function generateArticleLD(post: Post, slug: string) {
     inLanguage: 'ja-JP',
     isPartOf: {
       '@type': 'WebSite',
-      name: '富山のくせに',
+      name: '富山、お好きですか？',
       url: 'https://sasakiyoshimasa.com'
     }
   }
@@ -189,7 +189,7 @@ export function generateCategoryLD(categoryName: string, posts: Post[]) {
     },
     isPartOf: {
       '@type': 'WebSite',
-      name: '富山のくせに',
+      name: '富山、お好きですか？',
       url: 'https://sasakiyoshimasa.com'
     }
   }
@@ -214,7 +214,7 @@ export function generateTagLD(tagName: string, posts: Post[]) {
     },
     isPartOf: {
       '@type': 'WebSite',
-      name: '富山のくせに',
+      name: '富山、お好きですか？',
       url: 'https://sasakiyoshimasa.com'
     }
   }

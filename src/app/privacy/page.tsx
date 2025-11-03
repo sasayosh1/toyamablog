@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export const metadata: Metadata = {
-  title: 'プライバシーポリシー - 富山のくせに',
-  description: '富山のくせにのプライバシーポリシーと個人情報の取り扱いについて説明しています。',
+  title: 'プライバシーポリシー - 富山、お好きですか？',
+  description: '「富山、お好きですか？」のプライバシーポリシーと個人情報の取り扱いについて説明しています。',
   openGraph: {
-    title: 'プライバシーポリシー - 富山のくせに',
-    description: '富山のくせにのプライバシーポリシーと個人情報の取り扱いについて',
+    title: 'プライバシーポリシー - 富山、お好きですか？',
+    description: '「富山、お好きですか？」のプライバシーポリシーと個人情報の取り扱いについて',
     type: 'website',
     url: 'https://sasakiyoshimasa.com/privacy',
   },
@@ -44,7 +44,7 @@ export default async function PrivacyPage() {
                 1. 個人情報の利用目的
               </h2>
               <p className="leading-relaxed mb-4">
-                当サイト「富山のくせに」では、お問い合わせやコメントの際にお名前やメールアドレス等の個人情報をいただく場合があります。
+                当サイト「富山、お好きですか？」では、お問い合わせやコメントの際にお名前やメールアドレス等の個人情報をいただく場合があります。
                 これらの個人情報は以下の目的でのみ利用いたします。
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
@@ -145,7 +145,7 @@ export default async function PrivacyPage() {
                 本ポリシーに関するお問い合わせは、以下の連絡先までお願いいたします。
               </p>
               <div className="bg-blue-50 rounded-lg p-6 mt-4">
-                <p className="font-medium">富山のくせに</p>
+                <p className="font-medium">富山、お好きですか？</p>
                 <p>Email: ptb875pmj49@gmail.com</p>
                 <p>X: @sasayoshi_tym</p>
               </div>

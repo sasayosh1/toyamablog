@@ -20,35 +20,35 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "富山のくせに - AMAZING TOYAMA",
-    template: '%s | 富山のくせに'
+    default: "富山、お好きですか？ - AMAZING TOYAMA",
+    template: '%s | 富山、お好きですか？'
   },
-  description: "富山県の観光スポット、グルメ情報、文化を紹介するYouTube Shorts連携ブログ。地元の魅力を発信し「富山のくせになかなかええやん！」をお届けします。",
+  description: "富山県の観光スポットやグルメ、文化を紹介するYouTube Shorts連携ブログ。「富山、お好きですか？」がもっと好きになる視点をお届けします。",
   keywords: ["富山", "富山県", "観光", "グルメ", "YouTube Shorts", "旅行", "地域情報", "北陸", "立山連峰", "日本海"],
   authors: [{ name: "ささよし", url: "https://sasakiyoshimasa.com" }],
   creator: "ささよし",
-  publisher: "富山のくせに",
+  publisher: "富山、お好きですか？",
   metadataBase: new URL('https://sasakiyoshimasa.com'),
   alternates: {
     canonical: 'https://sasakiyoshimasa.com',
   },
   openGraph: {
-    title: "富山のくせに - AMAZING TOYAMA",
-    description: "富山県の観光スポット、グルメ情報、文化を紹介するYouTube Shorts連携ブログ。",
+    title: "富山、お好きですか？ - AMAZING TOYAMA",
+    description: "富山県の観光スポットやグルメ、文化を紹介するYouTube Shorts連携ブログ。もっと富山を好きになるヒントをお届けします。",
     url: 'https://sasakiyoshimasa.com',
-    siteName: '富山のくせに',
+    siteName: '富山、お好きですか？',
     images: [{
       url: '/images/og-image.png',
       width: 1200,
       height: 630,
-      alt: '富山のくせに - AMAZING TOYAMA サイトイメージ'
+      alt: '富山、お好きですか？ - AMAZING TOYAMA サイトイメージ'
     }],
     locale: 'ja_JP',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "富山のくせに - AMAZING TOYAMA",
+    title: "富山、お好きですか？ - AMAZING TOYAMA",
     description: "富山県の観光スポット、グルメ情報、文化を紹介するYouTube Shorts連携ブログ。",
     site: '@sasayoshi_tym',
     creator: '@sasayoshi_tym',
@@ -84,10 +84,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#3b82f6" />
-        <meta name="application-name" content="富山のくせに" />
+        <meta name="application-name" content="富山、お好きですか？" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="富山のくせに" />
+        <meta name="apple-mobile-web-app-title" content="富山、お好きですか？" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

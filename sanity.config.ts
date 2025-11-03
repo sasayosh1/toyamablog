@@ -7,7 +7,7 @@ import {structure} from './src/sanity/structure'
 
 export default defineConfig({
   name: 'sasakiyoshimasa-com',
-  title: '富山のくせに',
+  title: '富山、お好きですか？',
 
   projectId: 'aoxze287',
   dataset: 'production',

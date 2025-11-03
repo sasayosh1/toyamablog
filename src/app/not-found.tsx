@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'ページが見つかりません - 富山のくせに',
+  title: 'ページが見つかりません - 富山、お好きですか？',
   description: 'お探しのページは見つかりませんでした。ホームページから他のコンテンツをご覧ください。',
 }
 
