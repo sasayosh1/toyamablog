@@ -2,6 +2,37 @@
 
 ## 重大インシデント記録
 
+### 2025年11月3日: Gemini APIキー漏洩インシデントと緊急対応
+- **問題**: CLAUDE.mdにGemini APIキーを記載してGitHubに公開してしまった
+- **発見経緯**: Google Cloud Platformから「APIキーが一般公開されています」というセキュリティアラートを受信
+- **重大性**: API悪用によるコスト発生リスク、セキュリティ侵害の可能性
+- **即座の対応**:
+  1. **CLAUDE.mdから機密情報を削除**
+     - Gemini APIキーを削除
+     - セキュリティ注意書きに変更
+     - コミット・プッシュ（コミットID: 9262d2a）
+  2. **露出したAPIキーを無効化**
+     - Google Cloud Consoleで旧APIキー削除
+     - 露出キー: `AIzaSyAtApZzg0mozgdERJ-Dih0-io0oljpsatY`
+  3. **新しいAPIキーを生成**
+     - セキュリティ強化された新キー生成
+     - API制限設定: Generative Language APIのみアクセス可能
+  4. **環境変数とGitHub Secretsを更新**
+     - `.env.local`のGEMINI_API_KEYを更新
+     - GitHub SecretsのGEMINI_API_KEYを更新
+  5. **動作確認**
+     - 新しいAPIキーでGemini APIが正常動作することを確認
+     - YouTube記事自動生成スクリプトで検証完了
+- **根本原因**: ドキュメント作成時に機密情報をCLAUDE.mdに記載してしまった（Claude Code担当者のミス）
+- **再発防止策**:
+  - **絶対ルール**: APIキー、トークン等の機密情報はドキュメントに記載しない
+  - **管理方法**: `.env.local`とGitHub Secretsでのみ管理
+  - **ドキュメント記載**: 「セキュリティのため記載なし」と明記
+- **影響**: APIキー漏洩期間中の不正使用は確認されず、迅速な対応により被害なし
+- **対応時間**: アラート受信から全対応完了まで約30分
+- **教訓**: **機密情報の取り扱いは最重要セキュリティ事項**
+- **参考**: Google Cloud Platform セキュリティアラート対応プロトコル
+
 ### 2025年11月3日: YouTube記事自動生成システム再開とGemini API統合
 - **問題**: YouTube記事自動生成システムが停止中（Gemini API費用が月¥519で予算超過のため）
 - **要求**: 月¥100以内でシステムを再開したい
