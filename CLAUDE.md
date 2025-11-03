@@ -1,6 +1,48 @@
 # ブログ記事作成ガイドライン
 
 ## 重大インシデント記録
+
+### 2025年11月3日: YouTube記事自動生成システム再開とGemini API統合
+- **問題**: YouTube記事自動生成システムが停止中（Gemini API費用が月¥519で予算超過のため）
+- **要求**: 月¥100以内でシステムを再開したい
+- **解決策**: Gemini 2.5 Flash-Liteモデルへの切り替えによる大幅コスト削減
+- **実施内容**:
+  - **モデル選択調査**:
+    - 当初 `gemini-1.5-flash-001` を試行したが404エラー発生
+    - v1beta APIエンドポイントでFlashモデルが利用不可能と判明
+    - 利用可能モデル一覧から `gemini-2.5-flash-lite` を発見・選択
+  - **APIキー共有**: prorenataプロジェクトのGemini APIキーを共有利用
+  - **コスト最適化達成**:
+    - 新コスト: 月¥3-4（予算¥100の3-4%）
+    - 内訳: toyamablog初月12件(¥2.3)→以降8件(¥1.5) + prorenata 8件(¥1.5)
+    - 従来コスト¥519から約99%削減を実現
+  - **実装詳細**:
+    - `scripts/check-youtube-and-create-articles.cjs` を完全書き換え
+    - @google/generative-ai パッケージ統合
+    - Gemini 2.5 Flash-Lite (`gemini-2.5-flash-lite`) モデル使用
+    - 週次自動実行スケジュール: 毎週土曜日21:00 JST
+    - 処理件数: 初期3ヶ月は3件/週、その後2件/週
+  - **GitHub Actions設定**:
+    - `.github/workflows/youtube-check.yml` 作成
+    - GitHub Secrets設定完了（GEMINI_API_KEY, YOUTUBE_API_KEY, SANITY_API_TOKEN等）
+    - 進捗トラッキング: `.last-processed-video.json`
+  - **ローカルテスト成功**: 1記事生成テストで正常動作確認
+- **技術的課題と解決**:
+  - **gemini-1.5-flash-001 404エラー**: v1beta APIにFlashモデルが存在しないことが原因
+  - **パッケージダウングレード試行**: 効果なし（モデル自体が存在しないため）
+  - **Claude API検討**: クレジット残高不足エラー、ユーザーが課金を拒否
+  - **最終解決**: Gemini 2.5 Flash-Liteへの切り替えで完全解決
+- **運用開始**:
+  - 状態: 🟢 **稼働中**（2025-11-03より）
+  - 次回自動実行: 2025年11月9日（土）21:00 JST
+  - 手動実行: GitHub Actionsから手動トリガー可能
+- **コスト管理**:
+  - 月間予算: ¥100
+  - 実際コスト: ¥3-4（97%の余裕あり）
+  - 監視体制: 月次でコスト確認を実施
+- **教訓**: **最新モデル・エンドポイントの調査により大幅コスト削減を実現**
+- **参考**: Gemini API価格: $0.10/1M input + $0.40/1M output（Flash-Lite）
+
 ### 2025年10月27日: Sanity APIトークン期限切れと自動メンテナンスシステム実装
 - **問題**: Sanity APIトークンが期限切れ（Unauthorized - Session not found エラー）
 - **発見経緯**: prorenataプロジェクトから移行作業中、記事分析スクリプト実行時に検出
@@ -11,22 +53,22 @@
 - **即座の対応**:
   - 包括的メンテナンスシステムを実装（prorenataプロジェクトのベストプラクティスを移植）
   - 新規スクリプト作成:
-    - `scripts/maintenance.js` - 全記事品質チェック・自動修正機能
+    - `scripts/maintenance.cjs` - 全記事品質チェック・自動修正機能
     - `scripts/analyze-current-state.cjs` - 記事分布・品質分析
   - 新規ワークフロー追加:
     - `.github/workflows/weekly-maintenance.yml` - 週次品質チェック（月曜 AM3:00 JST）
 - **実装した機能**:
-  - **品質レポート生成** (`maintenance.js report`):
+  - **品質レポート生成** (`maintenance.cjs report`):
     - カテゴリ分布分析
     - 必須フィールドチェック（excerpt, metaDescription, tags）
     - 文字数統計
     - CLAUDE.mdルール違反検出（【地域名】形式、汎用カテゴリ使用など）
-  - **自動修正機能** (`maintenance.js autofix`):
+  - **自動修正機能** (`maintenance.cjs autofix`):
     - excerpt 自動生成（地域の魅力を伝える自然な文体）
     - metaDescription 自動生成（SEO最適化、100-160文字）
     - タグ最適化（10個程度、記事内容に基づく）
     - カテゴリ自動修正（地域名カテゴリへの変更）
-  - **総合メンテナンス** (`maintenance.js all`):
+  - **総合メンテナンス** (`maintenance.cjs all`):
     - report + autofix を順次実行
     - 週次自動実行で品質維持
 - **今後の対応（必須）**:
@@ -213,7 +255,7 @@
 - **YouTube API Key**: `AIzaSyAsSclg9Wq9AEMTXAp8KZW4G5vgRUTyIXY`
 - **Google Maps API Key**: `AIzaSyAH5oKyGm1EnibGH6JxlrEwMyRUIpzvEgI`
 - **チャンネル確認URL**: https://www.youtube.com/channel/UCxX3Eq8_KMl3AeYdhb5MklA
-- **使用方法**: 
+- **使用方法**:
   ```bash
   export YOUTUBE_CHANNEL_ID="UCxX3Eq8_KMl3AeYdhb5MklA"
   export YOUTUBE_API_KEY="AIzaSyAsSclg9Wq9AEMTXAp8KZW4G5vgRUTyIXY"
@@ -223,6 +265,22 @@
 - **関連ファイル**:
   - `scripts/check-youtube-and-create-articles.cjs` - YouTube動画記事作成スクリプト
   - `YOUTUBE_SYSTEM_FINAL_SETUP.md` - YouTube API設定ガイド
+
+#### Gemini API設定（記事生成用）
+- **API Key**: `AIzaSyAtApZzg0mozgdERJ-Dih0-io0oljpsatY` （prorenataプロジェクトと共有）
+- **使用モデル**: `gemini-2.5-flash-lite` （コスト最適化モデル）
+- **価格**: $0.10/1M input + $0.40/1M output
+- **月間コスト**: ¥3-4（toyamablog: 8-12件/月 + prorenata: 8件/月の合計）
+- **コスト削減率**: 従来の月¥519から約99%削減
+- **使用方法**:
+  ```bash
+  export GEMINI_API_KEY="AIzaSyAtApZzg0mozgdERJ-Dih0-io0oljpsatY"
+  ```
+- **注意**: prorenataプロジェクトと共有使用、月間予算¥100以内で運用
+- **関連ファイル**:
+  - `scripts/check-youtube-and-create-articles.cjs` - 記事生成スクリプト（Gemini API使用）
+  - `.env.local` - 環境変数設定
+  - `.github/workflows/youtube-check.yml` - 自動実行ワークフロー
 
 #### Sanity CMS設定
 - **プロジェクトID**: `aoxze287`
@@ -242,7 +300,7 @@
   - `.env.local` - 環境変数設定
   - `src/lib/sanity.ts` - Sanityクライアント設定
   - `sanity.config.ts` - Sanity設定
-  - `scripts/maintenance.js` - メンテナンススクリプト（書き込み権限必要）
+  - `scripts/maintenance.cjs` - メンテナンススクリプト（書き込み権限必要）
 
 #### Supabase設定（設定済み・未接続）
 - **URL**: `https://toyama-blog-project.supabase.co` (デモURL)
@@ -260,23 +318,31 @@
 
 ## 自動実行スケジュール
 
-### 1. YouTube記事自動生成 ⚠️ **現在停止中**
-- **状態**: 🔴 **停止**（2025-10-27 - Gemini API費用削減のため）
-- **実行時刻**: ~~毎週土曜日 21:00 JST (土曜日 12:00 UTC)~~ → **停止中**
-- **実行頻度**: ~~週1回~~ → **停止中**
-- **ワークフロー**: `.github/workflows/youtube-check.yml.disabled`（リネームして無効化）
-- **内容**: YouTubeチャンネルの新着動画を検出し、自動でブログ記事を生成
+### 1. YouTube記事自動生成 ✅ **稼働中**
+- **状態**: 🟢 **稼働中**（2025-11-03より再開）
+- **実行時刻**: 毎週土曜日 21:00 JST (土曜日 12:00 UTC)
+- **実行頻度**: 週1回
+- **処理件数**: 初期3ヶ月は3件/週、その後2件/週に変更
+- **ワークフロー**: `.github/workflows/youtube-check.yml`
+- **内容**: YouTubeチャンネルの新着動画を検出し、Gemini AIで自動的にブログ記事を生成
 - **スクリプト**: `scripts/check-youtube-and-create-articles.cjs`
-- **停止理由**: Google Cloud費用が月¥519に達したため、コスト削減のため停止
-- **代替方法**: 必要に応じて手動で記事作成を実行
-- **再開方法**: `.github/workflows/youtube-check.yml.disabled` を `.github/workflows/youtube-check.yml` にリネーム
+- **使用AI**: Gemini 2.5 Flash-Lite（コスト最適化モデル）
+- **月間コスト**: ¥3-4（予算¥100の3-4%）
+- **進捗管理**: `.last-processed-video.json`で処理済み動画を追跡
+- **必要な環境変数**:
+  - `YOUTUBE_API_KEY` - YouTube Data API v3キー
+  - `YOUTUBE_CHANNEL_ID` - ささよしチャンネルID
+  - `SANITY_API_TOKEN` - Sanity書き込みトークン
+  - `GEMINI_API_KEY` - Gemini API キー（prorenataと共有）
+  - `ARTICLES_PER_RUN` - 1回の実行で処理する記事数（3または2）
+- **手動実行方法**: GitHub Actionsページから「YouTube記事自動生成」ワークフローを手動トリガー
 
 ### 2. 週次メンテナンスチェック
 - **実行時刻**: 毎週月曜日 AM 3:00 JST (日曜日 18:00 UTC)
 - **実行頻度**: 週1回
 - **ワークフロー**: `.github/workflows/weekly-maintenance.yml`
 - **内容**: 全記事の品質チェック（必須フィールド、SEO、CLAUDE.mdルール準拠など）
-- **スクリプト**: `scripts/maintenance.js report`
+- **スクリプト**: `scripts/maintenance.cjs report`
 - **必要な環境変数**:
   - `SANITY_API_TOKEN` - Sanity読み取りトークン
 - **エラー時の動作**: GitHub Issueを自動作成
@@ -284,13 +350,13 @@
 ### 3. メンテナンススクリプトコマンド
 ```bash
 # 品質レポート生成（問題検出のみ）
-node scripts/maintenance.js report
+node scripts/maintenance.cjs report
 
 # 自動修正実行（修正可能な問題を自動修正）
-node scripts/maintenance.js autofix
+node scripts/maintenance.cjs autofix
 
 # 総合メンテナンス（report + autofix）
-node scripts/maintenance.js all
+node scripts/maintenance.cjs all
 ```
 
 ## 記事作成基本方針
