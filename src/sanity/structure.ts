@@ -1,80 +1,60 @@
 import type {StructureResolver} from 'sanity/structure'
 
-const mergeMenuItems = (items: any[]) => {
-  const seen = new Set<string>()
-  const merged: any[] = []
+const customOrderings = [
+  {
+    title: 'Sort by Publish date (new→old)',
+    name: 'publishedAtDesc',
+    by: [{field: 'publishedAt', direction: 'desc'}],
+  },
+  {
+    title: 'Sort by Title (A→Z)',
+    name: 'titleAsc',
+    by: [{field: 'title', direction: 'asc'}],
+  },
+  {
+    title: 'Sort by Last Edited',
+    name: 'updatedAtDesc',
+    by: [{field: '_updatedAt', direction: 'desc'}],
+  },
+  {
+    title: 'Sort by Created',
+    name: 'createdAtDesc',
+    by: [{field: '_createdAt', direction: 'desc'}],
+  },
+]
 
-  items.forEach((item) => {
-    if (!item) return
-    const id = typeof item.getId === 'function' ? item.getId() : undefined
-    if (id && seen.has(id)) return
-    if (id) seen.add(id)
-    merged.push(item)
-  })
-
-  return merged
-}
-
-const createPostListFactory = (S: any) => {
+const createPostList = (S: any, title: string, filter?: string) => {
   const basePostList = S.documentTypeList('post')
-  const defaultMenuItems = basePostList.getMenuItems() || []
+  const defaultMenuItems = basePostList.getMenuItems?.() ?? []
+  const initialTemplates = basePostList.getInitialValueTemplates?.()
+  const canHandleIntent = basePostList.getCanHandleIntent?.()
 
-  const orderingMenuItems = [
-    S.orderingMenuItem(
-      S.ordering()
-        .title('Sort by Publish date (new→old)')
-        .id('publishedAtDesc')
-        .by([{field: 'publishedAt', direction: 'desc'}])
-    ),
-    S.orderingMenuItem(
-      S.ordering()
-        .title('Sort by Title (A→Z)')
-        .id('titleAsc')
-        .by([{field: 'title', direction: 'asc'}])
-    ),
-    S.orderingMenuItem(
-      S.ordering()
-        .title('Sort by Last Edited')
-        .id('updatedAtDesc')
-        .by([{field: '_updatedAt', direction: 'desc'}])
-    ),
-    S.orderingMenuItem(
-      S.ordering()
-        .title('Sort by Created')
-        .id('createdAtDesc')
-        .by([{field: '_createdAt', direction: 'desc'}])
-    ),
-  ]
+  let listBuilder = S.documentTypeList('post')
+    .title(title)
+    .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
+    .menuItems([
+      ...defaultMenuItems,
+      ...customOrderings.map((ordering) => S.orderingMenuItem(ordering)),
+    ])
 
-  const postMenuItems = mergeMenuItems([...defaultMenuItems, ...orderingMenuItems])
-  const initialTemplates = basePostList.getInitialValueTemplates()
-  const canHandleIntent = basePostList.getCanHandleIntent()
-
-  return (title: string, filter?: string) => {
-    let listBuilder = S.documentTypeList('post')
-      .title(title)
-      .menuItems(postMenuItems)
-      .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
-
-    if (initialTemplates) {
-      listBuilder = listBuilder.initialValueTemplates(initialTemplates)
-    }
-
-    if (typeof canHandleIntent === 'function') {
-      listBuilder = listBuilder.canHandleIntent(canHandleIntent)
-    }
-
-    if (filter) {
-      listBuilder = listBuilder.filter(filter)
-    }
-
-    return listBuilder
+  if (initialTemplates) {
+    listBuilder = listBuilder.initialValueTemplates(initialTemplates)
   }
+
+  if (typeof canHandleIntent === 'function') {
+    listBuilder = listBuilder.canHandleIntent(canHandleIntent)
+  }
+
+  if (filter) {
+    listBuilder = listBuilder.filter(filter)
+  }
+
+  return listBuilder
 }
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) => {
-  const createPostList = createPostListFactory(S)
+  const buildPostList = (title: string, filter?: string) => createPostList(S, title, filter)
 
   return S.list()
     .title('Content')
@@ -82,22 +62,22 @@ export const structure: StructureResolver = (S) => {
       // Posts section
       S.listItem()
         .title('📝 Posts')
-        .child(createPostList('All Posts')),
+        .child(buildPostList('All Posts')),
 
       // Published Posts
       S.listItem()
         .title('✅ Published Posts')
-        .child(createPostList('Published Posts', '_type == "post" && defined(publishedAt)')),
+        .child(buildPostList('Published Posts', '_type == "post" && defined(publishedAt)')),
 
       // Draft Posts
       S.listItem()
         .title('📄 Draft Posts')
-        .child(createPostList('Draft Posts', '_type == "post" && !defined(publishedAt)')),
+        .child(buildPostList('Draft Posts', '_type == "post" && !defined(publishedAt)')),
 
       // Posts with YouTube
       S.listItem()
         .title('📺 YouTube Posts')
-        .child(createPostList('Posts with YouTube Videos', '_type == "post" && defined(youtubeUrl)')),
+        .child(buildPostList('Posts with YouTube Videos', '_type == "post" && defined(youtubeUrl)')),
 
       // Categories section
       S.listItem()
@@ -129,7 +109,7 @@ export const structure: StructureResolver = (S) => {
               S.listItem()
                 .title('Missing Excerpts')
                 .child(
-                  createPostList(
+                  buildPostList(
                     'Posts without Excerpts',
                     '_type == "post" && (!defined(excerpt) || excerpt == "")'
                   )
@@ -137,7 +117,7 @@ export const structure: StructureResolver = (S) => {
               S.listItem()
                 .title('Missing Images')
                 .child(
-                  createPostList(
+                  buildPostList(
                     'Posts without Main Images',
                     '_type == "post" && !defined(mainImage)'
                   )
