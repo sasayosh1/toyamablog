@@ -1,7 +1,7 @@
 # Sanity Studio 記事説明文更新ガイド
 
 ## 🗂 投稿リストのソート機能（2025-11-04 更新）
-- 左サイドバーの「Posts」「Published Posts」「Draft Posts」「YouTube Posts」「Maintenance 配下リスト」すべてで、一覧右上のメニューから以下のソートが選べます。
+- 左サイドバーの「Posts」「Published Posts」「Draft Posts」「YouTube Posts」「Maintenance 配下リスト」すべてで、一覧右上の三点メニューから以下のソートが選べます。
   - Sort by Publish date (new→old)
   - Sort by Title (A→Z)
   - Sort by Last Edited
