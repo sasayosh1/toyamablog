@@ -1,5 +1,13 @@
 # Sanity Studio 記事説明文更新ガイド
 
+## 🗂 投稿リストのソート機能（2025-11-04 更新）
+- 左サイドバーの「Posts」「Published Posts」「Draft Posts」「YouTube Posts」「Maintenance 配下リスト」すべてで、一覧右上のメニューから以下のソートが選べます。
+  - Sort by Publish date (new→old)
+  - Sort by Title (A→Z)
+  - Sort by Last Edited
+  - Sort by Created
+- ソートは Sanity Studio の構造ツールに追加済みなので、どのビューでも同じ並び替えが利用できます。
+
 ## 🎯 更新対象の10件の記事と作成された説明文
 
 以下の10件の記事にSEO効果的で魅力的な説明文（50-160文字）を作成しました。
