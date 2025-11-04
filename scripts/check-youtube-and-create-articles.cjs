@@ -56,6 +56,38 @@ const POLITE_PREFIXES = [
   'はい、承知しました',
 ];
 
+const KEYWORD_SPLIT_REGEX = /[\s、。！？!?,．・「」『』\[\]（）()【】\|\/]+/;
+const TITLE_STOPWORDS = new Set([
+  '',
+  '富山',
+  '富山県',
+  'toyama',
+  'Toyama',
+  '紹介',
+  '観光',
+  '旅行',
+  'TRAVEL',
+  'travel',
+  'ショート',
+  'ショーツ',
+  'shorts',
+  'Shorts',
+  'ショート動画',
+  '動画',
+  '紹介動画',
+  'digest',
+  'ダイジェスト',
+  '本編',
+  'CM',
+  'ＰＲ',
+  'PR',
+  'PV',
+  'pv',
+  'Vlog',
+  'vlog',
+  '富山、お好きですか？'
+]);
+
 function shouldRemovePoliteIntro(line) {
   const trimmed = line.trim();
   if (!trimmed || trimmed === '---') return true;
@@ -72,6 +104,70 @@ function sanitizeMarkdownResponse(markdown = '') {
   }
 
   return lines.join('\n').trim();
+}
+
+const HTML_ENTITY_MAP = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' '
+};
+
+function decodeHtmlEntities(value = '') {
+  if (!value || typeof value !== 'string') {
+    return '';
+  }
+
+  return value
+    .replace(/&#(\d+);/g, (_, code) => {
+      const num = parseInt(code, 10);
+      return Number.isNaN(num) ? '' : String.fromCharCode(num);
+    })
+    .replace(/&([a-zA-Z]+);/g, (_, name) => HTML_ENTITY_MAP[name] || '');
+}
+
+function extractTitleKeywords(title = '', location) {
+  const decodedTitle = decodeHtmlEntities(title);
+
+  const cleanedTitle = decodedTitle
+    .replace(/#[^\s#]+/g, ' ')
+    .replace(/【.*?】/g, ' ')
+    .replace(/[「」『』【】\[\]]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!cleanedTitle) {
+    return [];
+  }
+
+  const rawKeywords = cleanedTitle
+    .split(KEYWORD_SPLIT_REGEX)
+    .map(keyword => keyword.trim())
+    .filter(Boolean);
+
+  const uniqueKeywords = [];
+  const seen = new Set();
+  for (const keyword of rawKeywords) {
+    const normalizedKeyword = keyword
+      .replace(/[’]/g, "'")
+      .trim();
+
+    if (!normalizedKeyword) continue;
+    if (location && normalizedKeyword === location) continue;
+
+    const lowerKeyword = normalizedKeyword.toLowerCase();
+    if (TITLE_STOPWORDS.has(normalizedKeyword) || TITLE_STOPWORDS.has(lowerKeyword)) continue;
+    if (/^[0-9０-９]+$/.test(normalizedKeyword)) continue;
+    if (normalizedKeyword.length <= 1) continue;
+    if (seen.has(lowerKeyword)) continue;
+
+    uniqueKeywords.push(normalizedKeyword);
+    seen.add(lowerKeyword);
+  }
+
+  return uniqueKeywords.slice(0, 6);
 }
 
 function fallbackSlugKeywords(video) {
@@ -358,13 +454,20 @@ function extractLocation(title) {
 /**
  * Gemini APIで高品質な記事本文を生成
  */
-async function generateArticleWithGemini(video, location) {
+async function generateArticleWithGemini(video, location, titleKeywords = []) {
+  const keywordSection = titleKeywords.length
+    ? titleKeywords.map(keyword => `- ${keyword}`).join('\n')
+    : '- （タイトルから特定の固有キーワードは抽出できませんでした）';
+
   const prompt = `あなたは富山県の魅力を伝えるブログ「富山、お好きですか？」のライターです。以下のYouTube動画から、親しみやすく読みやすいブログ記事を作成してください。
 
 【動画情報】
 タイトル: ${video.title}
 説明: ${video.description || '（説明なし）'}
 地域: ${location}
+
+【動画の核となるキーワード】
+${keywordSection}
 
 【記事作成ルール】
 1. **文字数**: 1,500〜2,000文字（スマホ読みやすさ最優先）
@@ -374,6 +477,7 @@ async function generateArticleWithGemini(video, location) {
 5. **箇条書き**: 積極的に活用（読みやすさ向上）
 6. **数字**: 具体的な情報を提供する際に積極的に使用
 7. **まとめ**: 読者の行動を促す結び
+8. **キーワード反映**: 動画タイトルのキーワードは本文中で必ず取り上げ、関連する具体的な描写や体験談を添えてください。汎用的な地域紹介で終わらせず、動画のテーマにフォーカスしてください。
 
 【記事タイトル】
 ${video.title.includes('【') ? video.title : `【${location}】${video.title}`}
@@ -389,6 +493,51 @@ ${video.title.includes('【') ? video.title : `【${location}】${video.title}`}
     console.error('❌ Gemini API記事生成エラー:', error);
     throw error;
   }
+}
+
+function ensureKeywordCoverage(markdown, titleKeywords = []) {
+  if (!Array.isArray(titleKeywords) || titleKeywords.length === 0) {
+    return {
+      markdown,
+      missing: []
+    };
+  }
+
+  const missing = titleKeywords.filter(
+    keyword => keyword && !markdown.includes(keyword)
+  );
+
+  if (missing.length === 0) {
+    return {
+      markdown,
+      missing: []
+    };
+  }
+
+  const emphasisSentence = `動画の主役は${missing
+    .map(keyword => `「${keyword}」`)
+    .join('、')}で、現地ならではの魅力がぎゅっと詰まっています。`;
+
+  const lines = markdown.split('\n');
+  const insertIndex = lines.findIndex(
+    line => line.trim() && !line.trim().startsWith('#')
+  );
+
+  if (insertIndex === -1) {
+    lines.push(emphasisSentence);
+  } else {
+    lines.splice(insertIndex + 1, 0, emphasisSentence);
+  }
+
+  const updatedMarkdown = lines.join('\n');
+  const stillMissing = titleKeywords.filter(
+    keyword => keyword && !updatedMarkdown.includes(keyword)
+  );
+
+  return {
+    markdown: updatedMarkdown,
+    missing: stillMissing
+  };
 }
 
 /**
@@ -465,10 +614,32 @@ async function createArticle(video, location) {
   console.log(`\n📝 記事作成中: ${video.title}`);
 
   try {
+    const titleKeywords = extractTitleKeywords(video.title, location);
+    if (titleKeywords.length) {
+      console.log(`🎯 タイトルキーワード: ${titleKeywords.join(', ')}`);
+    } else {
+      console.log('🎯 タイトルキーワード: （抽出なし）');
+    }
+
     // Gemini APIで記事本文を生成
     console.log('🤖 Gemini APIで記事を生成中...');
-    const markdownContent = await generateArticleWithGemini(video, location);
-    const bodyBlocks = markdownToPortableText(markdownContent);
+    const generatedMarkdown = await generateArticleWithGemini(
+      video,
+      location,
+      titleKeywords
+    );
+    const { markdown: ensuredMarkdown, missing } = ensureKeywordCoverage(
+      generatedMarkdown,
+      titleKeywords
+    );
+
+    if (missing.length) {
+      console.warn(
+        `⚠️  次のキーワードが本文に十分含まれていません: ${missing.join(', ')}`
+      );
+    }
+
+    const bodyBlocks = markdownToPortableText(ensuredMarkdown);
 
     // カテゴリ参照を取得
     const categoryRef = await getCategoryReference(location);
@@ -657,7 +828,11 @@ if (require.main === module) {
 module.exports = {
   main,
   extractLocation,
+  extractTitleKeywords,
   generateSlugForVideo: generateSlug,
+  generateArticleWithGemini,
+  ensureKeywordCoverage,
+  markdownToPortableText,
   sanitizeMarkdownResponse,
   LOCATION_SLUG_PREFIX,
 };
