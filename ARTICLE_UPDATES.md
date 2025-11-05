@@ -7,6 +7,8 @@
 - 新スクリプト `scripts/regenerate-priority-articles.cjs` を追加。デフォルトはドライランで最新記事から順にチェックし、`--apply` 指定時だけSanity更新。`--limit`/`--force`/`--delay` で件数・強制再生成・待機時間を制御可能。
 - ビューランキング（JSON/CSV）を読み込んで閲覧数の多い記事から優先的に再生成できるように更新。`--views` または環境変数 `VIEW_RANKING_FILE` でファイルを指定。
 - 410ページのメタデータ表記を「富山、お好きですか？」に統一し、旧ロゴ画像 `富山のくせに.PNG` を削除。
+- `scripts/clean-negative-branding.cjs` を追加し、Gemini 2.5 Flash-Lite で「富山のくせに」を含む全記事を前向きな表現へ書き換え（複数パス実行後に残存ゼロを確認）。
+- `scripts/remove-polite-preface.cjs` を追加し、Gemini応答由来の「はい、承知いたしました…」などの定型文を本文・抜粋・メタ説明から除去。
 - コスト管理: 実行件数は環境変数`REGEN_LIMIT`または`--limit`で絞り込み、Geminiは`gemini-2.5-flash-lite`の単回呼び出しのみ。ドライランで内容確認後に必要分だけ`--apply`で発火する運用を推奨。
 
 # 記事更新ログ
