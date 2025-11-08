@@ -6,6 +6,9 @@ on:
     - cron: '0 12 * * 6'
   workflow_dispatch: # 手動実行も可能
 
+permissions:
+  contents: write
+
 jobs:
   generate-articles:
     runs-on: ubuntu-latest
