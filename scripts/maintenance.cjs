@@ -40,6 +40,51 @@ function blocksToPlainText(blocks) {
 }
 
 /**
+ * 本文から #shorts ハッシュタグを除去
+ */
+function removeShortsHashtags(blocks) {
+  if (!Array.isArray(blocks)) {
+    return { body: blocks, removed: false };
+  }
+
+  let removed = false;
+  const cleaned = [];
+
+  blocks.forEach(block => {
+    if (!block || block._type !== 'block' || !Array.isArray(block.children)) {
+      cleaned.push(block);
+      return;
+    }
+
+    const newChildren = block.children
+      .map(child => {
+        if (!child || typeof child.text !== 'string') {
+          return child;
+        }
+        const newText = child.text.replace(/#shorts/gi, '').replace(/\s{2,}/g, ' ');
+        if (newText !== child.text) {
+          removed = true;
+          return { ...child, text: newText.trim() };
+        }
+        return child;
+      })
+      .filter(child => child && typeof child.text === 'string' && child.text.trim().length > 0)
+      .map(child => ({ ...child, text: child.text.trim() }));
+
+    if (newChildren.length === 0) {
+      if (block.children.length > 0) {
+        removed = true;
+      }
+      return;
+    }
+
+    cleaned.push({ ...block, children: newChildren });
+  });
+
+  return { body: cleaned, removed };
+}
+
+/**
  * タイトルから地域名を抽出（【】内）
  */
 function extractLocationFromTitle(title) {
@@ -69,22 +114,69 @@ async function getCategoryByLocation(location) {
 
 /**
  * excerpt を生成（記事の魅力的な要約）
+ *
+ * 【重要】Excerptルール:
+ * - 50-160文字程度
+ * - 訪問者が興味を持つ具体的な内容
+ * - SEOキーワードを自然に含める
+ * - タイトルをそのまま載せない
+ * - 「富山のくせに」「魅力を全力で」などの定型表現を使わない
+ * - 記事の内容から具体的な魅力を抽出する
  */
 function generateExcerpt(title, bodyText) {
   const location = extractLocationFromTitle(title);
-  const firstSentence = bodyText.split('。')[0] + '。';
 
-  // 富山県の魅力を伝える自然な文体
-  const excerpts = [
-    `${location}の魅力をご紹介します。${firstSentence}`,
-    `${location}で注目のスポットをYouTube動画でお届けします。`,
-    `${location}の素晴らしい魅力を動画でご覧いただけます。`,
+  // 定型表現リスト（除外対象）
+  const badPhrases = [
+    '富山のくせに',
+    '魅力を全力で',
+    '富山の魅力を全力でお届けする',
+    '富山、お好きですか？',
+    '#shorts'
   ];
 
-  const excerpt = bodyText.length > 100 ? excerpts[0] : excerpts[Math.floor(Math.random() * excerpts.length)];
+  // 本文から文を抽出
+  const sentences = bodyText.split('。').filter(s => {
+    const trimmed = s.trim();
+    // 短すぎる文や定型表現を含む文を除外
+    if (trimmed.length < 10) return false;
+    return !badPhrases.some(phrase => trimmed.includes(phrase));
+  });
 
-  // 100-150文字に調整
-  return excerpt.slice(0, 150);
+  // タイトルの内容（地域名を除く）
+  const titleWithoutLocation = title.replace(/【.+?】/, '').replace(/#shorts/gi, '').trim();
+
+  // タイトルと重複しない文を優先的に選択
+  const uniqueSentences = sentences.filter(s => {
+    if (titleWithoutLocation.length > 10) {
+      return !s.includes(titleWithoutLocation.substring(0, 20));
+    }
+    return true;
+  });
+
+  // Excerptを生成
+  let excerpt = '';
+
+  if (uniqueSentences.length > 0) {
+    // 良質な文がある場合は、最初の1-2文を使用
+    excerpt = uniqueSentences.slice(0, 2).join('。') + '。';
+  } else if (sentences.length > 0) {
+    // 定型表現を含まない文がある場合
+    excerpt = sentences.slice(0, 2).join('。') + '。';
+  } else {
+    // 適切な文がない場合は、シンプルな説明を生成
+    excerpt = `${location}で注目のスポットをご紹介。動画でその魅力をお伝えします。`;
+  }
+
+  // 50-160文字に調整
+  if (excerpt.length < 50) {
+    excerpt = `${location}の魅力をご紹介。${excerpt}`;
+  }
+  if (excerpt.length > 160) {
+    excerpt = excerpt.slice(0, 157) + '...';
+  }
+
+  return excerpt;
 }
 
 /**
@@ -190,7 +282,9 @@ async function generateReport() {
       wrongCategoryFormat: [],
       noYouTube: [],
       shortArticle: [],
-      titleFormatIssue: []
+      titleFormatIssue: [],
+      badExcerptFormat: [],  // 定型表現・タイトル重複などの品質問題
+      shortExcerpt: []  // 50文字未満
     };
 
     // 各記事をチェック
@@ -198,6 +292,31 @@ async function generateReport() {
       // excerpt チェック
       if (!post.excerpt || post.excerpt.trim() === '') {
         issues.noExcerpt.push(post);
+      } else {
+        // excerpt品質チェック
+        const excerpt = post.excerpt.trim();
+        const titleWithoutLocation = post.title.replace(/【.+?】/, '').trim();
+
+        // 定型表現チェック
+        const badPhrases = ['富山のくせに', '魅力を全力で', '富山の魅力を全力でお届けする'];
+        const hasBadPhrase = badPhrases.some(phrase => excerpt.includes(phrase));
+
+        // タイトル重複チェック（タイトルと完全一致または大部分一致）
+        const titleDuplication = excerpt.includes(titleWithoutLocation) && titleWithoutLocation.length > 10;
+
+        // 文字数チェック（50文字未満）
+        const tooShort = excerpt.length < 50;
+
+        if (hasBadPhrase || titleDuplication) {
+          issues.badExcerptFormat.push({
+            ...post,
+            reason: hasBadPhrase ? '定型表現使用' : 'タイトル重複'
+          });
+        }
+
+        if (tooShort) {
+          issues.shortExcerpt.push(post);
+        }
       }
 
       // metaDescription チェック
@@ -250,6 +369,8 @@ async function generateReport() {
 
     const problemCounts = [
       ['excerpt未設定', issues.noExcerpt.length],
+      ['excerpt品質問題（定型表現・タイトル重複）', issues.badExcerptFormat.length],
+      ['excerpt短すぎ(<50文字)', issues.shortExcerpt.length],
       ['metaDescription未設定', issues.noMetaDescription.length],
       ['タグなし', issues.noTags.length],
       ['タグ少なすぎ(<5個)', issues.fewTags.length],
@@ -274,6 +395,23 @@ async function generateReport() {
       console.log('\n【excerpt未設定の記事例】\n');
       issues.noExcerpt.slice(0, 3).forEach(post => {
         console.log(`  - ${post.title}`);
+      });
+    }
+
+    if (issues.badExcerptFormat.length > 0) {
+      console.log('\n【excerpt品質問題の記事例（定型表現・タイトル重複）】\n');
+      issues.badExcerptFormat.slice(0, 5).forEach(post => {
+        console.log(`  - ${post.title}`);
+        console.log(`    理由: ${post.reason}`);
+        console.log(`    現在: ${post.excerpt?.substring(0, 80)}...`);
+      });
+    }
+
+    if (issues.shortExcerpt.length > 0) {
+      console.log('\n【excerpt短すぎる記事例（<50文字）】\n');
+      issues.shortExcerpt.slice(0, 5).forEach(post => {
+        console.log(`  - ${post.title}`);
+        console.log(`    現在: ${post.excerpt} (${post.excerpt?.length || 0}文字)`);
       });
     }
 
@@ -336,7 +474,8 @@ async function autoFixMetadata() {
       excerpt: 0,
       metaDescription: 0,
       tags: 0,
-      category: 0
+      category: 0,
+      shortsRemoved: 0
     };
 
     for (const post of posts) {
@@ -344,8 +483,27 @@ async function autoFixMetadata() {
       const bodyText = blocksToPlainText(post.body);
       let needsUpdate = false;
 
-      // excerpt 生成
-      if (!post.excerpt || post.excerpt.trim() === '') {
+      // excerpt 生成・修正
+      const needsExcerptFix = () => {
+        if (!post.excerpt || post.excerpt.trim() === '') return true;
+
+        const excerpt = post.excerpt.trim();
+        const titleWithoutLocation = post.title.replace(/【.+?】/, '').trim();
+
+        // 定型表現チェック
+        const badPhrases = ['富山のくせに', '魅力を全力で', '富山の魅力を全力でお届けする'];
+        const hasBadPhrase = badPhrases.some(phrase => excerpt.includes(phrase));
+
+        // タイトル重複チェック
+        const titleDuplication = excerpt.includes(titleWithoutLocation) && titleWithoutLocation.length > 10;
+
+        // 短すぎる
+        const tooShort = excerpt.length < 50;
+
+        return hasBadPhrase || titleDuplication || tooShort;
+      };
+
+      if (needsExcerptFix()) {
         updates.excerpt = generateExcerpt(post.title, bodyText);
         needsUpdate = true;
         fixed.excerpt++;
@@ -381,6 +539,13 @@ async function autoFixMetadata() {
         }
       }
 
+      const shortsCleanup = removeShortsHashtags(post.body);
+      if (shortsCleanup.removed) {
+        updates.body = shortsCleanup.body;
+        needsUpdate = true;
+        fixed.shortsRemoved++;
+      }
+
       // 更新実行
       if (needsUpdate) {
         await client
@@ -411,7 +576,8 @@ async function autoFixMetadata() {
     console.log(`  metaDescription生成: ${fixed.metaDescription}件`);
     console.log(`  タグ最適化: ${fixed.tags}件`);
     console.log(`  カテゴリ修正: ${fixed.category}件`);
-    console.log(`\n  合計: ${fixed.excerpt + fixed.metaDescription + fixed.tags + fixed.category}件の修正を実行\n`);
+    console.log(`  本文から#shorts除去: ${fixed.shortsRemoved}件`);
+    console.log(`\n  合計: ${fixed.excerpt + fixed.metaDescription + fixed.tags + fixed.category + fixed.shortsRemoved}件の修正を実行\n`);
     console.log('='.repeat(80));
     console.log('\n✅ 自動修正完了\n');
 
