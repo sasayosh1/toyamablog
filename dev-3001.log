@@ -1,0 +1,191 @@
+
+> toyama-osukidesuka@0.1.0 dev
+> next dev --port 3001
+
+ ⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+   ▲ Next.js 15.5.2
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.11.6:3001
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1188ms
+ ✓ Compiled /middleware in 102ms (114 modules)
+ ⨯ EvalError: Code generation from strings disallowed for this context
+    at <unknown> (.next/server/middleware.js:18)
+    at (middleware)/./node_modules/next/dist/build/webpack/loaders/next-middleware-loader.js?absolutePagePath=%2FUsers%2Fsasakiyoshimasa%2Ftoyamablog%2Fsrc%2Fmiddleware.ts&page=%2Fmiddleware&rootDir=%2FUsers%2Fsasakiyoshimasa%2Ftoyamablog&matchers=&preferredRegion=&middlewareConfig=e30%3D! (.next/server/middleware.js:18:1)
+    at __webpack_require__ (.next/server/edge-runtime-webpack.js:37:33)
+    at __webpack_exec__ (.next/server/middleware.js:1109:48)
+    at <unknown> (.next/server/middleware.js:1110:37)
+    at webpackJsonpCallback (.next/server/edge-runtime-webpack.js:1128:39)
+    at <unknown> (.next/server/middleware.js:9:61)
+ ✓ Compiled /_error in 187ms (368 modules)
+ GET / 404 in 1ms
+ ⨯ ./src/app/globals.css
+Module parse failed: Unexpected character '@' (1:0)
+> @import "tailwindcss";
+| 
+| :root {
+
+Import trace for requested module:
+./src/app/globals.css
+./src/app/layout.tsx
+ ○ Compiling /_not-found ...
+[Error: ENOENT: no such file or directory, open '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'
+}
+ ⨯ ./src/app/globals.css
+Module parse failed: Unexpected character '@' (1:0)
+> @import "tailwindcss";
+| 
+| :root {
+
+Import trace for requested module:
+./src/app/globals.css
+./src/app/layout.tsx
+ ✓ Compiled /favicon.ico in 457ms (405 modules)
+ ✓ Compiled in 153ms (405 modules)
+ ✓ Compiled in 100ms (405 modules)
+ ✓ Compiled in 312ms (702 modules)
+ ✓ Compiled in 193ms (405 modules)
+ ✓ Compiled in 62ms (405 modules)
+ ✓ Compiled in 47ms (405 modules)
+ ✓ Compiled in 46ms (405 modules)
+ ✓ Compiled in 48ms (405 modules)
+ ✓ Compiled in 97ms (405 modules)
+ ✓ Compiled in 84ms (405 modules)
+ ✓ Compiled in 81ms (405 modules)
+ ✓ Compiled in 55ms (405 modules)
+ ✓ Compiled in 64ms (405 modules)
+ ✓ Compiled in 55ms (405 modules)
+ ✓ Compiled in 90ms (405 modules)
+ ✓ Compiled in 53ms (405 modules)
+ ✓ Compiled in 43ms (405 modules)
+ ✓ Compiled in 47ms (405 modules)
+ ✓ Compiled in 49ms (405 modules)
+ ✓ Compiled in 46ms (405 modules)
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+   ▲ Next.js 15.5.2
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.11.6:3001
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1298ms
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+   ▲ Next.js 15.5.2
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.11.6:3001
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1214ms
+   Reload env: .env.local
+ ✓ Compiled /middleware in 216ms (114 modules)
+ ⨯ EvalError: Code generation from strings disallowed for this context
+    at <unknown> (.next/server/middleware.js:18)
+    at (middleware)/./node_modules/next/dist/build/webpack/loaders/next-middleware-loader.js?absolutePagePath=%2FUsers%2Fsasakiyoshimasa%2Ftoyamablog%2Fsrc%2Fmiddleware.ts&page=%2Fmiddleware&rootDir=%2FUsers%2Fsasakiyoshimasa%2Ftoyamablog&matchers=&preferredRegion=&middlewareConfig=e30%3D! (.next/server/middleware.js:18:1)
+    at __webpack_require__ (.next/server/edge-runtime-webpack.js:37:33)
+    at __webpack_exec__ (.next/server/middleware.js:1109:48)
+    at <unknown> (.next/server/middleware.js:1110:37)
+    at webpackJsonpCallback (.next/server/edge-runtime-webpack.js:1128:39)
+    at <unknown> (.next/server/middleware.js:9:61)
+ ✓ Compiled /_error in 470ms (368 modules)
+ GET / 404 in 1ms
+ ○ Compiling /_not-found ...
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ EvalError: Code generation from strings disallowed for this context
+    at <unknown> (.next/server/middleware.js:18)
+    at (middleware)/./node_modules/next/dist/build/webpack/loaders/next-middleware-loader.js?absolutePagePath=%2FUsers%2Fsasakiyoshimasa%2Ftoyamablog%2Fsrc%2Fmiddleware.ts&page=%2Fmiddleware&rootDir=%2FUsers%2Fsasakiyoshimasa%2Ftoyamablog&matchers=&preferredRegion=&middlewareConfig=e30%3D! (.next/server/middleware.js:18:1)
+    at __webpack_require__ (.next/server/edge-runtime-webpack.js:37:33)
+    at __webpack_exec__ (.next/server/middleware.js:1109:48)
+    at <unknown> (.next/server/middleware.js:1110:37)
+    at webpackJsonpCallback (.next/server/edge-runtime-webpack.js:1128:39)
+    at <unknown> (.next/server/middleware.js:9:61)
+ ⨯ ./src/app/globals.css
+Module parse failed: Unexpected character '@' (1:0)
+> @import "tailwindcss";
+| 
+| :root {
+
+Import trace for requested module:
+./src/app/globals.css
+./src/app/layout.tsx
+[Error: ENOENT: no such file or directory, open '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'
+}
+ GET / 500 in 7ms
+ ⨯ ./src/app/globals.css
+Module parse failed: Unexpected character '@' (1:0)
+> @import "tailwindcss";
+| 
+| :root {
+
+Import trace for requested module:
+./src/app/globals.css
+./src/app/layout.tsx
+ ⨯ EvalError: Code generation from strings disallowed for this context
+    at <unknown> (.next/server/middleware.js:18)
+    at (middleware)/./node_modules/next/dist/build/webpack/loaders/next-middleware-loader.js?absolutePagePath=%2FUsers%2Fsasakiyoshimasa%2Ftoyamablog%2Fsrc%2Fmiddleware.ts&page=%2Fmiddleware&rootDir=%2FUsers%2Fsasakiyoshimasa%2Ftoyamablog&matchers=&preferredRegion=&middlewareConfig=e30%3D! (.next/server/middleware.js:18:1)
+    at __webpack_require__ (.next/server/edge-runtime-webpack.js:37:33)
+    at __webpack_exec__ (.next/server/middleware.js:1109:48)
+    at <unknown> (.next/server/middleware.js:1110:37)
+    at webpackJsonpCallback (.next/server/edge-runtime-webpack.js:1128:39)
+    at <unknown> (.next/server/middleware.js:9:61)
+[Error: ENOENT: no such file or directory, open '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/sasakiyoshimasa/toyamablog/.next/required-server-files.json'
+}
+ GET / 500 in 12ms
+ ✓ Compiled /favicon.ico in 285ms (404 modules)
+ ✓ Compiled in 72ms (404 modules)
+ ✓ Compiled in 57ms (404 modules)
+ ✓ Compiled in 225ms (509 modules)
+ ✓ Compiled in 79ms (609 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/sasakiyoshimasa/toyamablog/.next/cache/webpack/client-development-fallback/1.pack.gz_' -> '/Users/sasakiyoshimasa/toyamablog/.next/cache/webpack/client-development-fallback/1.pack.gz'
+ ✓ Compiled in 351ms (509 modules)
+[?25h

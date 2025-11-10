@@ -4,22 +4,22 @@ const customOrderings = [
   {
     title: 'Sort by Publish date (new→old)',
     name: 'publishedAtDesc',
-    by: [{field: 'publishedAt', direction: 'desc'}],
+    by: [{field: 'publishedAt', direction: 'desc' as const}],
   },
   {
     title: 'Sort by Title (A→Z)',
     name: 'titleAsc',
-    by: [{field: 'title', direction: 'asc'}],
+    by: [{field: 'title', direction: 'asc' as const}],
   },
   {
     title: 'Sort by Last Edited',
     name: 'updatedAtDesc',
-    by: [{field: '_updatedAt', direction: 'desc'}],
+    by: [{field: '_updatedAt', direction: 'desc' as const}],
   },
   {
     title: 'Sort by Created',
     name: 'createdAtDesc',
-    by: [{field: '_createdAt', direction: 'desc'}],
+    by: [{field: '_createdAt', direction: 'desc' as const}],
   },
 ]
 

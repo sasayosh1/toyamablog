@@ -10,6 +10,8 @@ import { TopArticleAd, MiddleArticleAd, BottomArticleAd } from '@/components/Art
 import StructuredData from '@/components/StructuredData'
 import { generateArticleLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import ArticleErrorBoundary from '@/components/ui/ArticleErrorBoundary'
+import RelatedPosts from '@/components/RelatedPosts'
+import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import type { Metadata } from 'next'
 
 // ISR: 詳細ページは10分キャッシュ
@@ -297,6 +299,13 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           );
         })()}
 
+        {/* SNSシェアボタン */}
+        <SocialShareButtons
+          url={`https://sasakiyoshimasa.com/blog/${slug}`}
+          title={cleanTitle}
+          twitterAccount="sasayoshi_tym"
+        />
+
         {post.tags && post.tags.length > 0 && (
           <div className="border-t border-gray-200 pt-8 mb-8">
             <div className="flex flex-wrap gap-2">
@@ -317,7 +326,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         {/* <BottomArticleAd /> */}
 
         {/* ナビゲーションボタン */}
-        <div className="border-t border-gray-200 pt-8">
+        <div className="border-t border-gray-200 pt-8 mb-8">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {post.category && (
               <Link
@@ -344,6 +353,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </>
         </article>
         </ArticleErrorBoundary>
+
+        {/* 関連記事セクション */}
+        <RelatedPosts currentPostId={post._id} category={post.category} limit={6} />
       </div>
       </div>
     </>
