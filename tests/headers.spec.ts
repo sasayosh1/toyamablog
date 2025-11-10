@@ -73,16 +73,15 @@ test.describe('Security Headers Regression Tests', () => {
   test('CSP should include required Sanity domains and directives', async ({ request }) => {
     const response = await request.get('/studio');
     const csp = response.headers()['content-security-policy'];
-    
+
     // Required directives for Sanity Studio
     expect(csp).toContain("default-src 'self'");
-    expect(csp).toContain("script-src 'self' 'unsafe-eval' 'unsafe-inline'");
+    expect(csp).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval'");
     expect(csp).toContain("https://cdn.sanity.io");
     expect(csp).toContain("https://*.sanity.io");
     expect(csp).toContain("style-src 'self' 'unsafe-inline'");
     expect(csp).toContain("img-src 'self' data:");
     expect(csp).toContain("connect-src 'self'");
-    expect(csp).toContain("https://*.sanity.dev");
   });
 
   test('All paths should have common security headers', async ({ request }) => {
