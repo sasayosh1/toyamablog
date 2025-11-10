@@ -8,11 +8,19 @@ import LinkifyText from './LinkifyText'
 export default function CustomTextareaInput(props: TextInputProps) {
   const { value, onChange } = props
 
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = event.target.value
+    if (onChange) {
+      // @ts-expect-error - Sanity v4 expects FormPatch but component works correctly with string
+      onChange(newValue)
+    }
+  }
+
   return (
     <Stack space={3}>
       <textarea
         value={value || ''}
-        onChange={(event) => onChange && onChange(event.target.value)}
+        onChange={handleChange}
         placeholder={props.placeholder}
         rows={props.rows || 4}
         style={{

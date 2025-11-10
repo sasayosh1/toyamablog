@@ -1,4 +1,4 @@
-import type {StructureResolver} from 'sanity/structure'
+import type {StructureResolver, StructureBuilder} from 'sanity/structure'
 
 const customOrderings = [
   {
@@ -23,7 +23,7 @@ const customOrderings = [
   },
 ]
 
-const createPostList = (S: any, title: string, filter?: string) => {
+const createPostList = (S: StructureBuilder, title: string, filter?: string) => {
   const basePostList = S.documentTypeList('post')
   const defaultMenuItems = basePostList.getMenuItems?.() ?? []
   const initialTemplates = basePostList.getInitialValueTemplates?.()
