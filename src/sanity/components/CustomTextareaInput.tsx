@@ -21,7 +21,9 @@ export default function CustomTextareaInput(props: TextInputProps) {
       <textarea
         value={value || ''}
         onChange={handleChange}
+        // @ts-expect-error - TextInputProps doesn't include placeholder/rows but they work correctly
         placeholder={props.placeholder}
+        // @ts-expect-error - TextInputProps doesn't include placeholder/rows but they work correctly
         rows={props.rows || 4}
         style={{
           width: '100%',

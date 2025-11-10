@@ -8,7 +8,7 @@ export const client = createClient({
   perspective: 'published', // publishedコンテンツのみ
   token: process.env.SANITY_API_TOKEN, // サーバーサイドトークン追加
   stega: false, // Stegaを無効化してパフォーマンス向上
-  requestTagPrefix: 'toyama-blog', // キャッシュタグ最適化
+  requestTagPrefix: 'toyama-osukidesuka', // キャッシュタグ最適化
 });
 
 export interface Author {
@@ -323,6 +323,52 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
   }
 }
 
+// 関連記事を取得（同じカテゴリの記事を優先）
+export async function getRelatedPosts(currentPostId: string, category?: string, limit: number = 6): Promise<Post[]> {
+  try {
+    const posts = await client.fetch<Post[]>(`
+      *[_type == "post" && _id != $currentPostId && defined(publishedAt)] | order(publishedAt desc) [0...${limit * 2}] {
+        _id,
+        title,
+        slug,
+        description,
+        excerpt,
+        category,
+        publishedAt,
+        youtubeUrl,
+        thumbnail {
+          asset -> {
+            _ref,
+            url
+          },
+          alt
+        },
+        "categories": [category],
+        "displayExcerpt": coalesce(excerpt, description)
+      }
+    `, { currentPostId }, {
+      next: {
+        tags: ['related-posts', `related-posts-${currentPostId}`],
+        revalidate: 600 // 10分キャッシュ
+      }
+    });
+
+    // カテゴリが指定されている場合は、同じカテゴリの記事を優先
+    if (category) {
+      const sameCategoryPosts = posts.filter(p => p.category === category);
+      const otherPosts = posts.filter(p => p.category !== category);
+
+      // 同じカテゴリの記事を優先して返す
+      return [...sameCategoryPosts, ...otherPosts].slice(0, limit);
+    }
+
+    return posts.slice(0, limit);
+  } catch (error) {
+    console.error('Error fetching related posts:', error);
+    return [];
+  }
+}
+
 // 分析用: 全記事の詳細データを取得（body含む）
 export async function getAllPostsForAnalysis(): Promise<Post[]> {
   try {
@@ -356,10 +402,10 @@ export async function getAllPostsForAnalysis(): Promise<Post[]> {
         "bodyLength": length(body),
         "bodyPlainText": array::join(body[_type == "block"].children[_type == "span"].text, " ")
       }
-    `, {}, { 
+    `, {}, {
       cache: 'no-store'
     });
-    
+
     return posts;
   } catch (error) {
     console.error('Error fetching posts for analysis:', error);

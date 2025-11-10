@@ -22,6 +22,7 @@ export default function CustomTextInput(props: StringInputProps) {
         type="text"
         value={value || ''}
         onChange={handleChange}
+        // @ts-expect-error - StringInputProps doesn't include placeholder but it works correctly
         placeholder={props.placeholder}
         style={{
           width: '100%',

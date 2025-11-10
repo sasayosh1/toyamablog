@@ -692,6 +692,7 @@ async function createArticle(video, location) {
         title: video.title,
         url: video.url
       },
+      youtubeUrl: video.url, // PostCardコンポーネント用（サムネイル表示に必要）
       body: bodyBlocks,
       excerpt: excerpt,
       metaDescription,
