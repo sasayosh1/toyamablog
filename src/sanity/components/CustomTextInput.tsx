@@ -8,12 +8,20 @@ import LinkifyText from './LinkifyText'
 export default function CustomTextInput(props: StringInputProps) {
   const { value, onChange } = props
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value
+    if (onChange) {
+      // @ts-expect-error - Sanity v4 expects FormPatch but component works correctly with string
+      onChange(newValue)
+    }
+  }
+
   return (
     <Stack space={3}>
       <input
         type="text"
         value={value || ''}
-        onChange={(event) => onChange && onChange(event.target.value)}
+        onChange={handleChange}
         placeholder={props.placeholder}
         style={{
           width: '100%',

@@ -7,23 +7,36 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Security Headers Regression Tests', () => {
   
-  test('Root path should have X-Frame-Options: DENY', async ({ request }) => {
+  test('Root path should have X-Frame-Options: DENY and CSP for AdSense', async ({ request }) => {
     const response = await request.get('/');
     const headers = response.headers();
-    
+
     expect(headers['x-frame-options']).toBe('DENY');
-    expect(headers['content-security-policy']).toBeUndefined();
+
+    // CSP should exist for AdSense support
+    const csp = headers['content-security-policy'];
+    expect(csp).toBeDefined();
+
+    // AdSense domains should be allowed
+    expect(csp).toContain('pagead2.googlesyndication.com');
+    expect(csp).toContain('googletagmanager.com');
   });
 
-  test('Non-studio paths should have X-Frame-Options: DENY', async ({ request }) => {
+  test('Non-studio paths should have X-Frame-Options: DENY and CSP for AdSense', async ({ request }) => {
     const testPaths = ['/about', '/blog', '/categories', '/privacy', '/terms'];
-    
+
     for (const path of testPaths) {
       const response = await request.get(path);
       const headers = response.headers();
-      
+
       expect(headers['x-frame-options'], `Path ${path} should have X-Frame-Options`).toBe('DENY');
-      expect(headers['content-security-policy'], `Path ${path} should not have CSP`).toBeUndefined();
+
+      // CSP should exist for AdSense support
+      const csp = headers['content-security-policy'];
+      expect(csp, `Path ${path} should have CSP for AdSense`).toBeDefined();
+
+      // AdSense domains should be allowed
+      expect(csp, `Path ${path} should allow AdSense domains`).toContain('pagead2.googlesyndication.com');
     }
   });
 
@@ -96,14 +109,22 @@ test.describe('Security Headers Regression Tests', () => {
   test('Header configuration consistency across environments', async ({ request }) => {
     const studioResponse = await request.get('/studio');
     const rootResponse = await request.get('/');
-    
+
     // Studio should have CSP but not X-Frame-Options
     expect(studioResponse.headers()['content-security-policy']).toBeDefined();
     expect(studioResponse.headers()['x-frame-options']).toBeUndefined();
-    
-    // Root should have X-Frame-Options but not CSP
+
+    // Root should have both X-Frame-Options and CSP (for AdSense)
     expect(rootResponse.headers()['x-frame-options']).toBe('DENY');
-    expect(rootResponse.headers()['content-security-policy']).toBeUndefined();
+    expect(rootResponse.headers()['content-security-policy']).toBeDefined();
+
+    // Studio CSP should allow Sanity domains
+    const studioCsp = studioResponse.headers()['content-security-policy'];
+    expect(studioCsp).toContain('https://*.sanity.io');
+
+    // Root CSP should allow AdSense domains
+    const rootCsp = rootResponse.headers()['content-security-policy'];
+    expect(rootCsp).toContain('pagead2.googlesyndication.com');
   });
 
 });
