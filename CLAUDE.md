@@ -2,6 +2,30 @@
 
 ## 重大インシデント記録
 
+### 2025年11月10日: GitHub Actions週次メンテナンスワークフロー3つのエラー修正
+- **問題**: 週次メンテナンスワークフローが3つの異なるエラーで繰り返し失敗
+- **発生日時**: 2025年11月9日〜10日
+- **対応内容**:
+  1. **GitHub Issues権限エラー修正** (コミット: cf3216a)
+     - **エラー**: "Resource not accessible by integration"
+     - **原因**: ワークフローに `permissions` セクションが存在せず、Issues作成権限が不足
+     - **修正**: `.github/workflows/weekly-maintenance.yml` に `permissions: { contents: read, issues: write }` を追加
+  2. **TypeScriptバージョン不整合エラー修正** (コミット: 69847a8)
+     - **エラー**: "Invalid: lock file's typescript@5.9.2 does not satisfy typescript@5.9.3"
+     - **原因**: package.jsonがTypeScript 5.9.3を要求するがpackage-lock.jsonが5.9.2を使用
+     - **修正**: `npm install` を実行してpackage-lock.jsonを5.9.3に更新
+  3. **Node.jsバージョン不整合エラー修正** (コミット: 7bef81a)
+     - **エラー**: "npm warn EBADENGINE Unsupported engine" （Sanity関連パッケージがNode.js 20以上を要求）
+     - **原因**: ワークフローがNode.js 18を使用していたが、依存関係がNode.js 20を要求
+     - **修正**: `.github/workflows/weekly-maintenance.yml` のNode.jsバージョンを18→20に更新
+  4. **Vercel本番環境の再デプロイ** (コミット: 2702e99)
+     - **問題**: ヒーロータイトル「富山、お好きですか？」がVercel本番環境で反映されていない
+     - **原因**: Vercelのビルドキャッシュが古いまま
+     - **修正**: 空のコミットをプッシュしてVercelの再デプロイを強制トリガー
+- **効果**: 週次メンテナンスワークフロー（毎週月曜AM3:00 JST）が正常に動作するようになった
+- **教訓**: **GitHub Actionsワークフローは依存関係とPermissionsの両方を正しく設定する必要がある**
+- **予防策**: 今後はNode.jsバージョンと依存関係の互換性を定期的に確認
+
 ### 2025年11月3日: Gemini APIキー漏洩インシデントと緊急対応
 - **問題**: CLAUDE.mdにGemini APIキーを記載してGitHubに公開してしまった
 - **発見経緯**: Google Cloud Platformから「APIキーが一般公開されています」というセキュリティアラートを受信
