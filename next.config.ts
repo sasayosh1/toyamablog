@@ -48,8 +48,40 @@ const nextConfig: NextConfig = {
   // セキュリティヘッダー
   async headers() {
     return [
+      // Studio paths MUST come first (more specific pattern takes precedence)
       {
-        source: '/((?!studio).*)',
+        source: '/studio/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io",
+              "style-src 'self' 'unsafe-inline' https://cdn.sanity.io https://fonts.googleapis.com",
+              "img-src 'self' data: https: blob: https://cdn.sanity.io https://i.ytimg.com https://img.youtube.com",
+              "font-src 'self' https://fonts.gstatic.com https://cdn.sanity.io",
+              "connect-src 'self' https://*.sanity.io https://cdn.sanity.io wss://*.sanity.io",
+              "frame-src 'self' https://sanity.io https://*.sanity.io",
+              "frame-ancestors 'self' https://sanity.io https://*.sanity.io"
+            ].join('; '),
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+      // All other paths (must come after more specific patterns)
+      {
+        source: '/:path*',
         headers: [
           {
             key: 'Content-Security-Policy',
@@ -92,36 +124,6 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), vr=(), accelerometer=(), gyroscope=(), magnetometer=()',
-          },
-        ],
-      },
-      {
-        source: '/studio/:path*',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io",
-              "style-src 'self' 'unsafe-inline' https://cdn.sanity.io https://fonts.googleapis.com",
-              "img-src 'self' data: https: blob: https://cdn.sanity.io https://i.ytimg.com https://img.youtube.com",
-              "font-src 'self' https://fonts.gstatic.com https://cdn.sanity.io",
-              "connect-src 'self' https://*.sanity.io https://cdn.sanity.io wss://*.sanity.io",
-              "frame-src 'self' https://sanity.io https://*.sanity.io",
-              "frame-ancestors 'self' https://sanity.io https://*.sanity.io"
-            ].join('; '),
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
           },
         ],
       },
