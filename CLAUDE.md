@@ -10,7 +10,7 @@
   - 18記事で `youtubeVideo.url` フィールドにYouTube URLが存在
   - しかし `youtubeUrl` フィールドが `null`
   - PostCardコンポーネントは `youtubeUrl` のみをチェックしていたため、サムネイル生成に失敗
-- **対応内容**:
+- **対応内容** (コミット: c5fcee6):
   1. **診断スクリプト作成** (`scripts/diagnose-thumbnails.cjs`)
      - トップ20記事のサムネイルデータを詳細分析
      - 18記事でサムネイル・youtubeUrl両方なし、youtubeVideoオブジェクトのみ存在を発見
