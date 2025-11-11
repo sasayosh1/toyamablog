@@ -134,6 +134,12 @@ interface PostCardProps {
     title: string
     slug: { current: string }
     youtubeUrl?: string
+    youtubeVideo?: {
+      _type: string
+      title?: string
+      url?: string
+      videoId?: string
+    }
     categories?: string[]
     excerpt?: string
     displayExcerpt?: string
@@ -155,15 +161,16 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
   // 改善されたサムネイル画像取得（信頼性重視）
   const getThumbnailUrls = () => {
     const urls = [];
-    
+
     // 1. Sanityサムネイルが存在する場合（最も信頼性が高い）
     if (post.thumbnail?.asset?.url) {
       urls.push(post.thumbnail.asset.url);
     }
-    
-    // 2. YouTubeURLが存在する場合
-    if (post.youtubeUrl) {
-      const videoId = post.youtubeUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
+
+    // 2. YouTubeURLが存在する場合（youtubeUrl または youtubeVideo.url）
+    const youtubeUrl = post.youtubeUrl || post.youtubeVideo?.url;
+    if (youtubeUrl) {
+      const videoId = youtubeUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1];
       if (videoId) {
         // YouTube画像の品質順（存在する可能性が高い順）
         urls.push(`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`);

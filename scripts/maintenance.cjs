@@ -266,6 +266,7 @@ async function generateReport() {
         body,
         "categories": categories[]->{ _id, title },
         youtubeUrl,
+        youtubeVideo,
         _createdAt
       } | order(_createdAt desc)
     `);
@@ -281,6 +282,7 @@ async function generateReport() {
       noCategory: [],
       wrongCategoryFormat: [],
       noYouTube: [],
+      youtubeVideoMismatch: [],  // youtubeVideo.urlはあるがyoutubeUrlがnull
       shortArticle: [],
       titleFormatIssue: [],
       badExcerptFormat: [],  // 定型表現・タイトル重複などの品質問題
@@ -352,6 +354,11 @@ async function generateReport() {
         issues.noYouTube.push(post);
       }
 
+      // YouTubeデータ不整合チェック（youtubeVideo.urlはあるがyoutubeUrlがnull）
+      if (!post.youtubeUrl && post.youtubeVideo && post.youtubeVideo.url) {
+        issues.youtubeVideoMismatch.push(post);
+      }
+
       // 文字数チェック
       const bodyText = blocksToPlainText(post.body);
       if (bodyText.length < 1000) {
@@ -378,6 +385,7 @@ async function generateReport() {
       ['カテゴリなし', issues.noCategory.length],
       ['汎用カテゴリ使用（地域名推奨）', issues.wrongCategoryFormat.length],
       ['YouTube動画なし', issues.noYouTube.length],
+      ['YouTubeデータ不整合（youtubeVideo.urlあり/youtubeUrlなし）', issues.youtubeVideoMismatch.length],
       ['短すぎる記事(<1000文字)', issues.shortArticle.length],
       ['タイトル形式違反（【地域名】なし）', issues.titleFormatIssue.length]
     ];
@@ -423,6 +431,15 @@ async function generateReport() {
       });
     }
 
+    if (issues.youtubeVideoMismatch.length > 0) {
+      console.log('\n【YouTubeデータ不整合の記事例（youtubeVideo.urlあり/youtubeUrlなし）】\n');
+      issues.youtubeVideoMismatch.slice(0, 5).forEach(post => {
+        console.log(`  - ${post.title}`);
+        console.log(`    youtubeVideo.url: ${post.youtubeVideo?.url || 'なし'}`);
+        console.log(`    youtubeUrl: ${post.youtubeUrl || 'なし'}`);
+      });
+    }
+
     if (issues.titleFormatIssue.length > 0) {
       console.log('\n【タイトル形式違反の記事例（【地域名】形式推奨）】\n');
       issues.titleFormatIssue.slice(0, 3).forEach(post => {
@@ -464,7 +481,9 @@ async function autoFixMetadata() {
         metaDescription,
         tags,
         body,
-        "categories": categories[]->{ _id, title }
+        "categories": categories[]->{ _id, title },
+        youtubeUrl,
+        youtubeVideo
       }
     `);
 
@@ -475,7 +494,8 @@ async function autoFixMetadata() {
       metaDescription: 0,
       tags: 0,
       category: 0,
-      shortsRemoved: 0
+      shortsRemoved: 0,
+      youtubeUrl: 0
     };
 
     for (const post of posts) {
@@ -539,6 +559,13 @@ async function autoFixMetadata() {
         }
       }
 
+      // YouTubeデータ不整合修正（youtubeVideo.urlからyoutubeUrlへコピー）
+      if (!post.youtubeUrl && post.youtubeVideo && post.youtubeVideo.url) {
+        updates.youtubeUrl = post.youtubeVideo.url;
+        needsUpdate = true;
+        fixed.youtubeUrl++;
+      }
+
       const shortsCleanup = removeShortsHashtags(post.body);
       if (shortsCleanup.removed) {
         updates.body = shortsCleanup.body;
@@ -576,8 +603,9 @@ async function autoFixMetadata() {
     console.log(`  metaDescription生成: ${fixed.metaDescription}件`);
     console.log(`  タグ最適化: ${fixed.tags}件`);
     console.log(`  カテゴリ修正: ${fixed.category}件`);
+    console.log(`  YouTubeデータ不整合修正: ${fixed.youtubeUrl}件`);
     console.log(`  本文から#shorts除去: ${fixed.shortsRemoved}件`);
-    console.log(`\n  合計: ${fixed.excerpt + fixed.metaDescription + fixed.tags + fixed.category + fixed.shortsRemoved}件の修正を実行\n`);
+    console.log(`\n  合計: ${fixed.excerpt + fixed.metaDescription + fixed.tags + fixed.category + fixed.youtubeUrl + fixed.shortsRemoved}件の修正を実行\n`);
     console.log('='.repeat(80));
     console.log('\n✅ 自動修正完了\n');
 
