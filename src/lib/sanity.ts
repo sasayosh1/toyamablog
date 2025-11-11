@@ -103,6 +103,7 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
         category,
         publishedAt,
         youtubeUrl,
+        youtubeVideo,
         thumbnail {
           asset -> {
             _ref,
@@ -113,20 +114,20 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
         "categories": [category],
         "displayExcerpt": coalesce(excerpt, description)
       }
-    `, {}, { 
-      next: { 
-        tags: ['post-list-paginated'], 
-        revalidate: 600 
-      } 
+    `, {}, {
+      next: {
+        tags: ['post-list-paginated'],
+        revalidate: 600
+      }
     }),
     client.fetch(`count(*[_type == "post" && defined(publishedAt)])`, {}, {
-      next: { 
-        tags: ['post-count'], 
-        revalidate: 3600 
-      } 
+      next: {
+        tags: ['post-count'],
+        revalidate: 3600
+      }
     })
   ])
-  
+
   return {
     posts,
     totalPosts,
