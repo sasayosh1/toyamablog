@@ -11,11 +11,13 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 0,
   },
   
-  // Sanity CMS用設定
+  // 環境変数設定（Vercel用）
   env: {
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
     SANITY_API_TOKEN: process.env.SANITY_API_TOKEN,
+    NEXT_PUBLIC_ADSENSE_PUBLISHER_ID: process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID,
+    NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
   },
   
   // 静的生成最適化（モバイル読み込み速度向上）
