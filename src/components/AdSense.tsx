@@ -9,7 +9,8 @@ declare global {
   }
 }
 
-const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ''
+// Hardcoded Publisher ID to avoid Vercel environment variable issues
+const ADSENSE_PUBLISHER_ID = 'ca-pub-9743843249239449'
 
 export function AdSense() {
   useEffect(() => {
