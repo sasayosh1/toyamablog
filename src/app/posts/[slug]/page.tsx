@@ -1,10 +1,11 @@
-import { getPost, getAllPosts } from '@/lib/sanity'
+import { getPost, getAllPosts, getRelatedPosts, type Post } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import Link from 'next/link'
 import PortableText from '@/components/PortableText'
 import TableOfContents from '@/components/TableOfContents'
+import SeriesNavigator from '@/components/SeriesNavigator'
 
 export async function generateStaticParams() {
   const posts = await getAllPosts()
@@ -23,6 +24,11 @@ export default async function PostPage({ params }: PostPageProps) {
 
   if (!post) {
     notFound()
+  }
+
+  let seriesPosts: Post[] = []
+  if (post._id) {
+    seriesPosts = await getRelatedPosts(post._id, post.category, 4)
   }
 
   return (
@@ -56,6 +62,14 @@ export default async function PostPage({ params }: PostPageProps) {
             </div>
           )}
           
+          {seriesPosts.length > 0 && (
+            <SeriesNavigator
+              posts={seriesPosts}
+              category={post.category}
+              variant="compact"
+            />
+          )}
+
           {post.body && Array.isArray(post.body) ? (
             <TableOfContents content={post.body} />
           ) : null}
@@ -65,6 +79,13 @@ export default async function PostPage({ params }: PostPageProps) {
               <PortableText value={post.body} />
             ) : null}
           </div>
+
+          {seriesPosts.length > 0 && (
+            <SeriesNavigator
+              posts={seriesPosts}
+              category={post.category}
+            />
+          )}
         </article>
       </div>
     </div>

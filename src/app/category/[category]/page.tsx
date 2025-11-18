@@ -1,4 +1,4 @@
-import { getAllPosts, getAllCategories, client } from '@/lib/sanity'
+import { getAllPosts, getAllCategories } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
@@ -44,16 +44,14 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   // 全記事と全カテゴリーを取得（カテゴリーは最新データを強制取得）
   const [allPosts, categories] = await Promise.all([
     getAllPosts(),
-    client.fetch<string[]>(`
-      array::unique(*[_type == "post" && defined(category)].category) | order(@)
-    `, {}, { 
-      next: { revalidate: 0 },
-      cache: 'no-store'
-    })
+    getAllCategories({ forceFresh: true })
   ])
   
   // 該当カテゴリーの記事をフィルター
-  const categoryPosts = allPosts.filter(post => post.category === decodedCategory)
+  const categoryPosts = allPosts.filter(post => 
+    post.category === decodedCategory ||
+    post.categories?.includes(decodedCategory)
+  )
   
   if (categoryPosts.length === 0) {
     notFound()
@@ -167,7 +165,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                 {filteredCategories
                   .slice(0, 8)
                   .map((otherCategory) => {
-                    const count = allPosts.filter(post => post.category === otherCategory).length
+                    const count = allPosts.filter(post => 
+                      post.category === otherCategory ||
+                      post.categories?.includes(otherCategory)
+                    ).length
                     return count > 0 && (
                       <CategoryCard
                         key={otherCategory}

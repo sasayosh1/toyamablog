@@ -53,8 +53,59 @@ export interface Post {
 
 export type BlogPost = Post;
 
+type CategoryCarrier = {
+  category?: string | null;
+  categories?: (string | null)[] | null;
+  categoryRefs?: (string | null)[] | null;
+};
+
+function collectCategories(source?: (string | null)[]) {
+  const values: string[] = [];
+  source?.forEach((value) => {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (trimmed) {
+        values.push(trimmed);
+      }
+    }
+  });
+  return values;
+}
+
+export function normalizePostCategories<T extends CategoryCarrier>(
+  doc: T
+): Omit<T, 'categoryRefs'> & { categories?: string[]; category?: string } {
+  const { categoryRefs, ...rest } = doc;
+  const combined = new Set<string>();
+  collectCategories(rest.categories || undefined).forEach((value) => combined.add(value));
+  collectCategories(categoryRefs || undefined).forEach((value) => combined.add(value));
+
+  if (typeof rest.category === 'string') {
+    const trimmed = rest.category.trim();
+    if (trimmed) {
+      combined.add(trimmed);
+    }
+  }
+
+  const categories = Array.from(combined);
+  const primaryCategory =
+    (typeof rest.category === 'string' && rest.category.trim()) || categories[0];
+
+  return {
+    ...rest,
+    category: primaryCategory || undefined,
+    categories: categories.length ? categories : undefined,
+  };
+}
+
+export function normalizePostCategoryList<T extends CategoryCarrier>(
+  docs: T[]
+): (Omit<T, 'categoryRefs'> & { categories?: string[]; category?: string })[] {
+  return docs.map((doc) => normalizePostCategories(doc));
+}
+
 export async function getAllPosts(): Promise<Post[]> {
-  const posts = await client.fetch(`
+  const posts = await client.fetch<(Post & CategoryCarrier)[]>(`
     *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) {
       _id,
       title,
@@ -71,7 +122,7 @@ export async function getAllPosts(): Promise<Post[]> {
         },
         alt
       },
-      "categories": [category],
+      "categoryRefs": categories[]->title,
       "displayExcerpt": coalesce(excerpt, description)
     }
   `, {}, { 
@@ -81,7 +132,7 @@ export async function getAllPosts(): Promise<Post[]> {
     } 
   });
   
-  return posts;
+  return normalizePostCategoryList(posts);
 }
 
 export async function getPostsPaginated(page: number = 1, limit: number = 51): Promise<{
@@ -93,7 +144,7 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
   const offset = (page - 1) * limit
 
   const [posts, totalPosts] = await Promise.all([
-    client.fetch(`
+    client.fetch<(Post & CategoryCarrier)[]>(`
       *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [${offset}...${offset + limit}] {
         _id,
         title,
@@ -111,7 +162,7 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
           },
           alt
         },
-        "categories": [category],
+        "categoryRefs": categories[]->title,
         "displayExcerpt": coalesce(excerpt, description)
       }
     `, {}, {
@@ -129,7 +180,7 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
   ])
 
   return {
-    posts,
+    posts: normalizePostCategoryList(posts),
     totalPosts,
     totalPages: Math.ceil(totalPosts / limit),
     currentPage: page
@@ -137,7 +188,7 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
-  const post = await client.fetch(`
+  const post = await client.fetch<(Post & CategoryCarrier) | null>(`
     *[_type == "post" && slug.current == $slug][0] {
       _id,
       title,
@@ -148,6 +199,7 @@ export async function getPost(slug: string): Promise<Post | null> {
       publishedAt,
       body,
       youtubeUrl,
+      "categoryRefs": categories[]->title,
       thumbnail {
         asset -> {
           _ref,
@@ -186,21 +238,36 @@ export async function getPost(slug: string): Promise<Post | null> {
     } 
   });
   
-  return post;
+  return post ? normalizePostCategories(post) : null;
 }
 
-export async function getAllCategories(): Promise<string[]> {
+export async function getAllCategories(options?: { forceFresh?: boolean }): Promise<string[]> {
   try {
-    const categories = await client.fetch<string[]>(`
-      array::unique(*[_type == "post" && defined(category)].category) | order(@)
-    `, {}, { 
-      next: { 
-        tags: ['categories'], 
-        revalidate: 300 // 5分キャッシュに短縮
-      } 
+    const fetchOptions = options?.forceFresh
+      ? { next: { revalidate: 0 }, cache: 'no-store' as const }
+      : { next: { tags: ['categories'], revalidate: 300 } };
+
+    const categoryDocs = await client.fetch<CategoryCarrier[]>(`
+      *[_type == "post" && defined(publishedAt)]{
+        category,
+        "categoryRefs": categories[]->title
+      }
+    `, {}, fetchOptions);
+
+    const normalized = normalizePostCategoryList(categoryDocs);
+    const set = new Set<string>();
+    normalized.forEach((doc) => {
+      doc.categories?.forEach((value) => {
+        if (typeof value === 'string') {
+          const trimmed = value.trim();
+          if (trimmed) {
+            set.add(trimmed);
+          }
+        }
+      });
     });
-    
-    return categories.filter(Boolean);
+
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'ja'));
   } catch (error) {
     console.error('Categories fetch error:', error);
     return [];
@@ -214,7 +281,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
   
   try {
     // シンプルで高速な検索クエリ
-    const posts = await client.fetch<Post[]>(`
+    const posts = await client.fetch<(Post & CategoryCarrier)[]>(`
       *[_type == "post" && (
         title match "*" + $searchTerm + "*" ||
         description match "*" + $searchTerm + "*" ||
@@ -248,7 +315,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
           }
         },
         excerpt,
-        "categories": [category],
+        "categoryRefs": categories[]->title,
         "displayExcerpt": coalesce(excerpt, description)
       }
     `, { searchTerm }, { 
@@ -258,7 +325,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
     });
     
     console.log(`Direct search for "${searchTerm}" returned ${posts.length} results`);
-    return posts;
+    return normalizePostCategoryList(posts);
     
   } catch (error) {
     console.error('Direct search error:', error);
@@ -266,7 +333,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
     // フォールバック: 全件取得してクライアントサイドフィルタリング
     try {
       console.log('Attempting fallback search...');
-      const fallbackPosts = await client.fetch<Post[]>(`
+      const fallbackPosts = await client.fetch<(Post & CategoryCarrier)[]>(`
         *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
           _id,
           title,
@@ -292,13 +359,13 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
               asset->{
                 _ref,
                 url
-              }
             }
-          },
-          excerpt,
-          "categories": [category],
-          "displayExcerpt": coalesce(excerpt, description)
-        }
+          }
+        },
+        excerpt,
+        "categoryRefs": categories[]->title,
+        "displayExcerpt": coalesce(excerpt, description)
+      }
       `, {}, { 
         next: { revalidate: 0 },
         cache: 'no-store'
@@ -315,7 +382,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
       );
       
       console.log(`Fallback search for "${searchTerm}" returned ${filtered.length} results`);
-      return filtered;
+      return normalizePostCategoryList(filtered);
       
     } catch (fallbackError) {
       console.error('Fallback search error:', fallbackError);
@@ -327,7 +394,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
 // 関連記事を取得（同じカテゴリの記事を優先）
 export async function getRelatedPosts(currentPostId: string, category?: string, limit: number = 6): Promise<Post[]> {
   try {
-    const posts = await client.fetch<Post[]>(`
+    const posts = await client.fetch<(Post & CategoryCarrier)[]>(`
       *[_type == "post" && _id != $currentPostId && defined(publishedAt)] | order(publishedAt desc) [0...${limit * 2}] {
         _id,
         title,
@@ -344,7 +411,7 @@ export async function getRelatedPosts(currentPostId: string, category?: string, 
           },
           alt
         },
-        "categories": [category],
+        "categoryRefs": categories[]->title,
         "displayExcerpt": coalesce(excerpt, description)
       }
     `, { currentPostId }, {
@@ -355,15 +422,17 @@ export async function getRelatedPosts(currentPostId: string, category?: string, 
     });
 
     // カテゴリが指定されている場合は、同じカテゴリの記事を優先
+    const normalized = normalizePostCategoryList(posts);
+
     if (category) {
-      const sameCategoryPosts = posts.filter(p => p.category === category);
-      const otherPosts = posts.filter(p => p.category !== category);
+      const sameCategoryPosts = normalized.filter(p => p.category === category);
+      const otherPosts = normalized.filter(p => p.category !== category);
 
       // 同じカテゴリの記事を優先して返す
       return [...sameCategoryPosts, ...otherPosts].slice(0, limit);
     }
 
-    return posts.slice(0, limit);
+    return normalized.slice(0, limit);
   } catch (error) {
     console.error('Error fetching related posts:', error);
     return [];
@@ -373,7 +442,7 @@ export async function getRelatedPosts(currentPostId: string, category?: string, 
 // 分析用: 全記事の詳細データを取得（body含む）
 export async function getAllPostsForAnalysis(): Promise<Post[]> {
   try {
-    const posts = await client.fetch<Post[]>(`
+    const posts = await client.fetch<(Post & CategoryCarrier & { bodyLength: number; bodyPlainText: string })[]>(`
       *[_type == "post"] | order(publishedAt desc) {
         _id,
         title,
@@ -398,7 +467,7 @@ export async function getAllPostsForAnalysis(): Promise<Post[]> {
           slug,
           bio
         },
-        "categories": [category],
+        "categoryRefs": categories[]->title,
         "displayExcerpt": coalesce(excerpt, description),
         "bodyLength": length(body),
         "bodyPlainText": array::join(body[_type == "block"].children[_type == "span"].text, " ")
@@ -407,7 +476,7 @@ export async function getAllPostsForAnalysis(): Promise<Post[]> {
       cache: 'no-store'
     });
 
-    return posts;
+    return normalizePostCategoryList(posts);
   } catch (error) {
     console.error('Error fetching posts for analysis:', error);
     return [];

@@ -1,4 +1,4 @@
-import { getPost, getAllCategories, type Post, client } from '@/lib/sanity'
+import { getPost, getAllCategories, type Post, client, normalizePostCategoryList } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PortableText from '@/components/PortableText'
@@ -102,17 +102,17 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   // 軽量化：検索用データのみ取得
   const [posts, categories] = await Promise.all([
-    client.fetch<Post[]>(`
+    client.fetch<(Post & { categoryRefs?: string[] | null })[]>(`
       *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
         _id, title, slug, category, publishedAt,
-        "categories": [category]
+        "categoryRefs": categories[]->title
       }
     `, {}, { 
       next: { 
         tags: ['search-posts'], 
         revalidate: 600 
       } 
-    }),
+    }).then((results) => normalizePostCategoryList(results)),
     getAllCategories()
   ])
 

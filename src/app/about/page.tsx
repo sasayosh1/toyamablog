@@ -1,5 +1,5 @@
 import GlobalHeader from '@/components/GlobalHeader'
-import { client, getAllCategories, type Post } from '@/lib/sanity'
+import { client, getAllCategories, type Post, normalizePostCategoryList } from '@/lib/sanity'
 import { Metadata } from 'next'
 import Image from 'next/image'
 
@@ -21,13 +21,13 @@ export const metadata: Metadata = {
 export default async function AboutPage() {
   // 検索用の記事一覧とカテゴリーを取得
   const [posts, categories] = await Promise.all([
-    client.fetch<Post[]>(`
+    client.fetch<(Post & { categoryRefs?: string[] | null })[]>(`
       *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...100] {
         _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
         author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
-        "excerpt": description, "categories": [category]
+        "excerpt": description, "categoryRefs": categories[]->title
       }
-    `),
+    `).then((results) => normalizePostCategoryList(results)),
     getAllCategories()
   ])
 

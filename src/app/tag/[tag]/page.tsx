@@ -1,4 +1,4 @@
-import { client, type Post, getAllCategories } from '@/lib/sanity'
+import { client, type Post, getAllCategories, normalizePostCategoryList } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
@@ -37,13 +37,13 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
   const decodedTag = decodeURIComponent(tag)
 
   // タグで記事を検索
-  const posts = await client.fetch<Post[]>(`
+  const posts = normalizePostCategoryList(await client.fetch<(Post & { categoryRefs?: string[] | null })[]>(`
     *[_type == "post" && defined(publishedAt) && "${decodedTag}" in tags] | order(publishedAt desc) {
       _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
       author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
-      "excerpt": description, "categories": [category]
+      "excerpt": description, "categoryRefs": categories[]->title
     }
-  `)
+  `))
 
   if (posts.length === 0) {
     notFound()
@@ -51,13 +51,13 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
 
   // 記事一覧とカテゴリーを取得（検索用）
   const [allPosts, categories] = await Promise.all([
-    client.fetch<Post[]>(`
+    client.fetch<(Post & { categoryRefs?: string[] | null })[]>(`
       *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...100] {
         _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
         author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
-        "excerpt": description, "categories": [category]
+        "excerpt": description, "categoryRefs": categories[]->title
       }
-    `),
+    `).then((results) => normalizePostCategoryList(results)),
     getAllCategories()
   ])
 
