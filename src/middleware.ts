@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export function middleware(request: NextRequest) {
   // セキュリティヘッダーの強化
   const response = NextResponse.next()
+  const path = request.nextUrl.pathname
   
   // XSS攻撃防止
   response.headers.set('X-XSS-Protection', '1; mode=block')
@@ -33,6 +34,12 @@ export function middleware(request: NextRequest) {
   if (process.env.NODE_ENV === 'development') {
     response.headers.set('X-Debug-IP', ip.split(',')[0])
     response.headers.set('X-Debug-Path', request.nextUrl.pathname)
+  }
+
+  if (path.startsWith('/studio')) {
+    response.headers.delete('X-Frame-Options')
+  } else {
+    response.headers.set('X-Frame-Options', 'DENY')
   }
 
   return response
