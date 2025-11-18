@@ -24,7 +24,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
   const { category } = await params
   const decodedCategory = decodeURIComponent(category)
-  
+  const canonical = `https://sasakiyoshimasa.com/category/${encodeURIComponent(decodedCategory)}`
   return {
     title: `${decodedCategory} - 富山、お好きですか？`,
     description: `富山県の${decodedCategory}に関する記事一覧。YouTube Shortsと連携した地域情報をお届けします。`,
@@ -32,8 +32,11 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
       title: `${decodedCategory} - 富山、お好きですか？`,
       description: `富山県の${decodedCategory}に関する記事一覧`,
       type: 'website',
-      url: `https://sasakiyoshimasa.com/category/${category}`,
+      url: canonical,
     },
+    alternates: {
+      canonical
+    }
   }
 }
 

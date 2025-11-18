@@ -6,6 +6,7 @@ import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data
 import { getHeroImageUrl } from '@/lib/image-utils'
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
+import type { Metadata } from 'next'
 
 // 動的インポートでパフォーマンス向上
 const MainSearchBar = dynamic(() => import('@/components/MainSearchBar'), {
@@ -18,22 +19,40 @@ const Pagination = dynamic(() => import('@/components/ui/Pagination'), {
 // ISR: 5分キャッシュでパフォーマンス向上
 export const revalidate = 300
 
-// メタデータ最適化
-export const metadata = {
-  title: '富山、お好きですか？ - AMAZING TOYAMA',
-  description: '富山県の観光スポットやグルメ、文化を紹介するYouTube Shorts連携ブログ。もっと富山を好きになるヒントをお届けします。',
-  keywords: '富山, 観光, グルメ, YouTube, Shorts, 富山県',
-  openGraph: {
-    title: '富山、お好きですか？ - AMAZING TOYAMA',
+interface SearchParams {
+  page?: string
+}
+
+export async function generateMetadata(
+  { searchParams }: { searchParams?: SearchParams } = {}
+): Promise<Metadata> {
+  const currentPage = searchParams?.page ? parseInt(searchParams.page, 10) : 1
+  const canonicalUrl = currentPage > 1
+    ? `https://sasakiyoshimasa.com/?page=${currentPage}`
+    : 'https://sasakiyoshimasa.com'
+
+  return {
+    title: currentPage > 1
+      ? `富山、お好きですか？ - ページ ${currentPage}`
+      : '富山、お好きですか？ - AMAZING TOYAMA',
     description: '富山県の観光スポットやグルメ、文化を紹介するYouTube Shorts連携ブログ。もっと富山を好きになるヒントをお届けします。',
-    type: 'website',
-    locale: 'ja_JP',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: '富山、お好きですか？ - AMAZING TOYAMA',
-    description: '富山県の観光スポット、グルメ情報、文化を紹介',
-  },
+    keywords: '富山, 観光, グルメ, YouTube, Shorts, 富山県',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: '富山、お好きですか？ - AMAZING TOYAMA',
+      description: '富山県の観光スポットやグルメ、文化を紹介するYouTube Shorts連携ブログ。もっと富山を好きになるヒントをお届けします。',
+      type: 'website',
+      locale: 'ja_JP',
+      url: canonicalUrl,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: '富山、お好きですか？ - AMAZING TOYAMA',
+      description: '富山県の観光スポット、グルメ情報、文化を紹介',
+    },
+  }
 }
 
 // ヒーロー画像コンポーネント
@@ -49,11 +68,11 @@ function HeroImage() {
 }
 
 interface Props {
-  searchParams?: Promise<{ page?: string }>
+  searchParams?: Promise<SearchParams>
 }
 
-export default async function Home({ 
-  searchParams 
+export default async function Home({
+  searchParams
 }: Props) {
   const params = searchParams ? await searchParams : {}
   const currentPage = parseInt(params?.page || '1', 10)
