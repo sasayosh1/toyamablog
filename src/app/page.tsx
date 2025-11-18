@@ -23,13 +23,14 @@ interface SearchParams {
 }
 
 type PageProps = {
-  searchParams?: SearchParams
+  searchParams?: Promise<SearchParams>
 }
 
 export async function generateMetadata(
-  props: PageProps
+  { searchParams }: PageProps = {}
 ): Promise<Metadata> {
-  const currentPage = props.searchParams?.page ? parseInt(props.searchParams.page, 10) : 1
+  const params = searchParams ? await searchParams : {}
+  const currentPage = params.page ? parseInt(params.page, 10) : 1
   const canonicalUrl = currentPage > 1
     ? `https://sasakiyoshimasa.com/?page=${currentPage}`
     : 'https://sasakiyoshimasa.com'
