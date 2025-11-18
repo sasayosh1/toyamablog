@@ -97,10 +97,10 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io",
-              "style-src 'self' 'unsafe-inline' https://cdn.sanity.io https://fonts.googleapis.com",
-              "img-src 'self' data: https: blob: https://cdn.sanity.io https://i.ytimg.com https://img.youtube.com",
-              "font-src 'self' https://fonts.gstatic.com https://cdn.sanity.io",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io https://*.sanity.io",
+              "style-src 'self' 'unsafe-inline' https://cdn.sanity.io https://*.sanity.io https://fonts.googleapis.com",
+              "img-src 'self' data: https: blob: https://cdn.sanity.io https://*.sanity.io https://i.ytimg.com https://img.youtube.com",
+              "font-src 'self' https://fonts.gstatic.com https://cdn.sanity.io https://*.sanity.io",
               "connect-src 'self' https://*.sanity.io https://cdn.sanity.io wss://*.sanity.io",
               "frame-src 'self' https://sanity.io https://*.sanity.io",
               "frame-ancestors 'self' https://sanity.io https://*.sanity.io"
