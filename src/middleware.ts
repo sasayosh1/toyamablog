@@ -10,8 +10,6 @@ export function middleware(request: NextRequest) {
   // MIME type sniffing攻撃防止
   response.headers.set('X-Content-Type-Options', 'nosniff')
   
-  // Clickjacking攻撃防止
-  response.headers.set('X-Frame-Options', 'DENY')
   
   // リファラーポリシー
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')

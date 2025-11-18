@@ -3,7 +3,6 @@ import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 import StructuredData from '@/components/StructuredData'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
-import { getHeroImageUrl } from '@/lib/image-utils'
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import type { Metadata } from 'next'
@@ -23,10 +22,14 @@ interface SearchParams {
   page?: string
 }
 
+type PageProps = {
+  searchParams?: SearchParams
+}
+
 export async function generateMetadata(
-  { searchParams }: { searchParams?: SearchParams } = {}
+  props: PageProps
 ): Promise<Metadata> {
-  const currentPage = searchParams?.page ? parseInt(searchParams.page, 10) : 1
+  const currentPage = props.searchParams?.page ? parseInt(props.searchParams.page, 10) : 1
   const canonicalUrl = currentPage > 1
     ? `https://sasakiyoshimasa.com/?page=${currentPage}`
     : 'https://sasakiyoshimasa.com'
