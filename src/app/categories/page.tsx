@@ -1,4 +1,4 @@
-import { getAllCategories, getAllPosts, client } from '@/lib/sanity'
+import { getAllCategories, getAllPosts } from '@/lib/sanity'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
 import CategoryCard from '@/components/ui/CategoryCard'
@@ -13,16 +13,8 @@ export const metadata = {
 }
 
 export default async function CategoriesPage() {
-  // カテゴリーページでは最新データを強制取得（キャッシュ無効化）
-  const timestamp = Date.now()
-  const forceTag = process.env.NEXT_CACHE_REVALIDATE_TAG || 'default'
   const [allCategories, posts] = await Promise.all([
-    client.fetch<string[]>(`
-      array::unique(*[_type == "post" && defined(category) && category != "グルメ" && category != "自然・公園"].category) | order(@)
-    `, {}, { 
-      next: { revalidate: 0, tags: [`categories-${timestamp}-${forceTag}`] },
-      cache: 'no-store'
-    }),
+    getAllCategories({ forceFresh: true }),
     getAllPosts()
   ])
   
@@ -52,7 +44,8 @@ export default async function CategoriesPage() {
       post.categories?.includes(category) || post.category === category
     ).length
     return { name: category, count }
-  }).sort((a, b) => b.count - a.count)
+  }).filter(category => category.count > 0)
+    .sort((a, b) => b.count - a.count)
 
   const categoryIcon = (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
