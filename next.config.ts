@@ -35,6 +35,54 @@ const nextConfig: NextConfig = {
         destination: '/categories',
         permanent: true,
       },
+      {
+        source: '/:path*',
+        has: [{ type: 'query', key: 'share' }],
+        destination: '/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'query', key: 'nb' }],
+        destination: '/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'query', key: 'utm_source' }],
+        destination: '/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'query', key: 'utm_medium' }],
+        destination: '/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'query', key: 'utm_campaign' }],
+        destination: '/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'query', key: 'utm_content' }],
+        destination: '/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'query', key: 'utm_term' }],
+        destination: '/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'query', key: 'fbclid' }],
+        destination: '/:path*',
+        permanent: true,
+      },
     ];
   },
 

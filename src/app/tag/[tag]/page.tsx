@@ -142,5 +142,8 @@ export async function generateMetadata({ params }: { params: Promise<{ tag: stri
   return {
     title: `${decodedTag} - タグ | 富山、お好きですか？`,
     description: `富山の魅力を紹介する「${decodedTag}」タグの記事一覧ページです。`,
+    alternates: {
+      canonical: `https://sasakiyoshimasa.com/tag/${encodeURIComponent(decodedTag)}`
+    }
   }
 }
