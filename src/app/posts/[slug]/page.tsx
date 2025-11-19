@@ -7,12 +7,8 @@ import PortableText from '@/components/PortableText'
 import TableOfContents from '@/components/TableOfContents'
 import SeriesNavigator from '@/components/SeriesNavigator'
 
-export async function generateStaticParams() {
-  const posts = await getAllPosts()
-  return posts.map((post) => ({
-    slug: post.slug.current,
-  }))
-}
+// 動的レンダリングに切り替え（ビルド時の静的生成を無効化）
+export const dynamic = 'force-dynamic'
 
 interface PostPageProps {
   params: Promise<{ slug: string }>

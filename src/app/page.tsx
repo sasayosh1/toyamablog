@@ -23,14 +23,13 @@ interface SearchParams {
 }
 
 type PageProps = {
-  searchParams?: Promise<SearchParams>
+  params: Promise<Record<string, never>>
+  searchParams: Promise<SearchParams>
 }
 
-export async function generateMetadata(
-  { searchParams }: PageProps = {}
-): Promise<Metadata> {
-  const params = searchParams ? await searchParams : {}
-  const currentPage = params.page ? parseInt(params.page, 10) : 1
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await searchParams
+  const currentPage = params?.page ? parseInt(params.page, 10) : 1
   const canonicalUrl = currentPage > 1
     ? `https://sasakiyoshimasa.com/?page=${currentPage}`
     : 'https://sasakiyoshimasa.com'
@@ -71,14 +70,8 @@ function HeroImage() {
   )
 }
 
-interface Props {
-  searchParams?: Promise<SearchParams>
-}
-
-export default async function Home({
-  searchParams
-}: Props) {
-  const params = searchParams ? await searchParams : {}
+export default async function Home({ searchParams }: PageProps) {
+  const params = await searchParams
   const currentPage = parseInt(params?.page || '1', 10)
   
   // ページネーション対応で記事を取得、検索用には全記事を取得

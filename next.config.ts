@@ -15,6 +15,17 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@sanity/client', '@portabletext/react'],
   },
+
+  // Sanity Studioをビルドから除外
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = config.externals || []
+      config.externals.push({
+        'sanity': 'commonjs sanity',
+      })
+    }
+    return config
+  },
   
   
   // コンパイル最適化
@@ -97,13 +108,13 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io https://*.sanity.io",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.sanity.io https://*.sanity.io https://manage.sanity.io",
               "style-src 'self' 'unsafe-inline' https://cdn.sanity.io https://*.sanity.io https://fonts.googleapis.com",
               "img-src 'self' data: https: blob: https://cdn.sanity.io https://*.sanity.io https://i.ytimg.com https://img.youtube.com",
               "font-src 'self' https://fonts.gstatic.com https://cdn.sanity.io https://*.sanity.io",
-              "connect-src 'self' https://*.sanity.io https://cdn.sanity.io wss://*.sanity.io",
-              "frame-src 'self' https://sanity.io https://*.sanity.io",
-              "frame-ancestors 'self' https://sanity.io https://*.sanity.io"
+              "connect-src 'self' https://*.sanity.io https://cdn.sanity.io wss://*.sanity.io https://manage.sanity.io",
+              "frame-src 'self' https://sanity.io https://*.sanity.io https://manage.sanity.io",
+              "frame-ancestors 'self' https://sanity.io https://*.sanity.io https://manage.sanity.io"
             ].join('; '),
           },
           {
@@ -120,19 +131,19 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // All other paths (must come after more specific patterns)
+      // All other paths (exclude Studio) must come after more specific patterns
       {
-        source: '/:path*',
+        source: '/((?!studio).*)',
         headers: [
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://partner.googleadservices.com https://*.sanity.io",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.sanity.io",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://partner.googleadservices.com https://cdn.sanity.io https://*.sanity.io",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.sanity.io https://*.sanity.io",
               "img-src 'self' data: https: blob: https://cdn.sanity.io https://i.ytimg.com https://img.youtube.com https://*.sanity.io",
-              "font-src 'self' https://fonts.gstatic.com https://*.sanity.io",
-              "connect-src 'self' https://www.google-analytics.com https://vitals.vercel-analytics.com https://*.supabase.co wss://*.supabase.co https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://stats.g.doubleclick.net https://*.sanity.io",
+              "font-src 'self' https://fonts.gstatic.com https://cdn.sanity.io https://*.sanity.io",
+              "connect-src 'self' https://www.google-analytics.com https://vitals.vercel-analytics.com https://*.supabase.co wss://*.supabase.co https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://stats.g.doubleclick.net https://cdn.sanity.io https://*.sanity.io",
               "frame-src 'self' https://www.youtube.com https://youtube.com https://www.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://tpc.googlesyndication.com",
               "media-src 'self' https:",
               "object-src 'none'",
@@ -141,6 +152,10 @@ const nextConfig: NextConfig = {
               "frame-ancestors 'none'",
               "upgrade-insecure-requests"
             ].join('; '),
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
           },
           {
             key: 'Strict-Transport-Security',
