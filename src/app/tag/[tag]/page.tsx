@@ -11,27 +11,6 @@ import { generateTagLD, generateBreadcrumbLD } from '@/lib/structured-data'
 export const revalidate = 0
 export const dynamic = 'force-dynamic'
 
-interface SanityTag {
-  tag: string;
-}
-
-// 静的パスを生成
-export async function generateStaticParams() {
-  const posts = await client.fetch<{ tags: string[] }[]>(`
-    *[_type == "post" && defined(publishedAt) && defined(tags)] {
-      tags
-    }
-  `);
-  
-  // すべてのタグを抽出して重複を除去
-  const allTags = posts.flatMap(post => post.tags || []);
-  const uniqueTags = [...new Set(allTags)];
-  
-  return uniqueTags.map((tag) => ({
-    tag: encodeURIComponent(tag),
-  }));
-}
-
 export default async function TagPage({ params }: { params: Promise<{ tag: string }> }) {
   const { tag } = await params
   const decodedTag = decodeURIComponent(tag)

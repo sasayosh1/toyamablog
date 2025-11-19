@@ -23,25 +23,16 @@ export default defineConfig({
 
   cors: {
     origin: [
-      'http://localhost:3000', 
-      'https://sasakiyoshimasa.com', 
+      'http://localhost:3000',
+      'http://localhost:4000',
+      'https://sasakiyoshimasa.com',
       'https://sanity.io',
       'https://aoxze287.sanity.studio',
       'https://toyamablog.sanity.studio'
     ],
-    credentials: true
+    credentials: false
   },
 
-  studio: {
-    components: {
-      layout: (props) => {
-        if (typeof window !== 'undefined') {
-          document.cookie = 'SameSite=None; Secure'
-        }
-        return props.renderDefault(props)
-      }
-    }
-  },
 
   document: {
     // 文書編集時のオプション

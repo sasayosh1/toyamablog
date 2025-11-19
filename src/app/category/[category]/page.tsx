@@ -14,13 +14,6 @@ import { Metadata } from 'next'
 export const revalidate = 0
 export const dynamic = 'force-dynamic'
 
-export async function generateStaticParams() {
-  const categories = await getAllCategories()
-  return categories.map((category) => ({
-    category: encodeURIComponent(category),
-  }))
-}
-
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
   const { category } = await params
   const decodedCategory = decodeURIComponent(category)

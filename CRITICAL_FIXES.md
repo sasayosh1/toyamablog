@@ -2,6 +2,14 @@
 
 ## Immediate Hotfixes Completed ✅
 
+### 2025-11-07: Studio セキュリティヘッダー再調整 & 型エラー解消
+- **症状**: `npm run test:headers:prod` が /studio で `X-Frame-Options: DENY` を検出し 20 件失敗、`src/app/page.tsx` で `PageProps | undefined` 型エラーが発生
+- **対応**:
+  - `next.config.ts`: Studio 用 CSP を `https://manage.sanity.io` まで許可しつつ、catch-all ヘッダーを `/((?!studio).*)` に変更して `X-Frame-Options: DENY` が Studio に伝播しないよう分岐。非 Studio でも `https://*.sanity.io` を全 directive に含めるよう再構成。
+  - `middleware.ts`: Studio 用のヘッダー改変は撤廃し、`X-Robots-Tag: noindex` のみ設定。`/structure/*` リダイレクト処理は維持。
+  - `src/app/page.tsx`: `searchParams` を `Promise | object` のどちらでも扱える `resolveSearchParams` ヘルパーに統一し、`generateMetadata` / `Home` での型エラーを解消。
+- **結果**: Studio で iframe 埋め込み可能、通常ページは AdSense/CSP 要件を維持。`next build` が型エラーなく完走し、Playwright のヘッダーテストに必要な前提条件が整備済み。*** End Patch
+
 ### 1. **Fixed Missing Not-Found Page**
 - ✅ **Enhanced** `/src/app/not-found.tsx` 
 - ✅ **Added** proper metadata for SEO

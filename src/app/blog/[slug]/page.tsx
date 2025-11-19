@@ -14,20 +14,9 @@ import RelatedPosts from '@/components/RelatedPosts'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import type { Metadata } from 'next'
 
-// ISR: 詳細ページは10分キャッシュ
-export const revalidate = 600
-
-interface SanityPost {
-  slug: string;
-}
-
-// 静的パスを生成
-export async function generateStaticParams() {
-  const posts = await client.fetch<SanityPost[]>(`*[_type == "post" && defined(publishedAt)]{ "slug": slug.current }`);
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
-}
+// 動的レンダリングに切り替え（ビルド時の静的生成を無効化）
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // メタデータ生成
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

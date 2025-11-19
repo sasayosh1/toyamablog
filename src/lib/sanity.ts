@@ -4,11 +4,11 @@ export const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'aoxze287',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
-  useCdn: true, // CDN有効化でパフォーマンス向上
+  useCdn: false, // トークン使用時はCDNを無効化
   perspective: 'published', // publishedコンテンツのみ
   token: process.env.SANITY_API_TOKEN, // サーバーサイドトークン追加
   stega: false, // Stegaを無効化してパフォーマンス向上
-  requestTagPrefix: 'toyama-osukidesuka', // キャッシュタグ最適化
+  ignoreBrowserTokenWarning: true, // ブラウザトークン警告を無視
 });
 
 export interface Author {
