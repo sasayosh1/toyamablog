@@ -41,7 +41,7 @@ export default defineConfig({
   ],
 
   // 開発サーバー設定
-  webServer: process.env.CI ? undefined : {
+  webServer: (process.env.CI || process.env.PLAYWRIGHT_SKIP_WEBSERVER) ? undefined : {
     command: 'npm run dev',
     url: 'http://localhost:4000',
     reuseExistingServer: !process.env.CI,
