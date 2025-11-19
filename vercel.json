@@ -3,7 +3,7 @@
   "buildCommand": "npm run build",
   "env": {
     "NEXT_CACHE_FORCE_REFRESH": "true",
-    "NEXT_CACHE_REVALIDATE_TAG": "security-headers-pattern-fix-2025-11-10-v2",
+    "NEXT_CACHE_REVALIDATE_TAG": "security-headers-manual-trigger-2025-11-19-v1",
     "VERCEL_FORCE_NO_BUILD_CACHE": "1",
     "NEXT_IMAGE_OPTIMIZATION": "false"
   },
