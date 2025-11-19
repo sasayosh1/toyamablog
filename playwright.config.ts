@@ -13,7 +13,7 @@ export default defineConfig({
   
   use: {
     // テスト対象ベースURL
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4000',
     trace: 'on-first-retry',
   },
 
@@ -43,7 +43,7 @@ export default defineConfig({
   // 開発サーバー設定
   webServer: process.env.CI ? undefined : {
     command: 'npm run dev',
-    url: 'http://localhost:3000',
+    url: 'http://localhost:4000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },
