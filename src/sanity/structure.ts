@@ -59,27 +59,7 @@ export const structure: StructureResolver = (S) => {
   return S.list()
     .title('Content')
     .items([
-      // Posts section
-      S.listItem()
-        .title('📝 Posts')
-        .child(buildPostList('All Posts')),
-
-      // Published Posts
-      S.listItem()
-        .title('✅ Published Posts')
-        .child(buildPostList('Published Posts', '_type == "post" && defined(publishedAt)')),
-
-      // Draft Posts
-      S.listItem()
-        .title('📄 Draft Posts')
-        .child(buildPostList('Draft Posts', '_type == "post" && !defined(publishedAt)')),
-
-      // Posts with YouTube
-      S.listItem()
-        .title('📺 YouTube Posts')
-        .child(buildPostList('Posts with YouTube Videos', '_type == "post" && defined(youtubeUrl)')),
-
-      // Categories section
+      S.listItem().title('📝 Posts').child(buildPostList('All Posts')),
       S.listItem()
         .title('📂 Categories')
         .child(
@@ -88,8 +68,6 @@ export const structure: StructureResolver = (S) => {
             .filter('_type == "category"')
             .defaultOrdering([{field: 'title', direction: 'asc'}])
         ),
-
-      // Authors section
       S.listItem()
         .title('👤 Authors')
         .child(
@@ -97,32 +75,6 @@ export const structure: StructureResolver = (S) => {
             .title('Authors')
             .filter('_type == "author"')
             .defaultOrdering([{field: 'name', direction: 'asc'}])
-        ),
-
-      // Maintenance section
-      S.listItem()
-        .title('🔧 Maintenance')
-        .child(
-          S.list()
-            .title('Content Maintenance')
-            .items([
-              S.listItem()
-                .title('Missing Excerpts')
-                .child(
-                  buildPostList(
-                    'Posts without Excerpts',
-                    '_type == "post" && (!defined(excerpt) || excerpt == "")'
-                  )
-                ),
-              S.listItem()
-                .title('Missing Images')
-                .child(
-                  buildPostList(
-                    'Posts without Main Images',
-                    '_type == "post" && !defined(mainImage)'
-                  )
-                ),
-            ])
         ),
     ])
 }
