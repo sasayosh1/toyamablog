@@ -14,9 +14,8 @@ const {GoogleGenerativeAI} = require('@google/generative-ai')
 const crypto = require('crypto')
 
 const TARGET_PHRASE = '富山のくせに'
-// gemini-flash-lite-001 は API v1beta で提供されていないため、
-// 既存のワークフローで利用している軽量モデル。
-const MODEL_NAME = 'gemini-2.5-flash-lite'
+// 料金を抑えるために gemini-2.5-flash-lite-001 を使用（pro へのフォールバック防止）
+const MODEL_NAME = 'gemini-2.5-flash-lite-001'
 const DRY_RUN = process.argv.includes('--dry-run')
 
 if (!process.env.SANITY_API_TOKEN) {
