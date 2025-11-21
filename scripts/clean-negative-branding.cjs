@@ -47,6 +47,10 @@ function blockContainsTarget(block) {
   return block.children.some((child) => typeof child.text === 'string' && child.text.includes(TARGET_PHRASE))
 }
 
+function textContainsTarget(text) {
+  return typeof text === 'string' && text.includes(TARGET_PHRASE)
+}
+
 function blockToPlainText(block) {
   if (!block || block._type !== 'block' || !Array.isArray(block.children)) {
     return ''
@@ -87,29 +91,38 @@ function sanitizeRewrittenText(text, fallback) {
   return lines.join('\n').trim()
 }
 
-async function rewriteParagraph(paragraph, title) {
-  const prompt = `以下の日本語段落を、ブログ「富山、お好きですか？」の読者に向けた柔らかく前向きなトーンに書き換えてください。
+async function rewriteText(original, title, contextLabel) {
+  const prompt = `以下の${contextLabel}を、ブログ「富山、お好きですか？」の読者に向けた柔らかく前向きなトーンに書き換えてください。
 - 「${TARGET_PHRASE}」という表現は使わず、必要ならポジティブな文に書き換えてください。
 - ブログ名を言及する場合は必ず「富山、お好きですか？」と表記してください。
-- 段落の事実関係は変えずに、文章全体を返してください。
-- 出力は書き換え後の段落テキストのみとし、解説・翻訳・罫線・コードブロックなどは付けないでください。
+- 内容の事実関係は変えずに、文章全体を返してください。
+- 出力は書き換え後のテキストのみとし、解説・翻訳・罫線・コードブロックなどは付けないでください。
 
 【記事タイトル】${title}
-【段落】
-${paragraph}
+【${contextLabel}】
+${original}
 `
   const result = await model.generateContent(prompt)
   const response = await result.response
   const raw = response.text().trim()
-  return sanitizeRewrittenText(raw, paragraph)
+  return sanitizeRewrittenText(raw, original)
 }
 
 async function main() {
   console.log('🔎 「富山のくせに」表現を含む記事を検索中...')
-  const posts = await sanityClient.fetch(`*[_type == "post" && pt::text(body) match "${TARGET_PHRASE}"]{_id, title, slug, body}`)
+  const posts = await sanityClient.fetch(`*[_type == "post" && (
+    pt::text(body) match "${TARGET_PHRASE}" ||
+    (defined(title) && title match "*${TARGET_PHRASE}*") ||
+    (defined(excerpt) && excerpt match "*${TARGET_PHRASE}*") ||
+    (defined(metaDescription) && metaDescription match "*${TARGET_PHRASE}*")
+  )]{_id, title, slug, body, excerpt, metaDescription}`)
 
-  const filteredPosts = posts.filter((post) =>
-    Array.isArray(post.body) && post.body.some((block) => blockContainsTarget(block))
+  const filteredPosts = posts.filter(
+    (post) =>
+      (Array.isArray(post.body) && post.body.some((block) => blockContainsTarget(block))) ||
+      textContainsTarget(post.title) ||
+      textContainsTarget(post.excerpt) ||
+      textContainsTarget(post.metaDescription)
   )
 
   if (!filteredPosts.length) {
@@ -140,7 +153,7 @@ async function main() {
 
       try {
         totalRequests++
-        const rewritten = await rewriteParagraph(originalText, post.title)
+        const rewritten = await rewriteText(originalText, post.title, '本文の段落')
         if (!rewritten || rewritten === originalText) {
           console.warn('    ⚠️  変換結果が元と同じか空でした。スキップします。')
           continue
@@ -157,21 +170,61 @@ async function main() {
       }
     }
 
-    if (updated && !DRY_RUN) {
+    const metadataUpdates = {}
+
+    const metadataTargets = [
+      {field: 'title', label: 'タイトル'},
+      {field: 'excerpt', label: '短い抜粋'},
+      {field: 'metaDescription', label: 'メタディスクリプション'},
+    ]
+
+    for (const {field, label} of metadataTargets) {
+      const currentValue = post[field]
+      if (!textContainsTarget(currentValue)) continue
+
+      console.log(`  ✏️  ${label}を再生成します`)
+      if (DRY_RUN) {
+        console.log(`    └─ ドライラン: ${currentValue}`)
+        continue
+      }
+
       try {
-        await sanityClient
-          .patch(post._id)
-          .set({
-            body: newBody,
-            lastBrandCleanupAt: new Date().toISOString(),
-          })
-          .commit()
+        totalRequests++
+        const rewritten = await rewriteText(currentValue, post.title, label)
+        if (!rewritten || rewritten === currentValue) {
+          console.warn(`    ⚠️  ${label}の変換結果が元と同じか空でした。スキップします。`)
+          continue
+        }
+        metadataUpdates[field] = rewritten
+        console.log(`    ✅ ${label}を書き換えました`)
+      } catch (error) {
+        console.error(`    ❌ ${label}の書き換えエラー:`, error.message || error)
+      }
+    }
+
+    const hasMetadataUpdates = Object.keys(metadataUpdates).length > 0
+
+    if ((updated || hasMetadataUpdates) && !DRY_RUN) {
+      try {
+        const setPayload = {
+          lastBrandCleanupAt: new Date().toISOString(),
+        }
+
+        if (updated) {
+          setPayload.body = newBody
+        }
+
+        if (hasMetadataUpdates) {
+          Object.assign(setPayload, metadataUpdates)
+        }
+
+        await sanityClient.patch(post._id).set(setPayload).commit()
         console.log('  💾 Sanity更新済み')
       } catch (error) {
         console.error('  ❌ Sanity更新エラー:', error.message || error)
       }
-    } else if (!updated) {
-      console.log('  ℹ️  対象段落は見つかりましたが更新する内容はありませんでした。')
+    } else if (!updated && !hasMetadataUpdates) {
+      console.log('  ℹ️  対象テキストは見つかりましたが更新する内容はありませんでした。')
     }
   }
 
