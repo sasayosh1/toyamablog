@@ -67,3 +67,7 @@ dist/
 *.tmp
 *.temp
 .vercel
+
+# Test artifacts
+playwright-report/
+test-results/
