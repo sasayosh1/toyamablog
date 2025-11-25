@@ -34,19 +34,19 @@ export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeader
 
 
   return (
-    <header className="sticky top-0 left-0 right-0 z-50 bg-white shadow-lg backdrop-blur-sm transition-all duration-300">
+    <header className="sticky top-0 left-0 right-0 z-50 bg-white/80 shadow-sm backdrop-blur-md transition-all duration-300 border-b border-white/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* PC用メニュー（lg以上で表示） */}
         <div className="hidden lg:flex items-center justify-between h-16">
           {/* PCナビゲーション */}
           <nav className="flex items-center space-x-8">
-            <Link href="/" className="font-medium transition-colors text-gray-800 hover:text-blue-600">
+            <Link href="/" className="font-bold transition-colors text-gray-700 hover:text-toyama-blue">
               ホーム
             </Link>
-            <Link href="/categories" className="font-medium transition-colors text-gray-800 hover:text-blue-600">
+            <Link href="/categories" className="font-bold transition-colors text-gray-700 hover:text-toyama-blue">
               地域別カテゴリー
             </Link>
-            <Link href="/about" className="font-medium transition-colors text-gray-800 hover:text-blue-600">
+            <Link href="/about" className="font-bold transition-colors text-gray-700 hover:text-toyama-blue">
               サイトについて
             </Link>
           </nav>
@@ -58,7 +58,7 @@ export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeader
           {/* ハンバーガーメニューボタン - 44px最小タッチターゲット */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] focus:outline-none transition-colors text-gray-800 hover:text-blue-600 rounded-md hover:bg-gray-100 active:bg-gray-200"
+            className="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] focus:outline-none transition-colors text-gray-700 hover:text-toyama-blue rounded-md hover:bg-gray-50 active:bg-gray-100"
             data-testid="hamburger-menu"
             aria-label="メニュー"
           >
@@ -72,40 +72,40 @@ export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeader
 
       {/* モバイル用ハンバーガーメニュー */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg" data-testid="mobile-menu">
+        <div className="lg:hidden bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-lg" data-testid="mobile-menu">
           <nav className="max-w-7xl mx-auto px-4 py-4" aria-label="mobile">
             <div className="flex flex-col space-y-3">
               <MenuLink
                 href="/"
-                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
+                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-toyama-blue hover:bg-blue-50 rounded-lg transition-colors font-medium"
                 onMenuClick={() => setIsMenuOpen(false)}
               >
-                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-toyama-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 ホーム
               </MenuLink>
               <MenuLink
                 href="/categories"
-                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
+                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-toyama-blue hover:bg-blue-50 rounded-lg transition-colors font-medium"
                 onMenuClick={() => setIsMenuOpen(false)}
               >
-                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-toyama-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                 </svg>
                 地域別カテゴリー
               </MenuLink>
               <MenuLink
                 href="/about"
-                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-md transition-colors"
+                className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-toyama-blue hover:bg-blue-50 rounded-lg transition-colors font-medium"
                 onMenuClick={() => setIsMenuOpen(false)}
               >
-                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-toyama-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 サイトについて
               </MenuLink>
-              
+
             </div>
           </nav>
         </div>
