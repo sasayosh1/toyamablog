@@ -4,9 +4,9 @@ export const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'aoxze287',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
-  useCdn: false, // トークン使用時はCDNを無効化
+  useCdn: !process.env.SANITY_API_TOKEN, // トークンがない場合はCDNを使用
   perspective: 'published', // publishedコンテンツのみ
-  token: process.env.SANITY_API_TOKEN, // サーバーサイドトークン追加
+  ...(process.env.SANITY_API_TOKEN ? { token: process.env.SANITY_API_TOKEN } : {}), // トークンがある場合のみ設定
   stega: false, // Stegaを無効化してパフォーマンス向上
   ignoreBrowserTokenWarning: true, // ブラウザトークン警告を無視
 });
@@ -125,13 +125,13 @@ export async function getAllPosts(): Promise<Post[]> {
       "categoryRefs": categories[]->title,
       "displayExcerpt": coalesce(excerpt, description)
     }
-  `, {}, { 
-    next: { 
-      tags: ['post-list'], 
+  `, {}, {
+    next: {
+      tags: ['post-list'],
       revalidate: 300 // 5分キャッシュ
-    } 
+    }
   });
-  
+
   return normalizePostCategoryList(posts);
 }
 
@@ -231,13 +231,13 @@ export async function getPost(slug: string): Promise<Post | null> {
         }
       }
     }
-  `, { slug }, { 
-    next: { 
-      tags: ['post-detail', `post-detail-${slug}`], 
+  `, { slug }, {
+    next: {
+      tags: ['post-detail', `post-detail-${slug}`],
       revalidate: 600 // 10分キャッシュ
-    } 
+    }
   });
-  
+
   return post ? normalizePostCategories(post) : null;
 }
 
@@ -276,9 +276,9 @@ export async function getAllCategories(options?: { forceFresh?: boolean }): Prom
 
 export async function searchPosts(searchTerm: string): Promise<Post[]> {
   if (!searchTerm.trim()) return [];
-  
+
   console.log(`Starting search for: "${searchTerm}"`);
-  
+
   try {
     // シンプルで高速な検索クエリ
     const posts = await client.fetch<(Post & CategoryCarrier)[]>(`
@@ -318,18 +318,18 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
         "categoryRefs": categories[]->title,
         "displayExcerpt": coalesce(excerpt, description)
       }
-    `, { searchTerm }, { 
+    `, { searchTerm }, {
       // キャッシュを無効にして即座に結果を取得
       next: { revalidate: 0 },
       cache: 'no-store'
     });
-    
+
     console.log(`Direct search for "${searchTerm}" returned ${posts.length} results`);
     return normalizePostCategoryList(posts);
-    
+
   } catch (error) {
     console.error('Direct search error:', error);
-    
+
     // フォールバック: 全件取得してクライアントサイドフィルタリング
     try {
       console.log('Attempting fallback search...');
@@ -366,24 +366,24 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
         "categoryRefs": categories[]->title,
         "displayExcerpt": coalesce(excerpt, description)
       }
-      `, {}, { 
+      `, {}, {
         next: { revalidate: 0 },
         cache: 'no-store'
       });
-      
+
       console.log(`Fetched ${fallbackPosts.length} posts for client-side filtering`);
-      
+
       // クライアントサイドフィルタリング
-      const filtered = fallbackPosts.filter(post => 
+      const filtered = fallbackPosts.filter(post =>
         post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         post.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         post.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         post.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
       );
-      
+
       console.log(`Fallback search for "${searchTerm}" returned ${filtered.length} results`);
       return normalizePostCategoryList(filtered);
-      
+
     } catch (fallbackError) {
       console.error('Fallback search error:', fallbackError);
       return [];
