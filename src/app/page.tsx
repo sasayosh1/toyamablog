@@ -2,6 +2,7 @@ import { getAllCategories, getPostsPaginated, getAllPosts } from '@/lib/sanity'
 import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 import StructuredData from '@/components/StructuredData'
+import ToyamaMap from '@/components/ToyamaMap'
 import { generateOrganizationLD, generateWebSiteLD } from '@/lib/structured-data'
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
@@ -127,6 +128,17 @@ export default async function Home({ searchParams }: PageProps) {
             </p>
           </div>
         </div>
+
+        {/* インタラクティブマップセクション */}
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">エリアから探す</h2>
+              <p className="text-gray-600">富山県は大きく4つのエリアに分かれています。<br className="hidden sm:block" />気になる地域をクリックして、その場所の魅力を発見しましょう。</p>
+            </div>
+            <ToyamaMap />
+          </div>
+        </section>
 
         {/* メイン検索バー */}
         <MainSearchBar posts={allPosts} />
