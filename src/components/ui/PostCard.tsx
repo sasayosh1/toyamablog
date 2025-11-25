@@ -102,9 +102,8 @@ function ThumbnailImage({ urls, alt, priority }: ThumbnailImageProps) {
       <img
         src={urls[currentUrlIndex]}
         alt={alt}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
-          isLoading ? 'opacity-0' : 'opacity-100'
-        }`}
+        className={`w-full h-full object-cover transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'
+          }`}
         loading={priority ? "eager" : "lazy"}
         onError={handleImageError}
         onLoad={handleImageLoad}
@@ -157,7 +156,7 @@ interface PostCardProps {
 export default function PostCard({ post, priority = false }: PostCardProps) {
   // タイトルから#shortsを削除
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
-  
+
   // 改善されたサムネイル画像取得（信頼性重視）
   const getThumbnailUrls = () => {
     const urls = [];
@@ -203,7 +202,7 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
       </svg>
     `)}`;
     urls.push(fallbackSvg);
-    
+
     return urls;
   };
 
@@ -235,44 +234,47 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
   const thumbnailUrls = getThumbnailUrls();
 
   return (
-    <Link 
+    <Link
       href={`/blog/${post.slug.current}`}
-      className="block min-h-[44px]"
+      className="block h-full"
       data-testid="article-card"
       aria-label={`記事「${cleanTitle}」を読む`}
     >
-      <article className="bg-white rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden cursor-pointer relative z-[1]" role="article">
-        <div className="relative h-48 overflow-hidden bg-gray-100">
+      <article className="bg-white rounded-2xl overflow-hidden h-full flex flex-col hover-card-effect border border-gray-100" role="article">
+        <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
           <ThumbnailImage
             urls={thumbnailUrls}
             alt={post.thumbnail?.alt || `${cleanTitle} サムネイル`}
             priority={priority}
           />
-        </div>
-        
-        <div className="p-5 md:p-6 min-h-[44px]">
-          <h3 className="text-lg md:text-xl font-semibold mb-3 text-gray-800 line-clamp-2 leading-tight">
-            {cleanTitle}
-          </h3>
-          
-          {post.categories && (
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {post.categories.slice(0, 2).map((category) => (
-                <CategoryTag
-                  key={category}
-                  className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-md"
-                >
-                  {category}
-                </CategoryTag>
-              ))}
+          {post.categories && post.categories.length > 0 && (
+            <div className="absolute top-3 left-3 z-10">
+              <CategoryTag
+                className="px-3 py-1 bg-white/90 backdrop-blur-sm text-toyama-blue-dark text-xs font-bold rounded-full shadow-sm"
+              >
+                {post.categories[0]}
+              </CategoryTag>
             </div>
           )}
+        </div>
+
+        <div className="p-6 flex flex-col flex-grow">
+          <h3 className="text-lg md:text-xl font-bold mb-3 text-gray-800 line-clamp-2 leading-snug group-hover:text-toyama-blue transition-colors">
+            {cleanTitle}
+          </h3>
 
           {(post.displayExcerpt || post.excerpt) && (
-            <p className="text-gray-800 text-sm line-clamp-2 leading-relaxed">
+            <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed mb-4 flex-grow">
               {post.displayExcerpt || post.excerpt}
             </p>
           )}
+
+          <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
+            <span>記事を読む</span>
+            <span className="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-toyama-blue">
+              →
+            </span>
+          </div>
         </div>
       </article>
     </Link>

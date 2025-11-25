@@ -61,12 +61,15 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 // ヒーロー画像コンポーネント
 function HeroImage() {
   return (
-    <img
-      src="/images/toyama-hero.png"
-      alt="富山市の風景 - 立山連峰を背景にした橋と川"
-      className="w-full h-full object-cover object-center brightness-110 contrast-105"
-      loading="eager"
-    />
+    <div className="absolute inset-0 z-0">
+      <img
+        src="/images/toyama-hero.png"
+        alt="富山市の風景 - 立山連峰を背景にした橋と川"
+        className="w-full h-full object-cover object-center scale-105 animate-fade-in"
+        loading="eager"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+    </div>
   )
 }
 
@@ -92,32 +95,35 @@ export default async function Home({ searchParams }: PageProps) {
       <StructuredData data={[organizationLD, websiteLD]} />
       <div className="min-h-screen bg-gray-50 blog-page">
         <GlobalHeader posts={allPosts} categories={categories} />
-      <div className="relative h-80 md:h-96 lg:h-[32rem] overflow-hidden">
+      
+      {/* ヒーローセクション */}
+      <div className="relative h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden flex items-end pb-12 md:pb-20">
         <HeroImage />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/15 to-black/20" />
         
-        {/* ヒーローセクション タイトル */}
-        <div className="absolute inset-0 flex items-center justify-center md:justify-start">
-          <div className="md:ml-20 lg:ml-24 xl:ml-28 px-4">
-            <div className="bg-black/20 backdrop-blur-sm rounded-lg px-6 py-4 shadow-lg">
-              <h1 className="text-white font-bold text-center md:text-left leading-tight">
-                <div className="text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-1 sm:mb-2 drop-shadow-lg">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <div className="glass-panel inline-block rounded-2xl px-8 py-6 mb-6 animate-fade-in delay-100">
+              <h1 className="text-white font-bold leading-tight">
+                <span className="block text-xl md:text-2xl mb-2 tracking-widest opacity-90">AMAZING TOYAMA</span>
+                <span className="block text-4xl md:text-6xl lg:text-7xl drop-shadow-lg">
                   富山、お好きですか？
-                </div>
-                <div className="text-xs sm:text-sm md:text-lg lg:text-xl font-medium drop-shadow-md">
-                  AMAZING TOYAMA
-                </div>
+                </span>
               </h1>
             </div>
+            <p className="text-white text-lg md:text-xl font-medium drop-shadow-md max-w-2xl animate-fade-in delay-200">
+              富山の美しい風景、美味しいグルメ、そして心温まる文化。
+              <br className="hidden md:block" />
+              あなただけの「好き」を見つける旅へ。
+            </p>
           </div>
         </div>
       </div>
 
-      {/* プロモーション表示 - ヒーロー直下配置 */} {/* 修正 */}
-      <div className="bg-white py-4 px-6">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-center text-base font-medium text-gray-800 leading-relaxed">
-            ※本サイトで紹介している商品・サービス等の外部リンクには、プロモーションが含まれています。
+      {/* プロモーション表示 - 控えめに配置 */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
+          <p className="text-xs text-gray-400 text-right">
+            ※本サイトの記事にはプロモーションが含まれる場合があります
           </p>
         </div>
       </div>

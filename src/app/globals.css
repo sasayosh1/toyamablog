@@ -1,175 +1,154 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #111827;
+  /* Modern Color Palette for Toyama Blog */
+  --background: #f8fafc; /* Slate 50 - Softer white */
+  --foreground: #1e293b; /* Slate 800 - Softer black */
+  
+  /* Brand Colors */
+  --toyama-blue: #0ea5e9; /* Sky 500 */
+  --toyama-blue-dark: #0284c7; /* Sky 600 */
+  --toyama-green: #10b981; /* Emerald 500 */
+  --toyama-accent: #f59e0b; /* Amber 500 */
+  
+  /* Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
-/* ダークモード設定を無効化 - 常にライトモード */
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
-
 body {
   background: var(--background);
-  color: #111827;
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 強制的に濃い文字色を適用 */
-* {
-  color: inherit;
+/* Typography Enhancements */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: 0.025em;
+  line-height: 1.4;
 }
 
-/* 記事コンテンツの文字色を確実に濃くする */
-.prose, .prose * {
-  color: #111827 !important;
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
-/* ピクセルアート画像のスタイル */
-.pixelated {
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-crisp-edges;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+/* Card Hover Effects */
+.hover-card-effect {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ヒーローセクションの文字色を白色に固定 */
-.text-white, .text-white * {
-  color: white !important;
+.hover-card-effect:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* ロゴテキストの強化シャドウ */
-.text-shadow-strong {
-  text-shadow: 
-    0 0 10px rgba(0, 0, 0, 0.9),
-    0 0 20px rgba(0, 0, 0, 0.8),
-    0 0 30px rgba(0, 0, 0, 0.7),
-    2px 2px 4px rgba(0, 0, 0, 1),
-    -1px -1px 2px rgba(255, 255, 255, 0.3);
+/* Text Utilities */
+.text-toyama-blue {
+  color: var(--toyama-blue);
 }
 
-.text-shadow-medium {
-  text-shadow: 
-    0 0 8px rgba(0, 0, 0, 0.8),
-    0 0 15px rgba(0, 0, 0, 0.7),
-    2px 2px 3px rgba(0, 0, 0, 0.9),
-    -1px -1px 1px rgba(255, 255, 255, 0.2);
+.text-toyama-blue-dark {
+  color: var(--toyama-blue-dark);
 }
 
-/* グラデーション背景の追加 */
-.bg-gradient-radial {
-  background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.text-gray-100 {
-  color: #f3f4f6 !important;
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
 }
 
-/* ブログページ内のリンクのアンダーラインを削除（スコープ限定） */
-/* ナビゲーション、カードコンポーネント、ボタン類のリンク */
-.blog-page .bg-white a,
-.blog-page .bg-blue-600 a,
-.blog-page .bg-green-600 a,
-.blog-page .bg-gray-600 a,
-.categories-page a,
-.category-page a {
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Prose Customization for Blog Content */
+.prose {
+  max-width: 65ch;
+  color: #334155; /* Slate 700 */
+}
+
+.prose h2 {
+  color: #1e293b;
+  font-weight: 700;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5em;
+  margin-top: 2em;
+}
+
+.prose h3 {
+  color: #334155;
+  font-weight: 600;
+  margin-top: 1.5em;
+}
+
+.prose p {
+  line-height: 1.8;
+  margin-bottom: 1.5em;
+}
+
+.prose a {
+  color: var(--toyama-blue-dark);
   text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
 }
 
-/* PostCard内のリンク */
-.blog-page article a,
-.blog-page .bg-white a {
-  text-decoration: none;
+.prose a:hover {
+  border-bottom-color: var(--toyama-blue-dark);
 }
 
-/* 追加のコントラスト改善 */
-.prose blockquote {
-  color: #111827 !important;
+.prose img {
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.prose figcaption, .prose .caption {
-  color: #111827 !important;
+/* Utility for text shadow */
+.text-shadow-sm {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-/* ブログコンテンツの詳細スタイル */
-.blog-content.prose h1, .blog-content.prose h2, .blog-content.prose h3, .blog-content.prose h4, .blog-content.prose h5, .blog-content.prose h6 {
-  color: #111827 !important;
-  font-weight: 800 !important;
-  text-shadow: none !important;
-  opacity: 1 !important;
+.text-shadow-md {
+  text-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
 }
 
-.blog-content.prose h2 {
-  font-size: 1.875rem !important;
-  margin-top: 2rem !important;
-  margin-bottom: 1rem !important;
-  border-bottom: 2px solid #e5e7eb !important;
-  padding-bottom: 0.5rem !important;
+.text-shadow-lg {
+  text-shadow: 0 15px 30px rgba(0,0,0,0.11), 0 5px 15px rgba(0,0,0,0.08);
 }
 
-.blog-content.prose h3 {
-  font-size: 1.5rem !important;
-  margin-top: 1.5rem !important;
-  margin-bottom: 0.75rem !important;
-  font-weight: 700 !important;
+/* Animation Utilities */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.blog-content.prose p, .blog-content.prose span, .blog-content.prose div, .blog-content.prose li, .blog-content.prose td, .blog-content.prose th {
-  color: #111827 !important;
-  line-height: 1.8 !important;
-  font-size: 1.125rem !important;
-  font-weight: 500 !important;
-  text-shadow: none !important;
-  opacity: 1 !important;
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
 }
 
-.blog-content.prose p {
-  margin-bottom: 1.25rem !important;
-}
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
 
-.blog-content.prose [data-sanity-span], .blog-content.prose [data-sanity-block] {
-  color: #111827 !important;
-  opacity: 1 !important;
-}
-
-.blog-content.prose a {
-  color: #2563eb !important;
-  font-weight: 600 !important;
-  text-decoration: none !important;
-}
-
-.blog-content.prose strong {
-  color: #111827 !important;
-  font-weight: 700 !important;
-}
-
-.blog-content.prose em {
-  color: #111827 !important;
-  font-style: italic !important;
-}
-
-/* Line clamps for text truncation */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
