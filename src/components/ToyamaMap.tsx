@@ -6,6 +6,7 @@ import Link from 'next/link'
 type Area = {
     id: string
     name: string
+    enName: string // 英語名を追加
     label: string
     description: string
     color: string
@@ -19,6 +20,7 @@ const areas: Area[] = [
     {
         id: 'gosei',
         name: '呉西エリア',
+        enName: 'GO-WEST',
         label: '高岡・氷見・射水',
         description: '歴史ある街並みと海の幸',
         color: 'fill-blue-400',
@@ -31,6 +33,7 @@ const areas: Area[] = [
     {
         id: 'tonami',
         name: '砺波エリア',
+        enName: 'TONAMI',
         label: '砺波・南砺・小矢部',
         description: '散居村の風景と世界遺産',
         color: 'fill-green-500',
@@ -43,6 +46,7 @@ const areas: Area[] = [
     {
         id: 'gotou',
         name: '富山エリア',
+        enName: 'TOYAMA CITY',
         label: '富山市・立山',
         description: '都市の賑わいと雄大な山々',
         color: 'fill-indigo-500',
@@ -55,6 +59,7 @@ const areas: Area[] = [
     {
         id: 'niikawa',
         name: '新川エリア',
+        enName: 'NIIKAWA',
         label: '魚津・黒部・朝日',
         description: '秘境トロッコと名水の里',
         color: 'fill-cyan-500',
@@ -99,20 +104,34 @@ export default function ToyamaMap() {
                             />
 
                             {/* エリアラベル（常時表示またはホバー時強調） */}
-                            <text
-                                x={area.x}
-                                y={area.y}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                                className={`
-                  text-lg font-bold fill-white pointer-events-none
-                  transition-all duration-300
-                  ${hoveredArea === area.id ? 'text-2xl drop-shadow-md' : 'drop-shadow-sm'}
-                `}
-                                style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
+                            <g
+                                className={`transition-all duration-300 pointer-events-none`}
+                                style={{
+                                    transform: hoveredArea === area.id ? 'scale(1.1)' : 'scale(1)',
+                                    transformOrigin: `${area.x}px ${area.y}px`
+                                }}
                             >
-                                {area.name}
-                            </text>
+                                <text
+                                    x={area.x}
+                                    y={area.y - 10}
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    className="text-lg font-bold fill-white drop-shadow-md"
+                                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
+                                >
+                                    {area.name}
+                                </text>
+                                <text
+                                    x={area.x}
+                                    y={area.y + 12}
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    className="text-xs font-bold fill-white/90 tracking-widest uppercase drop-shadow-sm"
+                                    style={{ fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.1em' }}
+                                >
+                                    {area.enName}
+                                </text>
+                            </g>
                         </Link>
                     ))}
                 </svg>
@@ -132,13 +151,13 @@ export default function ToyamaMap() {
                                     <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                         <span className={`w-3 h-3 rounded-full ${area.color.replace('fill-', 'bg-')}`} />
                                         {area.name}
-                                        <span className="text-sm font-normal text-gray-500">({area.label})</span>
+                                        <span className="text-sm font-normal text-gray-400 font-mono tracking-wider ml-1">{area.enName}</span>
                                     </h3>
                                     <p className="text-gray-600 mt-1">{area.description}</p>
                                 </div>
                                 <div className="flex-shrink-0">
                                     <span className="inline-flex items-center px-4 py-2 bg-toyama-blue text-white text-sm font-bold rounded-full">
-                                        記事を見る →
+                                        VIEW MORE →
                                     </span>
                                 </div>
                             </div>
