@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 type Area = {
@@ -79,6 +79,17 @@ const areas: Area[] = [
 export default function ToyamaMap() {
     const [hoveredArea, setHoveredArea] = useState<string | null>(null)
     const [isSticky, setIsSticky] = useState(false)
+    const [hasHover, setHasHover] = useState(true) // デフォルトはPC（ホバーあり）と仮定
+
+    // タッチデバイスかどうか（ホバーが使えるか）を判定
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(hover: hover)')
+        setHasHover(mediaQuery.matches)
+
+        const handler = (e: MediaQueryListEvent) => setHasHover(e.matches)
+        mediaQuery.addEventListener('change', handler)
+        return () => mediaQuery.removeEventListener('change', handler)
+    }, [])
 
     return (
         <div className="w-full max-w-4xl mx-auto p-4">
@@ -92,7 +103,7 @@ export default function ToyamaMap() {
                         className="w-full h-full drop-shadow-xl"
                         style={{ filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.1))' }}
                         onClick={() => {
-                            // 背景クリックで選択解除（スティッキー状態も解除）
+                            // 背景クリックで選択解除
                             setHoveredArea(null)
                             setIsSticky(false)
                         }}
@@ -111,22 +122,24 @@ export default function ToyamaMap() {
                                         transformOrigin: `${area.x}px ${area.y}px`,
                                         transform: hoveredArea === area.id ? 'scale(1.02)' : 'scale(1)'
                                     }}
+                                    // PC（ホバー対応デバイス）のみホバーイベントを有効化
                                     onMouseEnter={() => {
-                                        setHoveredArea(area.id)
-                                        setIsSticky(false) // ホバー時はスティッキー解除（PCの挙動）
+                                        if (hasHover) {
+                                            setHoveredArea(area.id)
+                                            setIsSticky(false)
+                                        }
                                     }}
                                     onMouseLeave={() => {
-                                        // クリック（タップ）で選択された場合は解除しない
-                                        if (!isSticky) {
+                                        if (hasHover && !isSticky) {
                                             setHoveredArea(null)
                                         }
                                     }}
-                                    // スマホでのタップ操作を改善：リンクではなくdivとして扱い、クリックでステート更新のみ行う
+                                    // クリック/タップ時の処理
                                     onClick={(e) => {
                                         e.preventDefault()
-                                        e.stopPropagation() // 背景クリックへの伝播を防ぐ
+                                        e.stopPropagation()
                                         setHoveredArea(area.id)
-                                        setIsSticky(true) // クリック時は選択を維持
+                                        setIsSticky(true)
                                     }}
                                 />
 
@@ -164,7 +177,7 @@ export default function ToyamaMap() {
                     </svg>
                 </div>
 
-                {/* PC用：ホバー時の情報パネル（地図の上にオーバーレイ） */}
+                {/* PC用：ホバー時の情報パネル */}
                 <div className={`
           hidden md:block
           absolute bottom-6 left-6 right-6 
@@ -212,7 +225,8 @@ export default function ToyamaMap() {
                     return (
                         <Link
                             href={area.href}
-                            className="block bg-white rounded-xl p-6 shadow-md border border-gray-100 animate-fade-in"
+                            // タップ時のフィードバックを追加（scale, bg-gray-50）
+                            className="block bg-white rounded-xl p-6 shadow-md border border-gray-100 animate-fade-in active:scale-[0.98] active:bg-gray-50 transition-all duration-100"
                         >
                             <div className="flex flex-col gap-3">
                                 <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
@@ -235,7 +249,8 @@ export default function ToyamaMap() {
                                     <span className="font-mono text-xs md:text-sm">{area.cities}</span>
                                 </div>
 
-                                <div className="mt-2 text-center text-blue-600 font-bold text-sm flex items-center justify-center gap-1">
+                                {/* ボタンらしい見た目に強化 */}
+                                <div className="mt-2 text-center bg-blue-600 text-white font-bold text-sm py-3 rounded-lg shadow-sm flex items-center justify-center gap-1 active:bg-blue-700 transition-colors">
                                     <span>記事一覧を見る</span>
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
