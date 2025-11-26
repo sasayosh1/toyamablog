@@ -222,13 +222,13 @@ export default function ToyamaMap() {
             <div className="md:hidden min-h-[200px]">
                 {hoveredArea ? (() => {
                     const area = areas.find(a => a.id === hoveredArea)!
+                    const cityList = area.cities.split(' / ')
+
                     return (
-                        <Link
-                            href={area.href}
-                            // タップ時のフィードバックを追加（scale, bg-gray-50）
-                            className="block bg-white rounded-xl p-6 shadow-md border border-gray-100 animate-fade-in active:scale-[0.98] active:bg-gray-50 transition-all duration-100"
+                        <div
+                            className="block bg-white rounded-xl p-6 shadow-md border border-gray-100 animate-fade-in"
                         >
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-4">
                                 <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
                                     <span className={`w-4 h-4 rounded-full ${area.color.replace('fill-', 'bg-')}`} />
                                     <h3 className="text-2xl font-bold text-gray-900">
@@ -241,23 +241,23 @@ export default function ToyamaMap() {
                                     {area.description}
                                 </p>
 
-                                <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
-                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span className="font-mono text-xs md:text-sm">{area.cities}</span>
-                                </div>
-
-                                {/* ボタンらしい見た目に強化 */}
-                                <div className="mt-2 text-center bg-blue-600 text-white font-bold text-sm py-3 rounded-lg shadow-sm flex items-center justify-center gap-1 active:bg-blue-700 transition-colors">
-                                    <span>記事一覧を見る</span>
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                                    </svg>
+                                {/* 市町村リストをボタンとして表示 */}
+                                <div>
+                                    <p className="text-xs text-gray-400 mb-2 font-bold">地域を選択して記事を見る</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {cityList.map((city) => (
+                                            <Link
+                                                key={city}
+                                                href={`/category/${city}`}
+                                                className="inline-block px-4 py-2 bg-gray-50 text-gray-700 text-sm font-bold rounded-lg border border-gray-200 active:bg-blue-50 active:border-blue-300 active:text-blue-600 transition-colors"
+                                            >
+                                                {city}
+                                            </Link>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </Link>
+                        </div>
                     )
                 })() : (
                     <div className="flex items-center justify-center h-full text-gray-400 text-sm bg-gray-50 rounded-xl p-8 border border-dashed border-gray-200">
