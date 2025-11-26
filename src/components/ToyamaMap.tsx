@@ -81,69 +81,76 @@ export default function ToyamaMap() {
 
     return (
         <div className="w-full max-w-4xl mx-auto p-4">
-            <div className="relative aspect-[4/3] w-full bg-blue-50/50 rounded-3xl overflow-hidden border border-blue-100 shadow-inner mb-4">
+            <div className="relative w-full bg-blue-50/50 rounded-3xl overflow-hidden border border-blue-100 shadow-inner mb-6">
                 {/* 背景の装飾（富山湾） */}
                 <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-blue-200/30 to-transparent pointer-events-none" />
 
-                <svg
-                    viewBox="0 0 800 600"
-                    className="w-full h-full drop-shadow-xl"
-                    style={{ filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.1))' }}
-                >
-                    {areas.map((area) => (
-                        <Link key={area.id} href={area.href} className="group outline-none">
-                            <path
-                                d={area.path}
-                                className={`
-                  ${area.color} 
-                  transition-all duration-300 ease-out
-                  stroke-white stroke-[3]
-                  ${hoveredArea === area.id ? 'opacity-100 scale-105' : 'opacity-80 hover:opacity-100'}
-                `}
-                                style={{
-                                    transformOrigin: `${area.x}px ${area.y}px`,
-                                    transform: hoveredArea === area.id ? 'scale(1.02)' : 'scale(1)'
-                                }}
-                                onMouseEnter={() => setHoveredArea(area.id)}
-                                onMouseLeave={() => setHoveredArea(null)}
-                                onClick={() => setHoveredArea(area.id)} // スマホ用：タップでも選択状態にする
-                            />
+                <div className="aspect-[4/3] w-full relative">
+                    <svg
+                        viewBox="0 0 800 600"
+                        className="w-full h-full drop-shadow-xl"
+                        style={{ filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.1))' }}
+                    >
+                        {areas.map((area) => (
+                            <g key={area.id} className="group outline-none cursor-pointer">
+                                <path
+                                    d={area.path}
+                                    className={`
+                      ${area.color} 
+                      transition-all duration-300 ease-out
+                      stroke-white stroke-[3]
+                      ${hoveredArea === area.id ? 'opacity-100 scale-105' : 'opacity-80 hover:opacity-100'}
+                    `}
+                                    style={{
+                                        transformOrigin: `${area.x}px ${area.y}px`,
+                                        transform: hoveredArea === area.id ? 'scale(1.02)' : 'scale(1)'
+                                    }}
+                                    onMouseEnter={() => setHoveredArea(area.id)}
+                                    onMouseLeave={() => setHoveredArea(null)}
+                                    // スマホでのタップ操作を改善：リンクではなくdivとして扱い、クリックでステート更新のみ行う
+                                    onClick={(e) => {
+                                        e.preventDefault() // リンク遷移を防ぐ
+                                        setHoveredArea(area.id)
+                                    }}
+                                />
 
-                            {/* エリアラベル（常時表示またはホバー時強調） */}
-                            <g
-                                className={`transition-all duration-300 pointer-events-none`}
-                                style={{
-                                    transform: hoveredArea === area.id ? 'scale(1.1)' : 'scale(1)',
-                                    transformOrigin: `${area.x}px ${area.y}px`
-                                }}
-                            >
-                                <text
-                                    x={area.x}
-                                    y={area.y - 10}
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    className="text-lg font-bold fill-white drop-shadow-md"
-                                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
+                                {/* エリアラベル */}
+                                <g
+                                    className={`transition-all duration-300 pointer-events-none`}
+                                    style={{
+                                        transform: hoveredArea === area.id ? 'scale(1.1)' : 'scale(1)',
+                                        transformOrigin: `${area.x}px ${area.y}px`
+                                    }}
                                 >
-                                    {area.name}
-                                </text>
-                                <text
-                                    x={area.x}
-                                    y={area.y + 12}
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    className="text-xs font-bold fill-white/90 tracking-widest uppercase drop-shadow-sm"
-                                    style={{ fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.1em' }}
-                                >
-                                    {area.enName}
-                                </text>
+                                    <text
+                                        x={area.x}
+                                        y={area.y - 10}
+                                        textAnchor="middle"
+                                        dominantBaseline="middle"
+                                        className="text-lg font-bold fill-white drop-shadow-md"
+                                        style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
+                                    >
+                                        {area.name}
+                                    </text>
+                                    <text
+                                        x={area.x}
+                                        y={area.y + 12}
+                                        textAnchor="middle"
+                                        dominantBaseline="middle"
+                                        className="text-xs font-bold fill-white/90 tracking-widest uppercase drop-shadow-sm"
+                                        style={{ fontFamily: 'var(--font-geist-mono)', letterSpacing: '0.1em' }}
+                                    >
+                                        {area.enName}
+                                    </text>
+                                </g>
                             </g>
-                        </Link>
-                    ))}
-                </svg>
+                        ))}
+                    </svg>
+                </div>
 
-                {/* ホバー時の情報パネル（クリックで遷移可能に） */}
+                {/* PC用：ホバー時の情報パネル（地図の上にオーバーレイ） */}
                 <div className={`
+          hidden md:block
           absolute bottom-6 left-6 right-6 
           transition-all duration-300 transform
           ${hoveredArea ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'}
@@ -182,11 +189,50 @@ export default function ToyamaMap() {
                 </div>
             </div>
 
-            {/* デフォルトの案内メッセージ（地図の外に配置） */}
-            <div className="text-center">
-                <p className="inline-block text-gray-500 text-sm">
-                    地図のエリアをタップして地域を選択
-                </p>
+            {/* スマホ用：選択時の情報パネル（地図の下に表示） */}
+            <div className="md:hidden min-h-[200px]">
+                {hoveredArea ? (() => {
+                    const area = areas.find(a => a.id === hoveredArea)!
+                    return (
+                        <Link
+                            href={area.href}
+                            className="block bg-white rounded-xl p-6 shadow-md border border-gray-100 animate-fade-in"
+                        >
+                            <div className="flex flex-col gap-3">
+                                <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
+                                    <span className={`w-4 h-4 rounded-full ${area.color.replace('fill-', 'bg-')}`} />
+                                    <h3 className="text-2xl font-bold text-gray-900">
+                                        {area.name}
+                                        <span className="text-sm font-normal text-gray-400 font-mono tracking-wider ml-2">{area.enName}</span>
+                                    </h3>
+                                </div>
+
+                                <p className="text-gray-700 leading-relaxed font-medium">
+                                    {area.description}
+                                </p>
+
+                                <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span className="font-mono text-xs md:text-sm">{area.cities}</span>
+                                </div>
+
+                                <div className="mt-2 text-center text-blue-600 font-bold text-sm flex items-center justify-center gap-1">
+                                    <span>記事一覧を見る</span>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </Link>
+                    )
+                })() : (
+                    <div className="flex items-center justify-center h-full text-gray-400 text-sm bg-gray-50 rounded-xl p-8 border border-dashed border-gray-200">
+                        <p>地図のエリアをタップすると詳細が表示されます</p>
+                    </div>
+                )}
             </div>
         </div>
     )
