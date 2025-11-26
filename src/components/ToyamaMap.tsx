@@ -6,9 +6,10 @@ import Link from 'next/link'
 type Area = {
     id: string
     name: string
-    enName: string // 英語名を追加
+    enName: string
     label: string
     description: string
+    cities: string // 市町村リストを追加
     color: string
     path: string
     href: string
@@ -22,7 +23,8 @@ const areas: Area[] = [
         name: '呉西エリア',
         enName: 'GO-WEST',
         label: '高岡・氷見・射水',
-        description: '歴史ある街並みと海の幸',
+        description: '国宝・瑞龍寺や雨晴海岸など、歴史と絶景が息づくエリア。新鮮な海の幸も魅力です。',
+        cities: '高岡市 / 氷見市 / 射水市',
         color: 'fill-blue-400',
         // 左上エリア（氷見・高岡・射水）
         path: 'M 100,150 L 250,150 L 300,250 L 250,350 L 100,300 Z',
@@ -35,7 +37,8 @@ const areas: Area[] = [
         name: '砺波エリア',
         enName: 'TONAMI',
         label: '砺波・南砺・小矢部',
-        description: '散居村の風景と世界遺産',
+        description: '散居村の美しい田園風景と、世界遺産・五箇山合掌造り集落がある日本の原風景。',
+        cities: '砺波市 / 南砺市 / 小矢部市',
         color: 'fill-green-500',
         // 左下エリア（砺波・南砺）
         path: 'M 100,300 L 250,350 L 300,450 L 150,550 L 50,450 Z',
@@ -48,7 +51,8 @@ const areas: Area[] = [
         name: '富山エリア',
         enName: 'TOYAMA CITY',
         label: '富山市・立山',
-        description: '都市の賑わいと雄大な山々',
+        description: '富山県の中心地。富山駅周辺のグルメから、立山黒部アルペンルートの大自然まで楽しめます。',
+        cities: '富山市 / 立山町 / 上市町 / 舟橋村',
         color: 'fill-indigo-500',
         // 中央エリア（富山市）
         path: 'M 250,150 L 450,150 L 500,300 L 450,550 L 300,450 L 250,350 L 300,250 Z',
@@ -61,7 +65,8 @@ const areas: Area[] = [
         name: '新川エリア',
         enName: 'NIIKAWA',
         label: '魚津・黒部・朝日',
-        description: '秘境トロッコと名水の里',
+        description: '黒部峡谷トロッコ電車や宇奈月温泉、ホタルイカなど、神秘的な自然と名水に恵まれた里。',
+        cities: '魚津市 / 黒部市 / 滑川市 / 入善町 / 朝日町',
         color: 'fill-cyan-500',
         // 右エリア（魚津・黒部）
         path: 'M 450,150 L 650,100 L 700,300 L 550,500 L 450,550 L 500,300 Z',
@@ -146,19 +151,25 @@ export default function ToyamaMap() {
                     {hoveredArea && (() => {
                         const area = areas.find(a => a.id === hoveredArea)!
                         return (
-                            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                                <div>
-                                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                        <span className={`w-3 h-3 rounded-full ${area.color.replace('fill-', 'bg-')}`} />
+                            <div className="flex flex-col gap-3">
+                                <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
+                                    <span className={`w-4 h-4 rounded-full ${area.color.replace('fill-', 'bg-')}`} />
+                                    <h3 className="text-2xl font-bold text-gray-900">
                                         {area.name}
-                                        <span className="text-sm font-normal text-gray-400 font-mono tracking-wider ml-1">{area.enName}</span>
+                                        <span className="text-sm font-normal text-gray-400 font-mono tracking-wider ml-2">{area.enName}</span>
                                     </h3>
-                                    <p className="text-gray-600 mt-1">{area.description}</p>
                                 </div>
-                                <div className="flex-shrink-0">
-                                    <span className="inline-flex items-center px-4 py-2 bg-toyama-blue text-white text-sm font-bold rounded-full">
-                                        VIEW MORE →
-                                    </span>
+
+                                <p className="text-gray-700 leading-relaxed font-medium">
+                                    {area.description}
+                                </p>
+
+                                <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span className="font-mono text-xs md:text-sm">{area.cities}</span>
                                 </div>
                             </div>
                         )
