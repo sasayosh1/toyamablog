@@ -78,6 +78,7 @@ const areas: Area[] = [
 
 export default function ToyamaMap() {
     const [hoveredArea, setHoveredArea] = useState<string | null>(null)
+    const [isSticky, setIsSticky] = useState(false)
 
     return (
         <div className="w-full max-w-4xl mx-auto p-4">
@@ -90,6 +91,11 @@ export default function ToyamaMap() {
                         viewBox="0 0 800 600"
                         className="w-full h-full drop-shadow-xl"
                         style={{ filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.1))' }}
+                        onClick={() => {
+                            // 背景クリックで選択解除（スティッキー状態も解除）
+                            setHoveredArea(null)
+                            setIsSticky(false)
+                        }}
                     >
                         {areas.map((area) => (
                             <g key={area.id} className="group outline-none cursor-pointer">
@@ -105,12 +111,22 @@ export default function ToyamaMap() {
                                         transformOrigin: `${area.x}px ${area.y}px`,
                                         transform: hoveredArea === area.id ? 'scale(1.02)' : 'scale(1)'
                                     }}
-                                    onMouseEnter={() => setHoveredArea(area.id)}
-                                    onMouseLeave={() => setHoveredArea(null)}
+                                    onMouseEnter={() => {
+                                        setHoveredArea(area.id)
+                                        setIsSticky(false) // ホバー時はスティッキー解除（PCの挙動）
+                                    }}
+                                    onMouseLeave={() => {
+                                        // クリック（タップ）で選択された場合は解除しない
+                                        if (!isSticky) {
+                                            setHoveredArea(null)
+                                        }
+                                    }}
                                     // スマホでのタップ操作を改善：リンクではなくdivとして扱い、クリックでステート更新のみ行う
                                     onClick={(e) => {
-                                        e.preventDefault() // リンク遷移を防ぐ
+                                        e.preventDefault()
+                                        e.stopPropagation() // 背景クリックへの伝播を防ぐ
                                         setHoveredArea(area.id)
+                                        setIsSticky(true) // クリック時は選択を維持
                                     }}
                                 />
 
