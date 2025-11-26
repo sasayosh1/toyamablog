@@ -137,6 +137,7 @@ export default async function Home({ searchParams }: PageProps) {
               <p className="text-gray-600">富山県は大きく4つのエリアに分かれています。<br className="hidden sm:block" />気になる地域をクリックして、その場所の魅力を発見しましょう。</p>
             </div>
             <ToyamaMap />
+            {/* Map Section End */}
           </div>
         </section>
 
