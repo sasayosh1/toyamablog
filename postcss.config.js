@@ -1,7 +1,8 @@
-const config = {
+/**
+ * PostCSS config (ESM)
+ */
+export default {
   plugins: {
     '@tailwindcss/postcss': {},
   },
 };
-
-export default config;

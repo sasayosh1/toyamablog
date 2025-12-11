@@ -4,9 +4,9 @@ export const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'aoxze287',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
-  useCdn: !process.env.SANITY_API_TOKEN, // トークンがない場合はCDNを使用
+  // 公開データのみ使用するためCDNを強制。トークンは使用しない（認証エラーを防止）
+  useCdn: true,
   perspective: 'published', // publishedコンテンツのみ
-  ...(process.env.SANITY_API_TOKEN ? { token: process.env.SANITY_API_TOKEN } : {}), // トークンがある場合のみ設定
   stega: false, // Stegaを無効化してパフォーマンス向上
   ignoreBrowserTokenWarning: true, // ブラウザトークン警告を無視
 });
