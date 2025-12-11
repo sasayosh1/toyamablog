@@ -1,8 +1,11 @@
 import { createClient } from '@sanity/client';
 
+const normalize = (v: string | undefined, fallback: string) =>
+  (v || fallback).trim().toLowerCase().replace(/\s+/g, '')
+
 export const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'aoxze287',
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  projectId: normalize(process.env.NEXT_PUBLIC_SANITY_PROJECT_ID, 'aoxze287'),
+  dataset: normalize(process.env.NEXT_PUBLIC_SANITY_DATASET, 'production'),
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
   // 公開データのみ使用するためCDNを強制。トークンは使用しない（認証エラーを防止）
   useCdn: true,
