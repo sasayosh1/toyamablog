@@ -5,7 +5,7 @@ const fallbackProjectId = 'aoxze287'
 const fallbackDataset = 'production'
 
 function sanitizeProjectId(raw?: string) {
-  const value = (raw || fallbackProjectId).trim()
+  const value = (raw || fallbackProjectId).trim().toLowerCase()
   const normalized = value.replace(/\s+/g, '')
   if (!/^[a-z0-9-]+$/.test(normalized)) {
     throw new Error(
@@ -16,7 +16,7 @@ function sanitizeProjectId(raw?: string) {
 }
 
 function sanitizeDataset(raw?: string) {
-  const value = (raw || fallbackDataset).trim()
+  const value = (raw || fallbackDataset).trim().toLowerCase()
   const normalized = value.replace(/\s+/g, '')
   if (!/^[a-z0-9-]+$/.test(normalized)) {
     throw new Error(
