@@ -1,20 +1,32 @@
 export const apiVersion =
   process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2025-07-15'
 
-export const dataset = assertValue(
-  process.env.NEXT_PUBLIC_SANITY_DATASET,
-  'Missing environment variable: NEXT_PUBLIC_SANITY_DATASET'
-)
+const fallbackProjectId = 'aoxze287'
+const fallbackDataset = 'production'
 
-export const projectId = assertValue(
-  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-  'Missing environment variable: NEXT_PUBLIC_SANITY_PROJECT_ID'
-)
-
-function assertValue<T>(v: T | undefined, errorMessage: string): T {
-  if (v === undefined) {
-    throw new Error(errorMessage)
+function sanitizeProjectId(raw?: string) {
+  const value = (raw || fallbackProjectId).trim()
+  const normalized = value.replace(/\s+/g, '')
+  if (!/^[a-z0-9-]+$/.test(normalized)) {
+    throw new Error(
+      `Invalid Sanity projectId "${normalized}". Use only lowercase a-z, 0-9, and dashes.`
+    )
   }
-
-  return v
+  return normalized
 }
+
+function sanitizeDataset(raw?: string) {
+  const value = (raw || fallbackDataset).trim()
+  const normalized = value.replace(/\s+/g, '')
+  if (!/^[a-z0-9-]+$/.test(normalized)) {
+    throw new Error(
+      `Invalid Sanity dataset "${normalized}". Use only lowercase a-z, 0-9, and dashes.`
+    )
+  }
+  return normalized
+}
+
+export const dataset = sanitizeDataset(process.env.NEXT_PUBLIC_SANITY_DATASET)
+export const projectId = sanitizeProjectId(
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+)
