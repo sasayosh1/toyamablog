@@ -7,7 +7,7 @@ import { urlForImage } from '@/sanity/lib/image'
 import { extractYouTubeId, generateHeadingId } from '@/lib/utils'
 
 // HTMLコンテンツをパースして処理する関数
-function processTextContent(text: string): React.ReactNode {
+function processTextContent(text: string): string {
   // YouTube iframeを検出して置換
   const youtubeIframeRegex = /<iframe[^>]*src="[^"]*youtube\.com\/embed\/([^"]*)"[^>]*><\/iframe>/gi
   
@@ -31,6 +31,81 @@ function processTextContent(text: string): React.ReactNode {
 
   // <br />タグを改行に置換
   return text.replace(/<br\s*\/?>/gi, '\n')
+}
+
+// テキスト内の太字記法を処理するヘルパー関数
+function processTextWithBold(text: string): React.ReactNode[] {
+  const processed = processTextContent(text)
+  // 改行を<br>タグに変換し、太字記法(**text**)を処理
+  return processed.split('\n').map((line, index, array) => {
+    // 太字記法をパース
+    const parts = line.split(/(\*\*[^*]+\*\*)/g)
+    const lineContent = parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="font-bold">{part.slice(2, -2)}</strong>
+      }
+      return part
+    })
+
+    return (
+      <React.Fragment key={index}>
+        {lineContent}
+        {index < array.length - 1 && <br />}
+      </React.Fragment>
+    )
+  })
+}
+
+// markdown風の簡易記法を判定してReact要素を返す
+function renderMarkdownish(text: string): React.ReactNode {
+  const headingMatch = text.match(/^(#{1,6})\s+(.*)$/)
+  if (headingMatch) {
+    const level = headingMatch[1].length
+    const content = headingMatch[2]
+    const Tag = (`h${Math.min(level, 6)}`) as keyof React.JSX.IntrinsicElements
+    const classNames =
+      level <= 2
+        ? 'text-lg md:text-xl font-semibold text-gray-800 border-l-3 border-blue-500 pl-3 md:pl-4 my-4 md:my-6'
+        : level === 3
+        ? 'text-base md:text-lg font-medium text-gray-700 my-3 md:my-4'
+        : 'text-base font-medium text-gray-700 my-2'
+    return <Tag className={classNames}>{content}</Tag>
+  }
+
+  // 箇条書き（* または - で始まる行が複数ある場合）
+  const lines = text.split('\n')
+  const listLines = lines.filter((line) => line.trim().startsWith('* ') || line.trim().startsWith('- '))
+  if (listLines.length >= 2 || (listLines.length === lines.length && listLines.length > 0)) {
+    return (
+      <ul style={{ margin: '1rem 0', paddingLeft: '1.5rem' }}>
+        {lines
+          .filter((line) => line.trim())
+          .map((line, idx) => {
+            const isList = line.trim().startsWith('* ') || line.trim().startsWith('- ')
+            const body = isList ? line.trim().slice(2) : line
+            return (
+              <li key={idx} style={{ margin: '0.5rem 0', lineHeight: '1.6' }}>
+                {processTextWithBold(body)}
+              </li>
+            )
+          })}
+      </ul>
+    )
+  }
+
+  // デフォルト: 太字を処理した段落
+  return (
+    <p
+      style={{
+        margin: '1rem 0',
+        lineHeight: '1.7',
+        fontSize: '1.125rem',
+        whiteSpace: 'pre-wrap',
+      }}
+    >
+      {processTextWithBold(text)}
+    </p>
+  )
 }
 
 // カスタムコンポーネントの定義
@@ -101,14 +176,8 @@ const components = {
       
       if (!videoId) {
         return (
-          <div style={{ 
-            margin: '2rem 0',
-            padding: '1rem',
-            backgroundColor: '#f0f0f0',
-            borderRadius: '8px',
-            textAlign: 'center'
-          }}>
-            <p>YouTube動画: {url}</p>
+          <div className="bg-gray-100 p-4 rounded text-center text-gray-500">
+            動画を読み込めませんでした
           </div>
         )
       }
@@ -338,32 +407,24 @@ const components = {
       )
     },
     normal: ({ children }: { children: React.ReactNode }) => {
-      // 子要素がテキストの場合、HTMLコンテンツを処理
-      const processedChildren = React.Children.map(children, (child) => {
-        if (typeof child === 'string') {
-          const processed = processTextContent(child)
-          if (typeof processed === 'string') {
-            // 改行を<br>タグに変換
-            return processed.split('\n').map((line, index, array) => (
-              <React.Fragment key={index}>
-                {line}
-                {index < array.length - 1 && <br />}
-              </React.Fragment>
-            ))
-          }
-          return processed
+      // 文字列のみのブロックにmarkdown風記法が含まれる場合はパースして表示
+      if (React.Children.count(children) === 1) {
+        const onlyChild = React.Children.toArray(children)[0]
+        if (typeof onlyChild === 'string') {
+          return renderMarkdownish(onlyChild)
         }
-        return child
-      })
+      }
 
       return (
-        <p style={{ 
-          margin: '1rem 0',
-          lineHeight: '1.7',
-          fontSize: '1.125rem',
-          whiteSpace: 'pre-wrap'
-        }}>
-          {processedChildren}
+        <p
+          style={{
+            margin: '1rem 0',
+            lineHeight: '1.7',
+            fontSize: '1.125rem',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {children}
         </p>
       )
     },
@@ -398,22 +459,38 @@ const components = {
     ),
   },
   listItem: {
-    bullet: ({ children }: { children: React.ReactNode }) => (
-      <li style={{ 
-        margin: '0.5rem 0',
-        lineHeight: '1.6'
-      }}>
-        {children}
-      </li>
-    ),
-    number: ({ children }: { children: React.ReactNode }) => (
-      <li style={{ 
-        margin: '0.5rem 0',
-        lineHeight: '1.6'
-      }}>
-        {children}
-      </li>
-    ),
+    bullet: ({ children }: { children: React.ReactNode }) => {
+      const processedChildren = React.Children.map(children, (child) => {
+        if (typeof child === 'string') {
+          return processTextWithBold(child)
+        }
+        return child
+      })
+      return (
+        <li style={{ 
+          margin: '0.5rem 0',
+          lineHeight: '1.6'
+        }}>
+          {processedChildren}
+        </li>
+      )
+    },
+    number: ({ children }: { children: React.ReactNode }) => {
+      const processedChildren = React.Children.map(children, (child) => {
+        if (typeof child === 'string') {
+          return processTextWithBold(child)
+        }
+        return child
+      })
+      return (
+        <li style={{ 
+          margin: '0.5rem 0',
+          lineHeight: '1.6'
+        }}>
+          {processedChildren}
+        </li>
+      )
+    },
   },
 }
 

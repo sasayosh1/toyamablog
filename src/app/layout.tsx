@@ -66,7 +66,10 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "NocI3MMwDMlZ9xW66Er1NNBu4KIfUhL71SWYQpGysfE",
+    google: [
+      "NocI3MMwDMlZ9xW66Er1NNBu4KIfUhL71SWYQpGysfE",
+      "omvaUk6hn7En2E4kT7Mfh4KGei3LByhGEe_PpZKbJug",
+    ],
   },
   category: '旅行・観光',
 };

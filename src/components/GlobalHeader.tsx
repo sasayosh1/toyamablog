@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Post } from '@/lib/sanity'
 import Link from 'next/link'
+import SearchBox from './SearchBox'
 
 // MenuLink コンポーネント（Client Component）
 interface MenuLinkProps {
@@ -29,7 +30,7 @@ interface GlobalHeaderProps {
   categories?: string[]
 }
 
-export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeaderProps) {
+export default function GlobalHeader({ posts, categories = [] }: GlobalHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
 
@@ -51,6 +52,10 @@ export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeader
             </Link>
           </nav>
 
+          {/* PC用検索ボックス */}
+          <div className="w-72">
+            <SearchBox posts={posts} />
+          </div>
         </div>
 
         {/* モバイル用メニュー（lg未満で表示） */}
@@ -75,6 +80,11 @@ export default function GlobalHeader({ posts: _, categories = [] }: GlobalHeader
         <div className="lg:hidden bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-lg" data-testid="mobile-menu">
           <nav className="max-w-7xl mx-auto px-4 py-4" aria-label="mobile">
             <div className="flex flex-col space-y-3">
+              {/* モバイル用検索ボックス */}
+              <div className="px-4 pb-2">
+                <SearchBox posts={posts} />
+              </div>
+              
               <MenuLink
                 href="/"
                 className="flex items-center px-4 py-3 min-h-[44px] text-gray-700 hover:text-toyama-blue hover:bg-blue-50 rounded-lg transition-colors font-medium"
