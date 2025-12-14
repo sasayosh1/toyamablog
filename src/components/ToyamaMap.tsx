@@ -81,6 +81,8 @@ export default function ToyamaMap() {
     const [isSticky, setIsSticky] = useState(false)
     const [hasHover, setHasHover] = useState(true) // デフォルトはPC（ホバーあり）と仮定
 
+    const allCities = areas.flatMap(area => area.cities.split(' / '))
+
     // タッチデバイスかどうか（ホバーが使えるか）を判定
     useEffect(() => {
         const mediaQuery = window.matchMedia('(hover: hover)')
@@ -177,44 +179,84 @@ export default function ToyamaMap() {
                     </svg>
                 </div>
 
-                {/* PC用：ホバー時の情報パネル */}
-                <div className={`
-          hidden md:block
-          absolute bottom-6 left-6 right-6 
-          transition-all duration-300 transform
-          ${hoveredArea ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'}
-        `}>
-                    {hoveredArea && (() => {
-                        const area = areas.find(a => a.id === hoveredArea)!
-                        return (
+	                {/* PC用：ホバー時の情報パネル */}
+	                <div className={`
+	          hidden md:block
+	          absolute bottom-6 left-6 right-6 
+	          transition-all duration-300 transform
+	          ${hoveredArea ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'}
+	        `}>
+	                    {hoveredArea && (() => {
+	                        const area = areas.find(a => a.id === hoveredArea)!
+                            const cityList = area.cities.split(' / ')
+	                        return (
+	                            <div className="bg-white/95 backdrop-blur-md rounded-xl p-6 shadow-lg border border-gray-100">
+	                                <div className="flex flex-col gap-3">
+	                                    <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
+	                                        <span className={`w-4 h-4 rounded-full ${area.color.replace('fill-', 'bg-')}`} />
+	                                        <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 flex-wrap">
+	                                            <Link href={area.href} className="hover:underline underline-offset-4">
+	                                                {area.name}
+	                                            </Link>
+	                                            <span className="text-sm font-normal text-gray-400 font-mono tracking-wider ml-2">{area.enName}</span>
+	                                        </h3>
+	                                    </div>
+
+	                                    <p className="text-gray-700 leading-relaxed font-medium">
+	                                        {area.description}
+	                                    </p>
+
+                                        <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
+                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <span className="font-mono text-xs md:text-sm">{area.cities}</span>
+                                        </div>
+
+                                        {/* PCでも市町村へ直接移動できるようにする */}
+                                        <div className="pt-2">
+                                            <p className="text-xs text-gray-400 mb-2 font-bold">市町村を選択して記事を見る</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {cityList.map((city) => (
+                                                    <Link
+                                                        key={city}
+                                                        href={`/category/${city}`}
+                                                        className="inline-block px-4 py-2 bg-gray-50 text-gray-700 text-sm font-bold rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors"
+                                                    >
+                                                        {city}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
+	                                </div>
+	                            </div>
+	                        )
+	                    })()}
+	                </div>
+	            </div>
+
+            {/* PC用：市町村一覧（より細かく選べる） */}
+            <div className="hidden md:block mt-6">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div className="flex items-baseline justify-between gap-4 flex-wrap">
+                        <h3 className="text-lg font-bold text-gray-900">市町村から探す</h3>
+                        <Link href="/categories" className="text-sm font-bold text-blue-700 hover:underline underline-offset-4">
+                            地域別カテゴリー一覧へ
+                        </Link>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">PCでは画面が広いので、市町村単位でも選べるようにしました。</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        {allCities.map(city => (
                             <Link
-                                href={area.href}
-                                className="block bg-white/95 backdrop-blur-md rounded-xl p-6 shadow-lg border border-gray-100 hover:bg-white transition-colors"
+                                key={city}
+                                href={`/category/${city}`}
+                                className="inline-block px-4 py-2 bg-gray-50 text-gray-800 text-sm font-bold rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors"
                             >
-                                <div className="flex flex-col gap-3">
-                                    <div className="flex items-center gap-3 border-b border-gray-100 pb-2">
-                                        <span className={`w-4 h-4 rounded-full ${area.color.replace('fill-', 'bg-')}`} />
-                                        <h3 className="text-2xl font-bold text-gray-900">
-                                            {area.name}
-                                            <span className="text-sm font-normal text-gray-400 font-mono tracking-wider ml-2">{area.enName}</span>
-                                        </h3>
-                                    </div>
-
-                                    <p className="text-gray-700 leading-relaxed font-medium">
-                                        {area.description}
-                                    </p>
-
-                                    <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
-                                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <span className="font-mono text-xs md:text-sm">{area.cities}</span>
-                                    </div>
-                                </div>
+                                {city}
                             </Link>
-                        )
-                    })()}
+                        ))}
+                    </div>
                 </div>
             </div>
 
