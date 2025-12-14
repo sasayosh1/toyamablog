@@ -142,14 +142,39 @@ export function generateArticleLD(post: Post, slug: string) {
 
   // YouTube動画がある場合はVideoObject追加
   if (post.youtubeUrl && videoId) {
+    const youtubeWatchUrl = post.youtubeUrl.startsWith('http')
+      ? post.youtubeUrl
+      : `https://www.youtube.com/watch?v=${videoId}`
+
+    const thumbnails = [
+      `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+      `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+      `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+    ]
+
     structuredData.video = {
       '@type': 'VideoObject',
       name: post.title,
       description: post.excerpt || post.description || `${post.title}の動画です。`,
-      thumbnailUrl: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-      contentUrl: post.youtubeUrl,
+      thumbnailUrl: thumbnails,
+      contentUrl: youtubeWatchUrl,
       embedUrl: `https://www.youtube.com/embed/${videoId}`,
-      uploadDate: post.publishedAt ? new Date(post.publishedAt).toISOString() : new Date().toISOString()
+      uploadDate: post.publishedAt ? new Date(post.publishedAt).toISOString() : new Date().toISOString(),
+      inLanguage: 'ja',
+      publisher: {
+        '@type': 'Organization',
+        name: '富山、お好きですか？',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://sasakiyoshimasa.com/images/og-image.png',
+          width: 1200,
+          height: 630
+        }
+      },
+      potentialAction: {
+        '@type': 'WatchAction',
+        target: youtubeWatchUrl
+      }
     }
   }
 

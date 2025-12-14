@@ -36,7 +36,7 @@ export default function SeriesNavigator({
           {displayPosts.map((post) => (
             <Link
               key={post._id}
-              href={`/posts/${post.slug.current}`}
+              href={`/blog/${post.slug.current}`}
               className="flex items-start gap-3 rounded-lg border border-blue-100 bg-white/70 px-3 py-2 text-sm text-blue-800 transition-all hover:bg-white hover:shadow"
             >
               <span className="mt-0.5 text-blue-400">→</span>
@@ -69,7 +69,7 @@ export default function SeriesNavigator({
         {displayPosts.map((post, index) => (
           <Link
             key={post._id}
-            href={`/posts/${post.slug.current}`}
+            href={`/blog/${post.slug.current}`}
             className="flex flex-col gap-1 rounded-xl bg-white/80 p-4 transition-all hover:bg-white hover:shadow"
           >
             <div className="flex items-center gap-2 text-sm font-semibold text-blue-700">

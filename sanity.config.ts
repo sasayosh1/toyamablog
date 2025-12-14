@@ -4,6 +4,7 @@ import {visionTool} from '@sanity/vision'
 
 import {schemaTypes} from './schemaTypes'
 import {structure} from './src/sanity/structure'
+import previewAction from './src/sanity/documentActions/preview'
 
 export default defineConfig({
   name: 'sasakiyoshimasa-com',
@@ -42,9 +43,12 @@ export default defineConfig({
       }
       return prev
     },
-    // 記事編集時の表示制限を解除
+    // 記事編集時の表示制限を解除し、プレビューを追加
     actions: (prev, context) => {
-      // デフォルトのアクションをすべて有効化
+      // post のみにプレビューアクションを追加
+      if (context.schemaType === 'post') {
+        return [previewAction, ...prev]
+      }
       return prev
     },
   },

@@ -42,8 +42,55 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: '/posts/:slug',
+        destination: '/blog/:slug',
+        permanent: true,
+      },
+      // 旧タグ（日本語スラッグ）を英数字に集約
+      {
+        source: '/tag/夜高行燈',
+        destination: '/tag/yotaka-lantern',
+        permanent: true,
+      },
+      {
+        source: '/post/:slug',
+        destination: '/blog/:slug',
+        permanent: true,
+      },
+      {
+        source: '/page/:path*',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/:year(\\d{4})/:month(\\d{2})/:path*',
+        destination: '/',
+        permanent: true,
+      },
+      {
         source: '/structure/:path*',
         destination: '/categories',
+        permanent: true,
+      },
+      // 旧サイトマップ系を新サイトマップへ集約
+      {
+        source: '/sitemap.xml.gz',
+        destination: '/sitemap.xml',
+        permanent: true,
+      },
+      {
+        source: '/add-sitemap.xml',
+        destination: '/sitemap.xml',
+        permanent: true,
+      },
+      {
+        source: '/page-sitemap.xml',
+        destination: '/sitemap.xml',
+        permanent: true,
+      },
+      {
+        source: '/post-sitemap.xml',
+        destination: '/sitemap.xml',
         permanent: true,
       },
       {
@@ -94,6 +141,46 @@ const nextConfig: NextConfig = {
         destination: '/:path*',
         permanent: true,
       },
+      // 記事スラッグを正規化（toyama- プレフィックス＋英数字ハイフンのみに集約）
+      { source: '/blog/fukuoka-town-park-15', destination: '/blog/toyama-fukuoka-park-koi-haven', permanent: true },
+      { source: '/blog/fuchu-town-castle-ver-yosakoi', destination: '/blog/toyama-fuchu-castle-yosakoi-festival', permanent: true },
+      { source: '/blog/yatsuo-town-400', destination: '/blog/toyama-yatsuo-town-heritage-streets', permanent: true },
+      { source: '/blog/park', destination: '/blog/toyama-funahashi-kyotsubogawa-park', permanent: true },
+      { source: '/blog/yatsuo-town-3', destination: '/blog/toyama-yatsuo-hikiyama-3years', permanent: true },
+      { source: '/blog/fukuoka-town-1000-sakura-1000', destination: '/blog/toyama-fukuoka-sakura-avenue-1000', permanent: true },
+      { source: '/blog/yatsuo-town', destination: '/blog/toyama-yatsuo-hikiyama-museum', permanent: true },
+      { source: '/blog/yatsuo-town-2023-33-27-in-2023', destination: '/blog/toyama-yatsuo-saka-art-2023', permanent: true },
+      { source: '/blog/namerikawa-city-shrine', destination: '/blog/toyama-namerikawa-ichihara-shrine', permanent: true },
+      { source: '/blog/takaoka-city-temple', destination: '/blog/toyama-takaoka-kokuhou-shokouji', permanent: true },
+      { source: '/blog/funahashi-village-1-260', destination: '/blog/toyama-funahashi-taiyaki-260yen', permanent: true },
+      { source: '/blog/en-cos-japan-2024-in-toyama', destination: '/blog/toyama-fantasy-weapon-shop-cosplay', permanent: true },
+      { source: '/blog/kamiichi-town-2024-festival-fireworks-bridge-2024', destination: '/blog/toyama-kamiichi-furusato-festival-2024', permanent: true },
+      { source: '/blog/takaoka-city-temple-1', destination: '/blog/toyama-takaoka-uzusama-myo-o-zuiryuji', permanent: true },
+      { source: '/blog/fuchu-town', destination: '/blog/toyama-fuchu-sunflower-farm', permanent: true },
+      { source: '/blog/takaoka-city-bread', destination: '/blog/toyama-takaoka-pan-dream-bakery', permanent: true },
+      { source: '/blog/uozu-city-aquarium-3', destination: '/blog/toyama-uozu-aquarium-penguins', permanent: true },
+      { source: '/blog/yatsuo-town-1', destination: '/blog/toyama-yatsuo-machiya-tsunagu', permanent: true },
+      { source: '/blog/fuchu-town-1', destination: '/blog/toyama-fuchu-tamura-farm-animals', permanent: true },
+      { source: '/blog/yatsuo-town-2024-2024-5-3', destination: '/blog/toyama-yatsuo-hikiyama-2024-05-03', permanent: true },
+      { source: '/blog/kamiichi-town-temple', destination: '/blog/toyama-kamiichi-o-iwayama-nissekiji', permanent: true },
+      { source: '/blog/takaoka-city-park-sakura-castle', destination: '/blog/toyama-takaoka-castle-park-sakura-walk', permanent: true },
+      { source: '/blog/asahi-town-2024-sakura-2024', destination: '/blog/toyama-asahi-funakawa-sakura-2024', permanent: true },
+      { source: '/blog/tonami-city-61', destination: '/blog/toyama-tonami-garrison-61st-anniversary', permanent: true },
+      { source: '/blog/namerikawa-city-museum', destination: '/blog/toyama-namerikawa-hotaruika-museum', permanent: true },
+      { source: '/blog/nanto-city-sakura-restaurant-johanare', destination: '/blog/toyama-nanto-sakura-restaurant-johanare', permanent: true },
+      { source: '/blog/tonami-city-dam', destination: '/blog/toyama-tonami-komaki-dam-boat-view', permanent: true },
+      { source: '/blog/kurobe-city-cafe', destination: '/blog/toyama-kurobe-gallery-cafe-hokuyo', permanent: true },
+      { source: '/blog/imizu-city-100', destination: '/blog/toyama-imizu-taikoyama-koi-pond', permanent: true },
+      { source: '/blog/imizu-city-2', destination: '/blog/toyama-imizu-kodomomirai-dollhouse', permanent: true },
+      { source: '/blog/money-exchange-70myr-rate-26-07-1824jpy', destination: '/blog/toyama-money-exchange-70myr', permanent: true },
+      { source: '/blog/nanto-city-temple-castle-500', destination: '/blog/toyama-nanto-zen-tokuji-gate-500years', permanent: true },
+      { source: '/blog/tonami-city-bridge', destination: '/blog/toyama-tonami-kakuryu-bridge', permanent: true },
+      { source: '/blog/kurobe-city-dam-station-bridge', destination: '/blog/toyama-kurobe-unazuki-dam-walk', permanent: true },
+      { source: '/blog/yatsuo-town-2023-300-2023', destination: '/blog/toyama-yatsuo-spring-festival-2023', permanent: true },
+      { source: '/blog/imizu-city-4', destination: '/blog/toyama-imizu-kaiohmaru-night-view', permanent: true },
+      { source: '/blog/namerikawa-city-merika-9', destination: '/blog/toyama-namerikawa-merika-pony', permanent: true },
+      { source: '/blog/uozu-city', destination: '/blog/toyama-uozu-katakayama-camp', permanent: true },
+      { source: '/blog/tonami-city-festival', destination: '/blog/toyama-tonami-yotaka-festival', permanent: true },
     ];
   },
 
