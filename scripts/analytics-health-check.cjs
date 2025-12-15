@@ -23,11 +23,19 @@
 
 const { google } = require('googleapis');
 const fs = require('fs');
+const path = require('path');
 
 function appendGithubOutput(key, value) {
   const outputPath = process.env.GITHUB_OUTPUT;
   if (!outputPath) return;
   fs.appendFileSync(outputPath, `${key}=${String(value)}\n`, 'utf8');
+}
+
+function writeHealthFile(payload) {
+  const dir = path.join(process.cwd(), 'analytics');
+  const filePath = path.join(dir, 'health.json');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(payload, null, 2) + '\n', 'utf8');
 }
 
 function toDateStringUtc(date) {
@@ -209,6 +217,15 @@ async function main() {
   try {
     ga4ByDate = await fetchGa4DailySessions({ auth, propertyId, startDate, endDate });
   } catch (error) {
+    writeHealthFile({
+      ok: false,
+      reason: 'ga4_auth_failed',
+      checkedAt: new Date().toISOString(),
+      dateCheckedUtc: yDate,
+      ga4: { propertyId },
+      gsc: { siteUrl },
+      error: String(error?.message || error),
+    });
     const title = `📉 Analytics health-check failed (GA4 auth) ${yDate}`;
     const body = [
       '## Analytics Health Check',
@@ -240,6 +257,15 @@ async function main() {
   try {
     gscByDate = await fetchGscDailyClicks({ auth, siteUrl, startDate, endDate });
   } catch (error) {
+    writeHealthFile({
+      ok: false,
+      reason: 'gsc_auth_failed',
+      checkedAt: new Date().toISOString(),
+      dateCheckedUtc: yDate,
+      ga4: { propertyId },
+      gsc: { siteUrl },
+      error: String(error?.message || error),
+    });
     const title = `📉 Analytics health-check failed (GSC auth) ${yDate}`;
     const body = [
       '## Analytics Health Check',
@@ -302,6 +328,18 @@ async function main() {
   ];
 
   if (problems.length > 0) {
+    writeHealthFile({
+      ok: false,
+      reason: 'anomaly_detected',
+      checkedAt: new Date().toISOString(),
+      dateCheckedUtc: yDate,
+      thresholds: { lookbackDays, dropRatio },
+      metrics: {
+        ga4: { yesterdaySessions: ga4Yesterday, dayBeforeSessions: ga4DayBefore, recentAvgSessions: ga4Avg },
+        gsc: { yesterdayClicks: gscYesterday, dayBeforeClicks: gscDayBefore, recentAvgClicks: gscAvg },
+      },
+      problems,
+    });
     const title = `📉 Analytics anomaly detected ${yDate}`;
     const body = [
       '## Analytics Health Check',
@@ -343,6 +381,18 @@ async function main() {
   console.log(`- GA4 sessions: ${ga4Yesterday}`);
   console.log(`- GSC clicks: ${gscYesterday}`);
 
+  writeHealthFile({
+    ok: true,
+    reason: 'ok',
+    checkedAt: new Date().toISOString(),
+    dateCheckedUtc: yDate,
+    thresholds: { lookbackDays, dropRatio },
+    metrics: {
+      ga4: { yesterdaySessions: ga4Yesterday, dayBeforeSessions: ga4DayBefore, recentAvgSessions: ga4Avg },
+      gsc: { yesterdayClicks: gscYesterday, dayBeforeClicks: gscDayBefore, recentAvgClicks: gscAvg },
+    },
+  });
+
   appendGithubOutput('healthy', 'true');
   appendGithubOutput('reason', 'ok');
 }
@@ -352,6 +402,13 @@ main().catch((error) => {
   try {
     const todayUtc = new Date();
     const date = toDateStringUtc(todayUtc);
+    writeHealthFile({
+      ok: false,
+      reason: 'script_error',
+      checkedAt: new Date().toISOString(),
+      dateCheckedUtc: date,
+      error: String(error?.message || error),
+    });
     const title = `📉 Analytics health-check failed (script error) ${date}`;
     const body = [
       '## Analytics Health Check',
