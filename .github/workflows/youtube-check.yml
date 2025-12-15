@@ -6,6 +6,10 @@ on:
     - cron: '0 12 * * 6'
   workflow_dispatch: # 手動実行も可能
 
+concurrency:
+  group: repo-write-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
   issues: write
@@ -79,5 +83,10 @@ jobs:
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
           git add .last-processed-video.json
-          git diff --staged --quiet || git commit -m "📝 YouTube記事生成進捗を更新"
-          git push
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📝 YouTube記事生成進捗を更新"
+            git pull --rebase --autostash origin main
+            git push
+          fi
