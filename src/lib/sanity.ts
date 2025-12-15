@@ -9,10 +9,25 @@ export const client = createClient({
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
   // 公開データのみ使用するためCDNを強制。トークンは使用しない（認証エラーを防止）
   useCdn: true,
+  token: undefined,
   perspective: 'published', // publishedコンテンツのみ
   stega: false, // Stegaを無効化してパフォーマンス向上
   ignoreBrowserTokenWarning: true, // ブラウザトークン警告を無視
 });
+
+export async function safeFetch<T>(
+  query: string,
+  params: Record<string, unknown> = {},
+  options: Record<string, unknown> = {},
+  fallback: T
+): Promise<T> {
+  try {
+    return await client.fetch<T>(query, params, options);
+  } catch (error) {
+    console.error('Sanity fetch error:', error);
+    return fallback;
+  }
+}
 
 export interface Author {
   _id: string;
@@ -108,7 +123,8 @@ export function normalizePostCategoryList<T extends CategoryCarrier>(
 }
 
 export async function getAllPosts(): Promise<Post[]> {
-  const posts = await client.fetch<(Post & CategoryCarrier)[]>(`
+  const posts = await safeFetch<(Post & CategoryCarrier)[]>(
+    `
     *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) {
       _id,
       title,
@@ -128,13 +144,17 @@ export async function getAllPosts(): Promise<Post[]> {
       "categoryRefs": categories[]->title,
       "displayExcerpt": coalesce(excerpt, description)
     }
-  `, {}, {
-    next: {
-      tags: ['post-list'],
-      revalidate: 300 // 5分キャッシュ
-    }
-  });
-
+  `,
+    {},
+    {
+      next: {
+        tags: ['post-list'],
+        revalidate: 300 // 5分キャッシュ
+      }
+    },
+    []
+  );
+	
   return normalizePostCategoryList(posts);
 }
 
@@ -147,7 +167,8 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
   const offset = (page - 1) * limit
 
   const [posts, totalPosts] = await Promise.all([
-    client.fetch<(Post & CategoryCarrier)[]>(`
+    safeFetch<(Post & CategoryCarrier)[]>(
+      `
       *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [${offset}...${offset + limit}] {
         _id,
         title,
@@ -168,18 +189,27 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
         "categoryRefs": categories[]->title,
         "displayExcerpt": coalesce(excerpt, description)
       }
-    `, {}, {
-      next: {
-        tags: ['post-list-paginated'],
-        revalidate: 600
-      }
-    }),
-    client.fetch(`count(*[_type == "post" && defined(publishedAt)])`, {}, {
-      next: {
-        tags: ['post-count'],
-        revalidate: 3600
-      }
-    })
+    `,
+      {},
+      {
+        next: {
+          tags: ['post-list-paginated'],
+          revalidate: 600
+        }
+      },
+      []
+    ),
+    safeFetch<number>(
+      `count(*[_type == "post" && defined(publishedAt)])`,
+      {},
+      {
+        next: {
+          tags: ['post-count'],
+          revalidate: 3600
+        }
+      },
+      0
+    )
   ])
 
   return {
@@ -191,7 +221,8 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
-  const post = await client.fetch<(Post & CategoryCarrier) | null>(`
+  const post = await safeFetch<(Post & CategoryCarrier) | null>(
+    `
     *[_type == "post" && slug.current == $slug][0] {
       _id,
       title,
@@ -234,13 +265,17 @@ export async function getPost(slug: string): Promise<Post | null> {
         }
       }
     }
-  `, { slug }, {
-    next: {
-      tags: ['post-detail', `post-detail-${slug}`],
-      revalidate: 600 // 10分キャッシュ
-    }
-  });
-
+  `,
+    { slug },
+    {
+      next: {
+        tags: ['post-detail', `post-detail-${slug}`],
+        revalidate: 600 // 10分キャッシュ
+      }
+    },
+    null
+  );
+	
   return post ? normalizePostCategories(post) : null;
 }
 
