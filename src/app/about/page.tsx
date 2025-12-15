@@ -2,6 +2,7 @@ import GlobalHeader from '@/components/GlobalHeader'
 import { client, getAllCategories, type Post, normalizePostCategoryList } from '@/lib/sanity'
 import { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 
 // キャッシュ無効化: 常に最新を表示 - 強制デプロイ
 export const dynamic = 'force-dynamic'
@@ -121,9 +122,9 @@ export default async function AboutPage() {
                 '滑川市', '氷見市', '立山町', '上市町',
                 '舟橋村', '入善町', '朝日町'
               ].map((area) => (
-                <div key={area} className="bg-gray-100 rounded-lg p-3 text-center">
+                <Link key={area} href={`/category/${area}`} className="bg-gray-100 rounded-lg p-3 text-center">
                   <span className="text-gray-800 font-medium">{area}</span>
-                </div>
+                </Link>
               ))}
             </div>
             <p className="text-gray-800 mt-4 text-center">

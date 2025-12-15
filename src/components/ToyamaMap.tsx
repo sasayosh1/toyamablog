@@ -81,8 +81,6 @@ export default function ToyamaMap() {
     const [isSticky, setIsSticky] = useState(false)
     const [hasHover, setHasHover] = useState(true) // デフォルトはPC（ホバーあり）と仮定
 
-    const allCities = areas.flatMap(area => area.cities.split(' / '))
-
     // タッチデバイスかどうか（ホバーが使えるか）を判定
     useEffect(() => {
         const mediaQuery = window.matchMedia('(hover: hover)')
@@ -206,14 +204,6 @@ export default function ToyamaMap() {
 	                                        {area.description}
 	                                    </p>
 
-                                        <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
-                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            <span className="font-mono text-xs md:text-sm">{area.cities}</span>
-                                        </div>
-
                                         {/* PCでも市町村へ直接移動できるようにする */}
                                         <div className="pt-2">
                                             <p className="text-xs text-gray-400 mb-2 font-bold">市町村を選択して記事を見る</p>
@@ -235,30 +225,6 @@ export default function ToyamaMap() {
 	                    })()}
 	                </div>
 	            </div>
-
-            {/* PC用：市町村一覧（より細かく選べる） */}
-            <div className="hidden md:block mt-6">
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                    <div className="flex items-baseline justify-between gap-4 flex-wrap">
-                        <h3 className="text-lg font-bold text-gray-900">市町村から探す</h3>
-                        <Link href="/categories" className="text-sm font-bold text-blue-700 hover:underline underline-offset-4">
-                            地域別カテゴリー一覧へ
-                        </Link>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">PCでは画面が広いので、市町村単位でも選べるようにしました。</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        {allCities.map(city => (
-                            <Link
-                                key={city}
-                                href={`/category/${city}`}
-                                className="inline-block px-4 py-2 bg-gray-50 text-gray-800 text-sm font-bold rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors"
-                            >
-                                {city}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            </div>
 
             {/* スマホ用：選択時の情報パネル（地図の下に表示） */}
             <div className="md:hidden min-h-[200px]">
