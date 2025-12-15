@@ -26,6 +26,9 @@ jobs:
     steps:
       - name: チェックアウト
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Node.js セットアップ
         uses: actions/setup-node@v4
