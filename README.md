@@ -101,6 +101,17 @@ Vercel経由でデプロイ済み: https://sasakiyoshimasa.com
 2. Maps Embed APIを有効化
 3. 認証情報 > APIキーを作成
 
+## 💸 コストガード & 📉 監視（自動運用）
+
+- `YouTube記事自動生成` workflow は Gemini 実行前に `scripts/budget-guard.cjs` を実行し、月額目安（既定 `100円`）を超える場合は **Gemini をスキップ**して Issue を作成します。
+- `Analytics Health Check (GA4/GSC)` workflow は GA4/GSC のゼロ・急落・認証失敗を検知した場合に Issue を作成し、異常時は最適化系の自動更新をスキップする前提で運用します。
+
+### 追加で必要な GitHub Secrets
+
+- `GOOGLE_SERVICE_ACCOUNT_JSON`: GA4 Data API + Search Console API 参照権限のあるサービスアカウントJSON（文字列）
+- `GA4_PROPERTY_ID`: GA4 のプロパティID（数値）
+- `GSC_SITE_URL`: Search Console のサイトURL（例: `https://sasakiyoshimasa.com/`）
+
 ### 自動実行スケジュール
 - **実行タイミング**: 毎週土曜日 21:00 JST
 - **処理対象**: 過去1週間以内の新着動画

@@ -8,10 +8,16 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   generate-articles:
     runs-on: ubuntu-latest
+
+    env:
+      GEMINI_BUDGET_JPY: '100'
+      GEMINI_ESTIMATED_COST_JPY_PER_ARTICLE: '0.2'
+      ARTICLES_PER_RUN: '3' # 初期3ヶ月: 3件、その後: 2件に変更
 
     steps:
       - name: チェックアウト
@@ -26,17 +32,49 @@ jobs:
       - name: 依存関係インストール
         run: npm ci
 
+      - name: Analytics health check (GA4/GSC)
+        id: analytics
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/analytics-health-check.cjs
+
+      - name: Determine budget month (UTC)
+        if: steps.analytics.outputs.healthy == 'true'
+        id: budget_month
+        run: echo "month=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Gemini budget state
+        if: steps.analytics.outputs.healthy == 'true'
+        uses: actions/cache@v4
+        with:
+          path: .budget
+          key: gemini-budget-${{ runner.os }}-${{ github.repository }}-${{ steps.budget_month.outputs.month }}-${{ github.run_id }}
+          restore-keys: |
+            gemini-budget-${{ runner.os }}-${{ github.repository }}-${{ steps.budget_month.outputs.month }}-
+            gemini-budget-${{ runner.os }}-${{ github.repository }}-
+
+      - name: Budget guard (pre-check)
+        if: steps.analytics.outputs.healthy == 'true'
+        id: budget
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/budget-guard.cjs --reserve-articles ${{ env.ARTICLES_PER_RUN }}
+
       - name: YouTube記事自動生成
+        if: steps.analytics.outputs.healthy == 'true' && steps.budget.outputs.allowed == 'true'
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
           SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          ARTICLES_PER_RUN: '3' # 初期3ヶ月: 3件、その後: 2件に変更
+          ARTICLES_PER_RUN: ${{ env.ARTICLES_PER_RUN }}
         run: node scripts/check-youtube-and-create-articles.cjs
 
       - name: 進捗ファイルコミット
-        if: success()
+        if: success() && steps.analytics.outputs.healthy == 'true' && steps.budget.outputs.allowed == 'true'
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
