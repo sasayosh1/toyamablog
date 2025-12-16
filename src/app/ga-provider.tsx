@@ -12,12 +12,31 @@ export default function GAProvider() {
   // ページ読み込み時に gtag を初期化（send_page_view は抑制）
   // 以降はルート変化で pageview を送信
   useEffect(() => {
-    // 初回マウント時にも一度送信
     const url =
       (pathname || '/') +
       (searchParams?.toString() ? `?${searchParams.toString()}` : '');
-    pageview(url);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // gtag 初期化が間に合わない場合があるため、少し待ってから送信する
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 20; // ~4s
+
+    const tick = () => {
+      if (cancelled) return;
+      if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+        pageview(url);
+        return;
+      }
+      attempts += 1;
+      if (attempts >= maxAttempts) return;
+      setTimeout(tick, 200);
+    };
+
+    tick();
+
+    return () => {
+      cancelled = true;
+    };
   }, [pathname, searchParams]);
 
   if (!GA_ID) return null;
