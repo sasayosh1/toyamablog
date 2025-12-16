@@ -41,6 +41,13 @@ const nextConfig: NextConfig = {
   // リダイレクト設定
   async redirects() {
     return [
+      // 末尾スラッシュを正規化（/foo/ → /foo）
+      // ※ `/` は対象外（:path+ なので最低1セグメント必要）
+      {
+        source: '/:path+/',
+        destination: '/:path+',
+        permanent: true,
+      },
       {
         source: '/posts/:slug',
         destination: '/blog/:slug',
@@ -181,6 +188,53 @@ const nextConfig: NextConfig = {
       { source: '/blog/namerikawa-city-merika-9', destination: '/blog/toyama-namerikawa-merika-pony', permanent: true },
       { source: '/blog/uozu-city', destination: '/blog/toyama-uozu-katakayama-camp', permanent: true },
       { source: '/blog/tonami-city-festival', destination: '/blog/toyama-tonami-yotaka-festival', permanent: true },
+
+      // 旧URL（市町村ベース）をカテゴリーへ寄せる（GSCの404削減＆UX改善）
+      { source: '/blog/toyama-city', destination: '/category/富山市', permanent: true },
+      { source: '/blog/toyama-city-:rest(.*)', destination: '/category/富山市', permanent: true },
+      { source: '/toyama-city-:rest(.*)', destination: '/category/富山市', permanent: true },
+
+      { source: '/blog/takaoka-city', destination: '/category/高岡市', permanent: true },
+      { source: '/blog/takaoka-city-:rest(.*)', destination: '/category/高岡市', permanent: true },
+
+      { source: '/blog/uozu-city', destination: '/category/魚津市', permanent: true },
+      { source: '/blog/uozu-city-:rest(.*)', destination: '/category/魚津市', permanent: true },
+
+      { source: '/blog/himi-city', destination: '/category/氷見市', permanent: true },
+      { source: '/blog/himi-city-:rest(.*)', destination: '/category/氷見市', permanent: true },
+
+      { source: '/blog/namerikawa-city', destination: '/category/滑川市', permanent: true },
+      { source: '/blog/namerikawa-city-:rest(.*)', destination: '/category/滑川市', permanent: true },
+
+      { source: '/blog/kurobe-city', destination: '/category/黒部市', permanent: true },
+      { source: '/blog/kurobe-city-:rest(.*)', destination: '/category/黒部市', permanent: true },
+
+      { source: '/blog/tonami-city', destination: '/category/砺波市', permanent: true },
+      { source: '/blog/tonami-city-:rest(.*)', destination: '/category/砺波市', permanent: true },
+
+      { source: '/blog/oyabe-city', destination: '/category/小矢部市', permanent: true },
+      { source: '/blog/oyabe-city-:rest(.*)', destination: '/category/小矢部市', permanent: true },
+
+      { source: '/blog/nanto-city', destination: '/category/南砺市', permanent: true },
+      { source: '/blog/nanto-city-:rest(.*)', destination: '/category/南砺市', permanent: true },
+
+      { source: '/blog/imizu-city', destination: '/category/射水市', permanent: true },
+      { source: '/blog/imizu-city-:rest(.*)', destination: '/category/射水市', permanent: true },
+
+      { source: '/blog/nyuzen-town', destination: '/category/入善町', permanent: true },
+      { source: '/blog/nyuzen-town-:rest(.*)', destination: '/category/入善町', permanent: true },
+
+      { source: '/blog/kamiichi-town', destination: '/category/上市町', permanent: true },
+      { source: '/blog/kamiichi-town-:rest(.*)', destination: '/category/上市町', permanent: true },
+
+      { source: '/blog/tateyama-town', destination: '/category/立山町', permanent: true },
+      { source: '/blog/tateyama-town-:rest(.*)', destination: '/category/立山町', permanent: true },
+
+      { source: '/blog/asahi-town', destination: '/category/朝日町', permanent: true },
+      { source: '/blog/asahi-town-:rest(.*)', destination: '/category/朝日町', permanent: true },
+
+      { source: '/blog/funahashi-village', destination: '/category/舟橋村', permanent: true },
+      { source: '/blog/funahashi-village-:rest(.*)', destination: '/category/舟橋村', permanent: true },
     ];
   },
 

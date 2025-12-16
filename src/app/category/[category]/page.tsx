@@ -1,5 +1,4 @@
-import { getAllPosts, getAllCategories } from '@/lib/sanity'
-import { notFound } from 'next/navigation'
+import { safeFetch, getAllPosts, getAllCategories } from '@/lib/sanity'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
 import Breadcrumb from '@/components/ui/Breadcrumb'
@@ -31,9 +30,13 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   const { category } = await params
   const decodedCategory = decodeURIComponent(category)
   const canonical = `https://sasakiyoshimasa.com/category/${encodeURIComponent(decodedCategory)}`
+  const postCountQuery =
+    `count(*[_type == "post" && defined(publishedAt) && (category == $cat || $cat in categories[]->title)])` as const
+  const postCount = await safeFetch<number>(postCountQuery, { cat: decodedCategory }, {}, 0)
   return {
     title: `${decodedCategory} - 富山、お好きですか？`,
     description: `富山県の${decodedCategory}に関する記事一覧。YouTube Shortsと連携した地域情報をお届けします。`,
+    robots: postCount > 0 ? undefined : { index: false, follow: true },
     openGraph: {
       title: `${decodedCategory} - 富山、お好きですか？`,
       description: `富山県の${decodedCategory}に関する記事一覧`,
@@ -62,12 +65,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
     post.categories?.includes(decodedCategory)
   )
 
-  if (categoryPosts.length === 0) {
-    notFound()
-  }
-
   // 構造化データを生成
-  const categoryLD = generateCategoryLD(decodedCategory, categoryPosts)
+  const categoryLD = categoryPosts.length ? generateCategoryLD(decodedCategory, categoryPosts) : null
   const breadcrumbLD = generateBreadcrumbLD([
     { name: 'ホーム', url: 'https://sasakiyoshimasa.com/' },
     { name: 'カテゴリー', url: 'https://sasakiyoshimasa.com/categories' },
@@ -76,7 +75,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
   return (
     <>
-      <StructuredData data={[categoryLD, breadcrumbLD]} />
+      <StructuredData data={[categoryLD, breadcrumbLD].filter(Boolean)} />
       <div className="min-h-screen bg-gray-50 category-page">
         <GlobalHeader posts={allPosts} categories={categories} />
 
@@ -109,11 +108,45 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
           />
 
           {/* 記事一覧 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {categoryPosts.map((post) => (
-              <PostCard key={post._id} post={post} />
-            ))}
-          </div>
+          {categoryPosts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {categoryPosts.map((post) => (
+                <PostCard key={post._id} post={post} />
+              ))}
+            </div>
+          ) : (
+            <div className="max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                    このカテゴリーの記事はまだ見つかりませんでした
+                  </h2>
+                  <p className="text-gray-600 leading-relaxed">
+                    しばらくしてから記事が追加される可能性があります。よければ他のカテゴリーも見てみてください。
+                  </p>
+                  <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                    <Link
+                      href="/categories"
+                      className="inline-flex items-center justify-center px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium shadow-sm"
+                    >
+                      カテゴリー一覧へ
+                    </Link>
+                    <Link
+                      href="/"
+                      className="inline-flex items-center justify-center px-5 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-sm border border-gray-300"
+                    >
+                      ホームに戻る
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ナビゲーションボタン */}
           <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">

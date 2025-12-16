@@ -1,11 +1,11 @@
-import { client, type Post, getAllCategories, normalizePostCategoryList } from '@/lib/sanity'
-import { notFound } from 'next/navigation'
+import { client, safeFetch, type Post, getAllCategories, normalizePostCategoryList } from '@/lib/sanity'
 import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
 import PostCard from '@/components/ui/PostCard'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import StructuredData from '@/components/StructuredData'
 import { generateTagLD, generateBreadcrumbLD } from '@/lib/structured-data'
+import type { Metadata } from 'next'
 
 // キャッシュ無効化: 常に最新を表示
 export const revalidate = 0
@@ -16,17 +16,22 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
   const decodedTag = decodeURIComponent(tag)
 
   // タグで記事を検索
-  const posts = normalizePostCategoryList(await client.fetch<(Post & { categoryRefs?: string[] | null })[]>(`
-    *[_type == "post" && defined(publishedAt) && "${decodedTag}" in tags] | order(publishedAt desc) {
+  const tagPostsQuery = `
+    *[_type == "post" && defined(publishedAt) && $tag in tags] | order(publishedAt desc) {
       _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
       author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
       "excerpt": description, "categoryRefs": categories[]->title
     }
-  `))
+  ` as const
 
-  if (posts.length === 0) {
-    notFound()
-  }
+  const posts = normalizePostCategoryList(
+    await safeFetch<(Post & { categoryRefs?: string[] | null })[]>(
+      tagPostsQuery,
+      { tag: decodedTag },
+      {},
+      []
+    )
+  )
 
   // 記事一覧とカテゴリーを取得（検索用）
   const [allPosts, categories] = await Promise.all([
@@ -41,7 +46,7 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
   ])
 
   // 構造化データを生成
-  const tagLD = generateTagLD(decodedTag, posts)
+  const tagLD = posts.length ? generateTagLD(decodedTag, posts) : null
   const breadcrumbLD = generateBreadcrumbLD([
     { name: 'ホーム', url: 'https://sasakiyoshimasa.com/' },
     { name: `タグ: ${decodedTag}` }
@@ -49,7 +54,7 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
 
   return (
     <>
-      <StructuredData data={[tagLD, breadcrumbLD]} />
+      <StructuredData data={[tagLD, breadcrumbLD].filter(Boolean)} />
       <div className="min-h-screen bg-gray-50">
         <GlobalHeader posts={allPosts} categories={categories} />
       
@@ -89,11 +94,45 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {posts.map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))}
-        </div>
+        {posts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {posts.map((post) => (
+              <PostCard key={post._id} post={post} />
+            ))}
+          </div>
+        ) : (
+          <div className="max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-sm border border-gray-200 mb-12">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                  このタグの記事はまだ見つかりませんでした
+                </h2>
+                <p className="text-gray-600 leading-relaxed">
+                  タグの表記ゆれ（例：全角/半角、表現の違い）で分かれている可能性があります。よければ検索やカテゴリーから探してみてください。
+                </p>
+                <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                  <Link
+                    href="/categories"
+                    className="inline-flex items-center justify-center px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium shadow-sm"
+                  >
+                    カテゴリーから探す
+                  </Link>
+                  <Link
+                    href="/"
+                    className="inline-flex items-center justify-center px-5 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-sm border border-gray-300"
+                  >
+                    ホームに戻る
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ナビゲーション */}
         <div className="text-center">
@@ -114,15 +153,21 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
 }
 
 // メタデータの生成
-export async function generateMetadata({ params }: { params: Promise<{ tag: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ tag: string }> }): Promise<Metadata> {
   const { tag } = await params
   const decodedTag = decodeURIComponent(tag)
+  const canonical = `https://sasakiyoshimasa.com/tag/${encodeURIComponent(decodedTag)}`
+
+  const postCountQuery =
+    `count(*[_type == "post" && defined(publishedAt) && $tag in tags])` as const
+  const postCount = await safeFetch<number>(postCountQuery, { tag: decodedTag }, {}, 0)
   
   return {
     title: `${decodedTag} - タグ | 富山、お好きですか？`,
     description: `富山の魅力を紹介する「${decodedTag}」タグの記事一覧ページです。`,
+    robots: postCount > 0 ? undefined : { index: false, follow: true },
     alternates: {
-      canonical: `https://sasakiyoshimasa.com/tag/${encodeURIComponent(decodedTag)}`
+      canonical
     }
   }
 }
