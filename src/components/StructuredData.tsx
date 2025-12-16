@@ -3,9 +3,7 @@ interface StructuredDataProps {
 }
 
 export default function StructuredData({ data }: StructuredDataProps) {
-  const jsonLd = Array.isArray(data) 
-    ? data.map(item => JSON.stringify(item)).join('\n')
-    : JSON.stringify(data)
+  const jsonLd = JSON.stringify(data)
 
   return (
     <script

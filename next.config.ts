@@ -48,6 +48,18 @@ const nextConfig: NextConfig = {
         destination: '/:path+',
         permanent: true,
       },
+      // 旧 /tags/* を /tag/* に統一
+      {
+        source: '/tags/:tag',
+        destination: '/tag/:tag',
+        permanent: true,
+      },
+      // 旧 author アーカイブをサイトについてへ
+      {
+        source: '/author/:path*',
+        destination: '/about',
+        permanent: true,
+      },
       {
         source: '/posts/:slug',
         destination: '/blog/:slug',
@@ -235,6 +247,26 @@ const nextConfig: NextConfig = {
 
       { source: '/blog/funahashi-village', destination: '/category/舟橋村', permanent: true },
       { source: '/blog/funahashi-village-:rest(.*)', destination: '/category/舟橋村', permanent: true },
+
+      // 日本語タイトルの旧URL（/【...】.../ 等）をカテゴリーへ誘導
+      // ※ 旧URLの個別マッピングが難しいため、まずは404を減らしてUXを守る
+      { source: '/:rest(\\【.*\\】.*)', destination: '/categories', permanent: true },
+
+      // 日本語プレフィックスの旧記事URL（/blog/富山-... 等）を該当市町村へ誘導
+      { source: '/blog/富山-:rest(.*)', destination: '/category/富山市', permanent: true },
+      { source: '/blog/高岡-:rest(.*)', destination: '/category/高岡市', permanent: true },
+      { source: '/blog/魚津-:rest(.*)', destination: '/category/魚津市', permanent: true },
+      { source: '/blog/氷見-:rest(.*)', destination: '/category/氷見市', permanent: true },
+      { source: '/blog/滑川-:rest(.*)', destination: '/category/滑川市', permanent: true },
+      { source: '/blog/黒部-:rest(.*)', destination: '/category/黒部市', permanent: true },
+      { source: '/blog/砺波-:rest(.*)', destination: '/category/砺波市', permanent: true },
+      { source: '/blog/小矢部-:rest(.*)', destination: '/category/小矢部市', permanent: true },
+      { source: '/blog/南砺-:rest(.*)', destination: '/category/南砺市', permanent: true },
+      { source: '/blog/射水-:rest(.*)', destination: '/category/射水市', permanent: true },
+      { source: '/blog/上市-:rest(.*)', destination: '/category/上市町', permanent: true },
+      { source: '/blog/立山-:rest(.*)', destination: '/category/立山町', permanent: true },
+      { source: '/blog/入善-:rest(.*)', destination: '/category/入善町', permanent: true },
+      { source: '/blog/朝日-:rest(.*)', destination: '/category/朝日町', permanent: true },
     ];
   },
 
