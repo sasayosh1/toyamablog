@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
-import { stripShortsAndHashtags } from '@/lib/utils'
 
 
 // フォールバック対応サムネイル画像コンポーネント
@@ -157,7 +156,6 @@ interface PostCardProps {
 export default function PostCard({ post, priority = false }: PostCardProps) {
   // タイトルから#shortsを削除
   const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
-  const cleanExcerpt = stripShortsAndHashtags(post.displayExcerpt || post.excerpt || '')
 
   // 改善されたサムネイル画像取得（信頼性重視）
   const getThumbnailUrls = () => {
@@ -265,9 +263,9 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
             {cleanTitle}
           </h3>
 
-          {cleanExcerpt && (
+          {(post.displayExcerpt || post.excerpt) && (
             <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed mb-4 flex-grow">
-              {cleanExcerpt}
+              {post.displayExcerpt || post.excerpt}
             </p>
           )}
 
