@@ -86,36 +86,3 @@ export const calculateReadingTimeFromPortableText = (content: Array<{
   extractText(content)
   return calculateReadingTime(totalText)
 }
-
-// YouTube Shorts由来の「#〜 #shorts」等を表示用に除去（本文は破壊しない）
-export const stripShortsAndHashtags = (raw: string): string => {
-  if (!raw) return raw
-
-  const lines = raw.split('\n')
-  const out: string[] = []
-
-  for (const originalLine of lines) {
-    const trimmed = originalLine.trim()
-
-    // "# ... #shorts" のような先頭行はタイトルと重複しやすいので丸ごと消す
-    if (/^#{1,6}\s+/.test(trimmed) && /[#＃]shorts\b/i.test(trimmed)) {
-      continue
-    }
-
-    let line = originalLine
-
-    // #shorts を除去
-    line = line.replace(/[#＃]shorts\b/gi, '')
-
-    // ハッシュタグ（#富山 / ＃富山 など）を除去（前後が空白のものだけを対象にする）
-    line = line.replace(/(^|[\s　])([#＃][^\s　#＃]+)(?=$|[\s　])/g, ' ')
-
-    // 余分なスペースを整形
-    line = line.replace(/[\s　]{2,}/g, ' ').trim()
-
-    if (!line) continue
-    out.push(line)
-  }
-
-  return out.join('\n').trim()
-}

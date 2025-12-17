@@ -4,7 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import { PortableText as BasePortableText } from '@portabletext/react'
 import { urlForImage } from '@/sanity/lib/image'
-import { extractYouTubeId, generateHeadingId, stripShortsAndHashtags } from '@/lib/utils'
+import { extractYouTubeId, generateHeadingId } from '@/lib/utils'
 
 // HTMLコンテンツをパースして処理する関数
 function processTextContent(text: string): string {
@@ -58,10 +58,7 @@ function processTextWithBold(text: string): React.ReactNode[] {
 
 // markdown風の簡易記法を判定してReact要素を返す
 function renderMarkdownish(text: string): React.ReactNode {
-  const cleanedText = stripShortsAndHashtags(text)
-  if (!cleanedText) return null
-
-  const headingMatch = cleanedText.match(/^(#{1,6})\s+(.*)$/)
+  const headingMatch = text.match(/^(#{1,6})\s+(.*)$/)
   if (headingMatch) {
     const level = headingMatch[1].length
     const content = headingMatch[2]
@@ -76,7 +73,7 @@ function renderMarkdownish(text: string): React.ReactNode {
   }
 
   // 箇条書き（* または - で始まる行が複数ある場合）
-  const lines = cleanedText.split('\n')
+  const lines = text.split('\n')
   const listLines = lines.filter((line) => line.trim().startsWith('* ') || line.trim().startsWith('- '))
   if (listLines.length >= 2 || (listLines.length === lines.length && listLines.length > 0)) {
     return (
@@ -106,7 +103,7 @@ function renderMarkdownish(text: string): React.ReactNode {
         whiteSpace: 'pre-wrap',
       }}
     >
-      {processTextWithBold(cleanedText)}
+      {processTextWithBold(text)}
     </p>
   )
 }
