@@ -87,6 +87,16 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/:year(\\d{4})/:month(\\d{2})',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/:year(\\d{4})/page/:page(\\d+)',
+        destination: '/',
+        permanent: true,
+      },
+      {
         source: '/structure/:path*',
         destination: '/categories',
         permanent: true,
@@ -110,54 +120,6 @@ const nextConfig: NextConfig = {
       {
         source: '/post-sitemap.xml',
         destination: '/sitemap.xml',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'query', key: 'share' }],
-        destination: '/:path*',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'query', key: 'nb' }],
-        destination: '/:path*',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'query', key: 'utm_source' }],
-        destination: '/:path*',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'query', key: 'utm_medium' }],
-        destination: '/:path*',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'query', key: 'utm_campaign' }],
-        destination: '/:path*',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'query', key: 'utm_content' }],
-        destination: '/:path*',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'query', key: 'utm_term' }],
-        destination: '/:path*',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'query', key: 'fbclid' }],
-        destination: '/:path*',
         permanent: true,
       },
       // 記事スラッグを正規化（toyama- プレフィックス＋英数字ハイフンのみに集約）
@@ -250,7 +212,7 @@ const nextConfig: NextConfig = {
 
       // 日本語タイトルの旧URL（/【...】.../ 等）をカテゴリーへ誘導
       // ※ 旧URLの個別マッピングが難しいため、まずは404を減らしてUXを守る
-      { source: '/:rest(\\【.*\\】.*)', destination: '/categories', permanent: true },
+      { source: '/:rest(【.*】.*)', destination: '/categories', permanent: true },
 
       // 日本語プレフィックスの旧記事URL（/blog/富山-... 等）を該当市町村へ誘導
       { source: '/blog/富山-:rest(.*)', destination: '/category/富山市', permanent: true },
