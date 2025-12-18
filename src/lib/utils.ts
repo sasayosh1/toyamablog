@@ -41,8 +41,8 @@ export const calculateReadingTime = (text: string): number => {
   // 日本語の場合、1分間に約400-500文字読めるとされる
   const CHARS_PER_MINUTE = 450
   
-  // HTMLタグを除去
-  const cleanText = text.replace(/<[^>]*>/g, '')
+  // HTMLタグを除去（読了時間計算用）
+  const cleanText = stripHtmlTags(text)
   
   // 文字数をカウント
   const charCount = cleanText.length
@@ -77,7 +77,7 @@ export const calculateReadingTimeFromPortableText = (content: Array<{
         }
       } else if (block._type === 'html' && block.html) {
         // HTMLブロックからテキストを抽出
-        const htmlText = block.html.replace(/<[^>]*>/g, '')
+        const htmlText = stripHtmlTags(block.html)
         totalText += htmlText + ' '
       }
     })
@@ -85,4 +85,24 @@ export const calculateReadingTimeFromPortableText = (content: Array<{
   
   extractText(content)
   return calculateReadingTime(totalText)
+}
+
+function stripHtmlTags(input: string): string {
+  let output = ''
+  let inTag = false
+
+  for (let index = 0; index < input.length; index++) {
+    const char = input[index]
+    if (char === '<') {
+      inTag = true
+      continue
+    }
+    if (char === '>' && inTag) {
+      inTag = false
+      continue
+    }
+    if (!inTag) output += char
+  }
+
+  return output
 }
