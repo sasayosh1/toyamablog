@@ -60,13 +60,31 @@ function validateComment(data: unknown): { isValid: boolean; errors: string[] } 
   }
   
   if (commentData.email && typeof commentData.email === 'string') {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(commentData.email)) {
+    if (!isValidEmail(commentData.email)) {
       errors.push('有効なメールアドレスを入力してください')
     }
   }
   
   return { isValid: errors.length === 0, errors }
+}
+
+function isValidEmail(email: string): boolean {
+  const trimmed = email.trim()
+  if (trimmed.length === 0 || trimmed.length > 254) return false
+  if (/\s/.test(trimmed)) return false
+
+  const atIndex = trimmed.indexOf('@')
+  if (atIndex <= 0) return false
+  if (trimmed.indexOf('@', atIndex + 1) !== -1) return false
+
+  const local = trimmed.slice(0, atIndex)
+  const domain = trimmed.slice(atIndex + 1)
+  if (local.length === 0 || domain.length === 0) return false
+  if (domain.startsWith('.') || domain.endsWith('.')) return false
+  if (!domain.includes('.')) return false
+  if (domain.includes('..')) return false
+
+  return true
 }
 
 // スパムフィルター

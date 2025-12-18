@@ -1,5 +1,6 @@
 version: 2
 updates:
+  # Production dependencies: keep framework/CMS separate, group minor/patch for everything else.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -7,26 +8,82 @@ updates:
       day: "monday"
       time: "03:00"
       timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
     versioning-strategy: "increase"
+    allow:
+      - dependency-type: "production"
     groups:
-      eslint:
-        patterns:
-          - "eslint*"
-          - "@eslint/*"
-      next:
+      framework:
         patterns:
           - "next"
           - "@next/*"
-      sanity:
+          - "react"
+          - "react-dom"
+        update-types:
+          - "minor"
+          - "patch"
+      cms:
         patterns:
           - "@sanity/*"
           - "sanity"
+        update-types:
+          - "minor"
+          - "patch"
+      prod-minor-patch:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "next"
+          - "@next/*"
+          - "react"
+          - "react-dom"
+          - "@sanity/*"
+          - "sanity"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Development dependencies: group minor/patch to avoid PR floods.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 3
+    versioning-strategy: "increase"
+    allow:
+      - dependency-type: "development"
+    groups:
+      linting:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+        update-types:
+          - "minor"
+          - "patch"
       testing:
         patterns:
           - "@playwright/*"
           - "playwright*"
           - "vitest*"
+        update-types:
+          - "minor"
+          - "patch"
+      dev-minor-patch:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "@playwright/*"
+          - "playwright*"
+          - "vitest*"
+        update-types:
+          - "minor"
+          - "patch"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -34,5 +91,11 @@ updates:
       day: "monday"
       time: "03:00"
       timezone: "Asia/Tokyo"
-    open-pull-requests-limit: 5
-
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"

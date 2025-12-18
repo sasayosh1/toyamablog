@@ -1,0 +1,20 @@
+name: "toyamablog-codeql-config"
+
+paths:
+  - "src"
+  - "lib"
+  - "types"
+
+paths-ignore:
+  - "**/*.html"
+  - "analytics/**"
+  - "data/**"
+  - "dist/**"
+  - "docs/**"
+  - "node_modules/**"
+  - "playwright-report/**"
+  - "public/**"
+  - "reports/**"
+  - "supabase/**"
+  - "test-results/**"
+  - "tests/**"
