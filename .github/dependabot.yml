@@ -1,0 +1,38 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    versioning-strategy: "increase"
+    groups:
+      eslint:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+      next:
+        patterns:
+          - "next"
+          - "@next/*"
+      sanity:
+        patterns:
+          - "@sanity/*"
+          - "sanity"
+      testing:
+        patterns:
+          - "@playwright/*"
+          - "playwright*"
+          - "vitest*"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+
