@@ -8,8 +8,6 @@ interface ArticleAdsProps {
 
 const AD_SLOTS = {
   top: process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP || '',
-  middle: process.env.NEXT_PUBLIC_ADSENSE_SLOT_MIDDLE || '',
-  bottom: process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOTTOM || '',
   sidebar: process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR || '',
   infeed: process.env.NEXT_PUBLIC_ADSENSE_SLOT_INFEED || '',
 }
@@ -24,40 +22,6 @@ export function TopArticleAd({ className }: ArticleAdsProps) {
   if (!slot) return null
   return (
     <div className={`mb-8 ${className}`}>
-      <div className="text-xs text-gray-500 mb-2 text-center">広告</div>
-      <AdUnit
-        slot={slot}
-        format="auto"
-        responsive={true}
-        className="w-full"
-      />
-    </div>
-  )
-}
-
-// 記事中央広告（記事の途中に挿入）
-export function MiddleArticleAd({ className }: ArticleAdsProps) {
-  const slot = getSlot(AD_SLOTS.middle)
-  if (!slot) return null
-  return (
-    <div className={`my-8 ${className}`}>
-      <div className="text-xs text-gray-500 mb-2 text-center">広告</div>
-      <AdUnit
-        slot={slot}
-        format="auto"
-        responsive={true}
-        className="w-full"
-      />
-    </div>
-  )
-}
-
-// 記事下部広告
-export function BottomArticleAd({ className }: ArticleAdsProps) {
-  const slot = getSlot(AD_SLOTS.bottom)
-  if (!slot) return null
-  return (
-    <div className={`mt-8 ${className}`}>
       <div className="text-xs text-gray-500 mb-2 text-center">広告</div>
       <AdUnit
         slot={slot}

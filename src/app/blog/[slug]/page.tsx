@@ -6,7 +6,7 @@ import GlobalHeader from '@/components/GlobalHeader'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import ReadingTime from '@/components/ui/ReadingTime'
 import TableOfContents from '@/components/TableOfContents'
-import { TopArticleAd, MiddleArticleAd, BottomArticleAd } from '@/components/ArticleAds'
+import { TopArticleAd } from '@/components/ArticleAds'
 import StructuredData from '@/components/StructuredData'
 import { generateArticleLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import ArticleErrorBoundary from '@/components/ui/ArticleErrorBoundary'
@@ -233,8 +233,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                   <div className="prose prose-lg max-w-none mb-12 blog-content">
                     <PortableText value={post.body} />
                   </div>
-                  {/* 記事中央広告 */}
-                  <MiddleArticleAd />
                 </>
               ) : null}
 
@@ -328,9 +326,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                     </div>
                   </div>
                 )}
-
-                {/* 記事下部広告 */}
-                <BottomArticleAd />
 
                 {/* ナビゲーションボタン */}
                 <div className="border-t border-gray-200 pt-8 mb-8">
