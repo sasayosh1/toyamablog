@@ -26,8 +26,9 @@ jobs:
       - name: Run mailer
         env:
           # === 共通 ===
-          PROJECT_NAME: ${{ secrets.PROJECT_NAME }} # prorenata or toyama
-          SITE_URL: ${{ secrets.SITE_URL }}
+          # secrets未設定でも落ちないようにデフォルトを用意（必要ならSecrets/Varsで上書き）
+          PROJECT_NAME: ${{ secrets.PROJECT_NAME || vars.PROJECT_NAME || 'toyama' }}
+          SITE_URL: ${{ secrets.SITE_URL || vars.SITE_URL || 'https://sasakiyoshimasa.com' }}
 
           # === Sanity ===
           SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
