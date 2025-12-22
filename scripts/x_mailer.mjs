@@ -28,11 +28,27 @@ async function readPostLog() {
   try {
     const raw = await fs.readFile(LOG_PATH, 'utf8')
     const parsed = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object') return { sent: {} }
-    if (!parsed.sent || typeof parsed.sent !== 'object') return { sent: {} }
-    return { sent: parsed.sent }
+    if (!parsed || typeof parsed !== 'object') return { posted: [] }
+
+    // New format: { posted: [...] }
+    if (Array.isArray(parsed.posted)) {
+      return { posted: parsed.posted }
+    }
+
+    // Backward compatibility: { sent: { [id]: iso } }
+    if (parsed.sent && typeof parsed.sent === 'object') {
+      const posted = Object.entries(parsed.sent)
+        .filter(([id]) => typeof id === 'string' && id)
+        .map(([id, sentAt]) => ({
+          id,
+          sentAt: typeof sentAt === 'string' ? sentAt : undefined,
+        }))
+      return { posted }
+    }
+
+    return { posted: [] }
   } catch {
-    return { sent: {} }
+    return { posted: [] }
   }
 }
 
@@ -84,7 +100,17 @@ async function main() {
   const DRY_RUN = optional('DRY_RUN', '').toLowerCase() === 'true'
 
   const postlog = await readPostLog()
-  const sentMap = postlog.sent || {}
+  const postedList = Array.isArray(postlog.posted) ? postlog.posted : []
+  const postedIds = new Set(
+    postedList
+      .map((entry) => {
+        if (!entry) return ''
+        if (typeof entry === 'string') return entry
+        if (typeof entry === 'object' && typeof entry.id === 'string') return entry.id
+        return ''
+      })
+      .filter(Boolean)
+  )
 
   const sanity = createClient({
     projectId: SANITY_PROJECT_ID,
@@ -110,7 +136,7 @@ async function main() {
   const unsent = (Array.isArray(candidates) ? candidates : [])
     .filter((item) => item && typeof item === 'object')
     .filter((item) => typeof item._id === 'string' && typeof item.slug === 'string')
-    .filter((item) => !sentMap[item._id])
+    .filter((item) => !postedIds.has(item._id))
     .slice(0, MAX_ITEMS)
 
   if (unsent.length === 0) {
@@ -165,12 +191,16 @@ async function main() {
   })
 
   const sentAt = new Date().toISOString()
-  const nextSent = { ...sentMap }
+  const nextPosted = [...postedList]
   for (const post of unsent) {
-    nextSent[post._id] = sentAt
+    nextPosted.push({
+      id: post._id,
+      slug: post.slug,
+      sentAt,
+    })
   }
 
-  await writePostLog({ sent: nextSent })
+  await writePostLog({ posted: nextPosted })
   console.log(`[x_mailer] Sent ${unsent.length} item(s). Updated ${LOG_PATH}.`)
 }
 
