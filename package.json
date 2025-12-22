@@ -35,7 +35,7 @@
     "dotenv": "^17.2.1",
     "googleapis": "^152.0.0",
     "gray-matter": "^4.0.3",
-    "next": "^15.5.7",
+    "next": "^15.5.9",
     "next-sanity": "^9.12.3",
     "nodemailer": "^6.10.1",
     "postcss": "^8.5.6",
