@@ -39,6 +39,11 @@ jobs:
           # === Gmail ===
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          # OAuth2 (optional; preferred if App Password is unreliable)
+          GMAIL_OAUTH_CLIENT_ID: ${{ secrets.GMAIL_OAUTH_CLIENT_ID }}
+          GMAIL_OAUTH_CLIENT_SECRET: ${{ secrets.GMAIL_OAUTH_CLIENT_SECRET }}
+          GMAIL_OAUTH_REFRESH_TOKEN: ${{ secrets.GMAIL_OAUTH_REFRESH_TOKEN }}
+          GMAIL_OAUTH_REDIRECT_URI: ${{ secrets.GMAIL_OAUTH_REDIRECT_URI }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: node scripts/x_mailer.mjs
 

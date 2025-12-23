@@ -88,7 +88,23 @@ GitHub Actions の `X Mailer (semi-auto)` が、Sanity の記事を1件選んで
 
 ### 恒久対策（App Password を使わない）
 
-App Password が使えない/弾かれる場合は、Gmail API (OAuth2 / XOAUTH2) に移行できます（次のセクションで手順を追加します）。
+App Password が使えない/弾かれる場合は、Gmail API (OAuth2 / XOAUTH2) に移行できます。
+
+#### OAuth2 セットアップ手順（Gmail API）
+
+1. Google Cloud Console でプロジェクトを用意し、**Gmail API** を有効化
+2. `API とサービス → 認証情報` で **OAuth クライアント ID** を作成（種類は「ウェブアプリ」でOK）
+   - 承認済みのリダイレクトURI（例）: `http://localhost`
+3. 下記の3点を GitHub Secrets に登録（`Settings → Secrets and variables → Actions → Secrets`）
+   - `GMAIL_OAUTH_CLIENT_ID`
+   - `GMAIL_OAUTH_CLIENT_SECRET`
+   - `GMAIL_OAUTH_REFRESH_TOKEN`
+   - （任意）`GMAIL_OAUTH_REDIRECT_URI`（上で設定したURI。未設定ならスクリプト側は省略可能）
+4. 送信元メールとして `GMAIL_USER` も必ず設定（例: `ptb875pmj49@gmail.com`）
+
+補足:
+- Refresh Token は `https://mail.google.com/`（または Gmail送信に必要な scope）を許可した同意フローから取得してください。
+- このリポジトリの `scripts/x_mailer.mjs` は、OAuth2 secrets が揃っている場合は **App Password より OAuth2 を優先**します。
 
 ## 🤖 自動記事作成システム
 
