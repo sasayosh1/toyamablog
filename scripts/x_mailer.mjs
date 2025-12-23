@@ -1,6 +1,8 @@
 import fs from 'node:fs'
+import http from 'node:http'
 import path from 'node:path'
 import nodemailer from 'nodemailer'
+import { google } from 'googleapis'
 
 const {
   PROJECT_NAME,
@@ -18,9 +20,14 @@ const {
   MAIL_TO,
 } = process.env
 
-if (!PROJECT_NAME || !SITE_URL) throw new Error('PROJECT_NAME / SITE_URL required')
-if (!SANITY_PROJECT_ID || !SANITY_DATASET || !SANITY_API_VERSION) throw new Error('Sanity env missing')
-if (!GMAIL_USER) throw new Error('Gmail env missing: GMAIL_USER')
+const [,, command] = process.argv
+const isAuthCommand = command === 'auth'
+
+if (!isAuthCommand) {
+  if (!PROJECT_NAME || !SITE_URL) throw new Error('PROJECT_NAME / SITE_URL required')
+  if (!SANITY_PROJECT_ID || !SANITY_DATASET || !SANITY_API_VERSION) throw new Error('Sanity env missing')
+  if (!GMAIL_USER) throw new Error('Gmail env missing: GMAIL_USER')
+}
 
 const LOG_PATH = path.resolve('scripts/postlog.json')
 const CHAR_LIMIT = 140
@@ -36,6 +43,81 @@ function maskEmail(email) {
   const domain = value.slice(at + 1)
   const maskedName = name.length <= 2 ? `${name[0] || ''}*` : `${name[0]}***${name[name.length - 1]}`
   return `${maskedName}@${domain}`
+}
+
+async function getGmailOAuthRefreshToken() {
+  if (process.env.GITHUB_ACTIONS) {
+    throw new Error('Refusing to run auth flow in GitHub Actions. Run locally: node scripts/x_mailer.mjs auth')
+  }
+
+  const clientId = String(GMAIL_OAUTH_CLIENT_ID || '').trim()
+  const clientSecret = String(GMAIL_OAUTH_CLIENT_SECRET || '').trim()
+  if (!clientId || !clientSecret) {
+    throw new Error('Missing OAuth2 secrets: GMAIL_OAUTH_CLIENT_ID / GMAIL_OAUTH_CLIENT_SECRET')
+  }
+
+  // Use loopback redirect. Desktop OAuth clients allow localhost loopback.
+  const server = http.createServer()
+  const port = await new Promise((resolve, reject) => {
+    server.once('error', reject)
+    server.listen(0, '127.0.0.1', () => {
+      const addr = server.address()
+      if (!addr || typeof addr === 'string') return reject(new Error('Failed to bind loopback server'))
+      resolve(addr.port)
+    })
+  })
+
+  const redirectUri =
+    String(GMAIL_OAUTH_REDIRECT_URI || '').trim() || `http://127.0.0.1:${port}`
+
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri)
+
+  const scopes = ['https://www.googleapis.com/auth/gmail.send']
+  const authUrl = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    prompt: 'consent',
+    scope: scopes,
+  })
+
+  const code = await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Auth flow timed out (no redirect received).'))
+    }, 5 * 60 * 1000)
+
+    server.on('request', (req, res) => {
+      try {
+        const url = new URL(req.url || '/', redirectUri)
+        const got = url.searchParams.get('code')
+        if (!got) {
+          res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' })
+          res.end('Missing code.')
+          return
+        }
+        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' })
+        res.end('OK. You can close this tab and return to the terminal.')
+        clearTimeout(timeout)
+        resolve(got)
+      } catch (err) {
+        clearTimeout(timeout)
+        reject(err)
+      } finally {
+        server.close(() => {})
+      }
+    })
+
+    console.log('Open this URL in your browser to authorize Gmail sending:')
+    console.log(authUrl)
+    console.log('')
+    console.log(`Waiting for redirect on ${redirectUri} ...`)
+  })
+
+  const tokenResponse = await oauth2Client.getToken(code)
+  const refreshToken = tokenResponse?.tokens?.refresh_token
+  if (!refreshToken) {
+    throw new Error('No refresh_token received. Re-run auth with prompt=consent and ensure you are not reusing an already-consented client.')
+  }
+
+  return refreshToken
 }
 
 function getJstHour(date = new Date()) {
@@ -157,6 +239,14 @@ const sendMail = async (subject, body) => {
 const daysAgo = (base, iso) => (base - new Date(iso)) / 86400000
 
 const main = async () => {
+  if (isAuthCommand) {
+    const refreshToken = await getGmailOAuthRefreshToken()
+    console.log('')
+    console.log('Refresh token (store this as GitHub Secret `GMAIL_OAUTH_REFRESH_TOKEN`):')
+    console.log(refreshToken)
+    return
+  }
+
   const siteUrl = normalizeBaseUrl(SITE_URL)
 
   const log = loadLog()

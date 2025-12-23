@@ -106,6 +106,24 @@ App Password が使えない/弾かれる場合は、Gmail API (OAuth2 / XOAUTH2
 - Refresh Token は `https://mail.google.com/`（または Gmail送信に必要な scope）を許可した同意フローから取得してください。
 - このリポジトリの `scripts/x_mailer.mjs` は、OAuth2 secrets が揃っている場合は **App Password より OAuth2 を優先**します。
 
+#### Refresh Token の取得（最短）
+
+このリポジトリ内のコマンドで取得できます（ローカル実行のみ。Actionsでは動きません）。
+
+1行実行例（値は例。秘密は貼らない）:
+```bash
+GMAIL_OAUTH_CLIENT_ID='...' \
+GMAIL_OAUTH_CLIENT_SECRET='...' \
+node scripts/x_mailer.mjs auth
+```
+
+実行後に表示される URL をブラウザで開いて許可すると、ローカルに立つ `127.0.0.1` の一時サーバーにリダイレクトされ、ターミナルに `GMAIL_OAUTH_REFRESH_TOKEN` として保存すべき値が出力されます。
+
+同意画面の重要ポイント:
+- 種類は **外部**（Gmail/個人アカウントで使う想定のため）
+- テストユーザーに **送信元Gmail（例: `ptb875pmj49@gmail.com`）** を追加
+- スコープは最小で `https://www.googleapis.com/auth/gmail.send` を追加（送信専用）
+
 ## 🤖 自動記事作成システム
 
 ### 概要
