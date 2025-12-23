@@ -55,6 +55,41 @@ Vercel経由でデプロイ済み: https://sasakiyoshimasa.com
 
 ローカル環境: http://localhost:3000/studio
 
+## 🐦 X Mailer（X投稿文のメール送信）
+
+GitHub Actions の `X Mailer (semi-auto)` が、Sanity の記事を1件選んで「Xに貼るための本文」を Gmail で `MAIL_TO` に送ります。
+
+### 最短の直し方（送信元を `ptb875pmj49@gmail.com` に統一する運用）
+
+この運用に切り替える場合は、`toyamablog` リポジトリの Secrets を下記で統一します。
+
+設定場所: `Settings → Secrets and variables → Actions → Secrets`
+- `GMAIL_USER`: `ptb875pmj49@gmail.com`
+- `GMAIL_APP_PASSWORD`: 上記アカウントで発行した App Password（16文字、空白は入れない）
+- `MAIL_TO`: 受信先メールアドレス
+
+チェック項目（535対策）:
+- `GMAIL_USER` と **同じアカウント**で App Password を発行していること
+- 2段階認証が有効になっていること（App Password 発行に必須）
+- `GMAIL_APP_PASSWORD` の長さが 16 文字であること（空白含めてコピペした場合は削除）
+
+### Secrets/Vars の「どれが実際に使われたか」を特定する手順
+
+この workflow は `.github/workflows/x-mailer.yml` で `secrets.*` を参照しています。
+そのため「どの値が使われたか」は、下記で切り分けできます。
+
+1. `Actions → X Mailer (semi-auto) → 失敗した Run → Run mailer` のログを見る
+2. ログに `Account: x***y@gmail.com` のような **マスク表示**が出るので、その値が「実際に読まれた `GMAIL_USER`」です（秘密は出しません）
+3. 想定と違う場合は、当該リポジトリの `Actions secrets` で同名キーが残っていないか確認し、更新する
+
+補足（優先順位の前提）:
+- `Environment secrets` は、job に `environment:` を指定したときだけ適用されます（この workflow では未使用）。
+- `Organization secrets` は、リポジトリに同名 secret を設定すると **リポジトリ側が優先**されます。
+
+### 恒久対策（App Password を使わない）
+
+App Password が使えない/弾かれる場合は、Gmail API (OAuth2 / XOAUTH2) に移行できます（次のセクションで手順を追加します）。
+
 ## 🤖 自動記事作成システム
 
 ### 概要
