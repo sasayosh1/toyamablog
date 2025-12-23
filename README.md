@@ -110,10 +110,17 @@ App Password が使えない/弾かれる場合は、Gmail API (OAuth2 / XOAUTH2
 
 このリポジトリ内のコマンドで取得できます（ローカル実行のみ。Actionsでは動きません）。
 
-1行実行例（値は例。秘密は貼らない）:
+⚠️ `VAR=...` を「改行で並べるだけ」だと環境変数が設定されません。必ず **ワンライナー** か **export** を使ってください。
+
+**ワンライナー（推奨）**（値は例。秘密は貼らない）:
 ```bash
-GMAIL_OAUTH_CLIENT_ID='...' \
-GMAIL_OAUTH_CLIENT_SECRET='...' \
+GMAIL_OAUTH_CLIENT_ID='...' GMAIL_OAUTH_CLIENT_SECRET='...' node scripts/x_mailer.mjs auth
+```
+
+**export方式**（値は例。秘密は貼らない）:
+```bash
+export GMAIL_OAUTH_CLIENT_ID='...'
+export GMAIL_OAUTH_CLIENT_SECRET='...'
 node scripts/x_mailer.mjs auth
 ```
 
