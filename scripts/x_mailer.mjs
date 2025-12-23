@@ -24,6 +24,16 @@ const CHAR_LIMIT = 140
 const normalizeBaseUrl = (url) => url.replace(/\/+$/, '')
 const now = () => new Date()
 
+function maskEmail(email) {
+  const value = String(email || '')
+  const at = value.indexOf('@')
+  if (at <= 0) return value ? `${value.slice(0, 2)}***` : ''
+  const name = value.slice(0, at)
+  const domain = value.slice(at + 1)
+  const maskedName = name.length <= 2 ? `${name[0] || ''}*` : `${name[0]}***${name[name.length - 1]}`
+  return `${maskedName}@${domain}`
+}
+
 function getJstHour(date = new Date()) {
   const formatter = new Intl.DateTimeFormat('ja-JP', {
     timeZone: 'Asia/Tokyo',
@@ -58,12 +68,22 @@ const buildText = (title, desc, url) => {
 }
 
 const sendMail = async (subject, body) => {
+  const smtpHost = String(process.env.SMTP_HOST || 'smtp.gmail.com').trim()
+  const smtpPortRaw = String(process.env.SMTP_PORT || '465').trim()
+  const smtpPort = Number(smtpPortRaw)
+  const smtpSecureRaw = String(process.env.SMTP_SECURE || 'true').trim().toLowerCase()
+  const smtpSecure = smtpSecureRaw === '1' || smtpSecureRaw === 'true' || smtpSecureRaw === 'yes' || smtpSecureRaw === 'on'
+
+  const appPass = String(GMAIL_APP_PASSWORD || '').replace(/\s+/g, '')
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: GMAIL_USER, pass: String(GMAIL_APP_PASSWORD || '').replace(/\s+/g, '') },
+    host: smtpHost,
+    port: Number.isFinite(smtpPort) ? smtpPort : 465,
+    secure: smtpSecure,
+    auth: { user: GMAIL_USER, pass: appPass },
   })
 
   try {
+    await transporter.verify()
     await transporter.sendMail({
       from: `"X Mailer" <${GMAIL_USER}>`,
       to: MAIL_TO || GMAIL_USER,
@@ -77,10 +97,12 @@ const sendMail = async (subject, body) => {
     const response = error?.response
 
     if (code === 'EAUTH' || responseCode === 535) {
-      const passLen = Array.from(String(GMAIL_APP_PASSWORD || '').replace(/\s+/g, '')).length
+      const passLen = Array.from(appPass).length
       throw new Error(
         [
           'Gmail authentication failed (EAUTH/535).',
+          `SMTP: host=${smtpHost} port=${Number.isFinite(smtpPort) ? smtpPort : 465} secure=${smtpSecure}`,
+          `Account: ${maskEmail(GMAIL_USER)} (appPassLen=${passLen})`,
           'Fix:',
           '- Make sure the GitHub Secret `GMAIL_APP_PASSWORD` is an App Password for the *same* `GMAIL_USER` you just updated.',
           '- The Gmail account must have 2-Step Verification enabled, then generate an App Password (Google Account > Security > App passwords).',
