@@ -129,7 +129,7 @@ node scripts/x_mailer.mjs auth
 同意画面の重要ポイント:
 - 種類は **外部**（Gmail/個人アカウントで使う想定のため）
 - テストユーザーに **送信元Gmail（例: `ptb875pmj49@gmail.com`）** を追加
-- スコープは最小で `https://www.googleapis.com/auth/gmail.send` を追加（送信専用）
+- SMTP(XOAUTH2) で送るので、スコープは `https://mail.google.com/` を追加（これが無いと `EAUTH/535` になりやすい）
 
 ## 🤖 自動記事作成システム
 

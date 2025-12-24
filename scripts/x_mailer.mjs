@@ -4,6 +4,19 @@ import path from 'node:path'
 import nodemailer from 'nodemailer'
 import { google } from 'googleapis'
 
+/**
+ * OAuth2 scopes used when requesting Gmail tokens.
+ *
+ * When sending mail via SMTP using XOAUTH2, Google requires a token issued with
+ * the full `https://mail.google.com/` scope. Tokens issued with the more
+ * granular `gmail.send` scope may be rejected by the SMTP server, which
+ * manifests as an `EAUTH/535` error at runtime.
+ *
+ * If you use the Gmail REST API (`gmail.users.messages.send`) you can choose
+ * a narrower scope, but for SMTP choose `mail.google.com`.
+ */
+const SCOPES = ['https://mail.google.com/']
+
 const {
   PROJECT_NAME,
   SITE_URL,
@@ -72,11 +85,10 @@ async function getGmailOAuthRefreshToken() {
 
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri)
 
-  const scopes = ['https://www.googleapis.com/auth/gmail.send']
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
-    scope: scopes,
+    scope: SCOPES,
   })
 
   const code = await new Promise((resolve, reject) => {
