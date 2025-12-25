@@ -2,11 +2,12 @@ name: X Mailer (semi-auto)
 
 on:
   workflow_dispatch:
-  schedule:
-    # 08:30 JST = 23:30 UTC (前日)
-    - cron: "30 23 * * *"
-    # 20:30 JST = 11:30 UTC
-    - cron: "30 11 * * *"
+  # 一旦停止（fails通知対策）：手動実行のみ残す
+  # schedule:
+  #   # 08:30 JST = 23:30 UTC (前日)
+  #   - cron: "30 23 * * *"
+  #   # 20:30 JST = 11:30 UTC
+  #   - cron: "30 11 * * *"
 
 permissions:
   contents: write
