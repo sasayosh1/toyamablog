@@ -1,5 +1,5 @@
 import GlobalHeader from '@/components/GlobalHeader'
-import { client, getAllCategories, type Post, normalizePostCategoryList } from '@/lib/sanity'
+import { safeFetch, getAllCategories, type Post, normalizePostCategoryList } from '@/lib/sanity'
 import { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
@@ -18,13 +18,20 @@ export const metadata: Metadata = {
 
 export default async function PrivacyPage() {
   const [posts, categories] = await Promise.all([
-    client.fetch<(Post & { categoryRefs?: string[] | null })[]>(`
-      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...100] {
-        _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
-        author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
-        "excerpt": description, "categoryRefs": categories[]->title
-      }
-    `).then((results) => normalizePostCategoryList(results)),
+    safeFetch<(Post & { categoryRefs?: string[] | null })[]>(
+      `
+        *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...100] {
+          _id, title, slug, description, tags, category, publishedAt, youtubeUrl,
+          author->{ _id, name, slug, bio, image{ asset->{ _ref, url } } },
+          "excerpt": description, "categoryRefs": categories[]->title
+        }
+      `,
+      {},
+      {
+        next: { tags: ['search-posts'], revalidate: 600 },
+      },
+      []
+    ).then((results) => normalizePostCategoryList(results)),
     getAllCategories()
   ])
 
