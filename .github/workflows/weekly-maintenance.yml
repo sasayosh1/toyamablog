@@ -34,7 +34,7 @@ jobs:
 
       - name: Create issue if problems found
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const title = '🔧 Weekly Maintenance: 品質問題を検出しました';
