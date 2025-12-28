@@ -1,4 +1,4 @@
-import { getPost, getAllCategories, type Post, client, normalizePostCategoryList } from '@/lib/sanity'
+import { getPost, getAllCategories, safeFetch, type Post, normalizePostCategoryList } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PortableText from '@/components/PortableText'
@@ -7,7 +7,6 @@ import Breadcrumb from '@/components/ui/Breadcrumb'
 import ReadingTime from '@/components/ui/ReadingTime'
 import TableOfContents from '@/components/TableOfContents'
 import { TopArticleAd } from '@/components/ArticleAds'
-import StructuredData from '@/components/StructuredData'
 import { generateArticleLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import ArticleErrorBoundary from '@/components/ui/ArticleErrorBoundary'
 import RelatedPosts from '@/components/RelatedPosts'
@@ -107,21 +106,26 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   // 軽量化：検索用データのみ取得
   const [posts, categories] = await Promise.all([
-    client.fetch<(Post & { categoryRefs?: string[] | null })[]>(`
-      *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
-        _id, title, slug, category, publishedAt,
-        "categoryRefs": categories[]->title
-      }
-    `, {}, {
-      next: {
-        tags: ['search-posts'],
-        revalidate: 600
-      }
-    }).then((results) => normalizePostCategoryList(results)),
-    getAllCategories()
+    safeFetch<(Post & { categoryRefs?: string[] | null })[]>(
+      `
+        *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
+          _id, title, slug, category, publishedAt,
+          "categoryRefs": categories[]->title
+        }
+      `,
+      {},
+      {
+        next: {
+          tags: ['search-posts'],
+          revalidate: 600,
+        },
+      },
+      []
+    ).then((results) => normalizePostCategoryList(results)),
+    getAllCategories(),
   ])
 
-  // 構造化データを生成
+  // 構造化データを生成 (サーバー側で直接埋め込み)
   const articleLD = generateArticleLD(post, slug)
   const breadcrumbLD = generateBreadcrumbLD([
     { name: 'ホーム', url: 'https://sasakiyoshimasa.com/' },
@@ -129,9 +133,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     { name: cleanTitle }
   ])
 
+  const jsonLd = JSON.stringify([articleLD, breadcrumbLD])
+
   return (
     <>
-      <StructuredData data={[articleLD, breadcrumbLD]} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
       <div className="min-h-screen bg-gray-50 blog-page">
         <GlobalHeader posts={posts} categories={categories} />
 
