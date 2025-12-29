@@ -9,6 +9,15 @@ npm install
 npm run dev
 ```
 
+## 🧰 生成物の保存先（重要）
+
+画像生成・加工などの「生成物」は `public/` に直接書き込みません。
+（削除や上書きが混ざって混乱するのを避けるため）
+
+- **生成物の保存先（統一）**: `~/_inbox/antigravity/toyamablog/`
+  - 例: `~/_inbox/antigravity/toyamablog/profile/`
+- `public/` は手動管理（必要なときだけ手動でコピー）
+
 ## ヒーロー画像の設定
 
 ### 📸 画像アップロード手順
