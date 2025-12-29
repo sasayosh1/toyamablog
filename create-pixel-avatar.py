@@ -1,5 +1,26 @@
 #!/usr/bin/env python3
 from PIL import Image, ImageDraw
+import os
+from datetime import datetime
+
+
+def _timestamp():
+    return datetime.now().strftime("%Y%m%d-%H%M%S")
+
+
+def _root_dir():
+    return os.path.expanduser(os.environ.get("ANTIGRAVITY_ROOT_DIR", "~/_inbox/antigravity"))
+
+
+def _out_dir():
+    return os.path.join(_root_dir(), "toyamablog", "profile")
+
+
+def _unique_path(path: str) -> str:
+    if not os.path.exists(path):
+        return path
+    base, ext = os.path.splitext(path)
+    return f"{base}-{_timestamp()}{ext}"
 
 # 512x512のキャンバスを作成
 size = 512
@@ -123,6 +144,8 @@ set_pixel_block(16, 28, orange)
 set_pixel_block(15, 29, orange)
 set_pixel_block(16, 29, orange)
 
-# 保存
-img.save('/Users/user/toyamablog/public/profile.png', 'PNG')
-print("ドット絵プロフィール画像を作成しました: /Users/user/toyamablog/public/profile.png")
+# 保存（public には直接書き込まない）
+os.makedirs(_out_dir(), exist_ok=True)
+out_path = os.environ.get("OUTPUT_PATH") or _unique_path(os.path.join(_out_dir(), "profile.png"))
+img.save(out_path, "PNG")
+print(f"ドット絵プロフィール画像を作成しました: {out_path}")

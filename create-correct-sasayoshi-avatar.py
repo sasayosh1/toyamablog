@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 from PIL import Image
+import os
+from datetime import datetime
 
 # 32x32のベースサイズで作成し、後で512x512にスケール
 base_size = 32
@@ -166,6 +168,27 @@ for coord in cross_coords:
 # 512x512にスケールアップ（ピクセル化を維持）
 final_img = base_img.resize((512, 512), Image.NEAREST)
 
-# 保存
-final_img.save('/Users/user/toyamablog/public/profile.png', 'PNG')
-print("正しいささよしアイコンを作成しました: /Users/user/toyamablog/public/profile.png")
+def _timestamp():
+    return datetime.now().strftime("%Y%m%d-%H%M%S")
+
+
+def _root_dir():
+    return os.path.expanduser(os.environ.get("ANTIGRAVITY_ROOT_DIR", "~/_inbox/antigravity"))
+
+
+def _out_dir():
+    return os.path.join(_root_dir(), "toyamablog", "profile")
+
+
+def _unique_path(path: str) -> str:
+    if not os.path.exists(path):
+        return path
+    base, ext = os.path.splitext(path)
+    return f"{base}-{_timestamp()}{ext}"
+
+
+# 保存（public には直接書き込まない）
+os.makedirs(_out_dir(), exist_ok=True)
+out_path = os.environ.get("OUTPUT_PATH") or _unique_path(os.path.join(_out_dir(), "profile.png"))
+final_img.save(out_path, "PNG")
+print(f"アイコンを作成しました: {out_path}")

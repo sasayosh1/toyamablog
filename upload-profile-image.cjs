@@ -2,6 +2,11 @@ const {createClient} = require('@sanity/client');
 const fs = require('fs');
 const path = require('path');
 
+function inboxProfilePath() {
+  const root = process.env.ANTIGRAVITY_ROOT_DIR || path.join(require('os').homedir(), '_inbox', 'antigravity');
+  return path.join(root, 'toyamablog', 'profile', 'profile.png');
+}
+
 const client = createClient({
   projectId: 'aoxze287',
   dataset: 'production',
@@ -13,7 +18,8 @@ const client = createClient({
 async function uploadProfileImage() {
   try {
     // 画像ファイルを読み込み
-    const imagePath = path.join(__dirname, 'public', 'profile.png');
+    // public/ には直接置かない運用。inbox をデフォルトにする（必要なら IMAGE_PATH で上書き可）。
+    const imagePath = process.env.IMAGE_PATH || inboxProfilePath();
     const imageBuffer = fs.readFileSync(imagePath);
     
     console.log('画像をSanityにアップロード中...');
