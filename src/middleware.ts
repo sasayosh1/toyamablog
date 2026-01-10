@@ -63,6 +63,11 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/', request.url), 308)
     }
 
+    // Google Search Console verification files should be served as-is.
+    if (path === '/google613d0403c01cf012.html') {
+      return NextResponse.next()
+    }
+
     // 拡張子付きの旧URL（.php/.html など）をトップへ
     if (/\.(php|html?)$/i.test(path)) {
       return NextResponse.redirect(new URL('/', request.url), 308)
