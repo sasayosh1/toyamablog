@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2025-12-24T11:30:29.343Z",
+  "results": [
+    {
+      "file": ".next/server/app/blog/toyama-funahashimura-1260yen.html",
+      "exists": true,
+      "jsonld_count": 1,
+      "parsed_count": 1,
+      "video_found": false,
+      "video_details": []
+    },
+    {
+      "file": ".next/server/app/blog/toyama-tateyamamachi-and.html",
+      "exists": true,
+      "jsonld_count": 1,
+      "parsed_count": 1,
+      "video_found": false,
+      "video_details": []
+    },
+    {
+      "file": ".next/server/app/blog/toyama-tonamishi-900.html",
+      "exists": true,
+      "jsonld_count": 1,
+      "parsed_count": 1,
+      "video_found": false,
+      "video_details": []
+    },
+    {
+      "file": ".next/server/app/blog/toyama-toyamashi-reberty.html",
+      "exists": true,
+      "jsonld_count": 1,
+      "parsed_count": 1,
+      "video_found": false,
+      "video_details": []
+    }
+  ]
+}

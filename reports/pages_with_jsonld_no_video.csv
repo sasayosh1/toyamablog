@@ -1,0 +1,5 @@
+file,slug,jsonld_count,parsed_count,has_video,has_contentUrl_watch,has_embedUrl,has_thumbnailUrl,has_uploadDate
+.next/server/app/blog/toyama-funahashimura-1260yen.html,toyama-funahashimura-1260yen,1,1,false,false,false,false,false
+.next/server/app/blog/toyama-tateyamamachi-and.html,toyama-tateyamamachi-and,1,1,false,false,false,false,false
+.next/server/app/blog/toyama-tonamishi-900.html,toyama-tonamishi-900,1,1,false,false,false,false,false
+.next/server/app/blog/toyama-toyamashi-reberty.html,toyama-toyamashi-reberty,1,1,false,false,false,false,false
