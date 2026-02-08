@@ -1,7 +1,7 @@
 {
   "ok": false,
   "reason": "script_error",
-  "checkedAt": "2026-02-01T19:29:00.598Z",
-  "dateCheckedUtc": "2026-02-01",
+  "checkedAt": "2026-02-08T19:29:57.337Z",
+  "dateCheckedUtc": "2026-02-08",
   "error": "GA4_PROPERTY_ID is required"
 }
