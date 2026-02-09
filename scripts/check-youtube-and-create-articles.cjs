@@ -2,30 +2,37 @@ const { createClient } = require('@sanity/client');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const fs = require('fs');
 const path = require('path');
+// Load .env.local with override: true to force new keys over old shell variables
+require('dotenv').config({
+  path: path.join(__dirname, '..', '.env.local'),
+  override: true
+});
 
 // ===== 設定 =====
 const PROGRESS_FILE = path.join(__dirname, '..', '.last-processed-video.json');
 const ARTICLES_PER_RUN = parseInt(process.env.ARTICLES_PER_RUN || '3', 10); // 初期3ヶ月: 3件、その後: 2件に変更
 
 // Gemini API設定（コスト最適化）
-const GEMINI_MODEL = 'gemini-2.5-flash-lite'; // 最安・高品質（¥0.19/記事、月¥3-4）
+const GEMINI_MODEL = 'gemini-2.5-flash'; // 最安・高品質（¥0.19/記事、月¥3-4）
 
 // Sanity Client
+const sanityToken = (process.env.SANITY_API_TOKEN || '').trim();
 const sanityClient = createClient({
   projectId: 'aoxze287',
   dataset: 'production',
   apiVersion: '2024-01-01',
   useCdn: false,
-  token: process.env.SANITY_API_TOKEN
+  token: sanityToken
 });
 
 // Gemini AI Client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const geminiKey = (process.env.GEMINI_API_KEY || '').trim();
+const genAI = new GoogleGenerativeAI(geminiKey);
 const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
 // YouTube設定
 const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UCxX3Eq8_KMl3AeYdhb5MklA';
-const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+const YOUTUBE_API_KEY = (process.env.YOUTUBE_API_KEY || '').trim();
 
 // ===== 文章整形ユーティリティ =====
 
