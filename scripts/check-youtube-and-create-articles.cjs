@@ -459,6 +459,56 @@ function extractLocation(title) {
 // ===== Gemini AI記事生成 =====
 
 /**
+ * 記事本文にアフィリエイト・関連リンクを挿入
+ */
+function injectAffiliateLinks(markdown, location) {
+  let updatedMarkdown = markdown;
+
+  // 1. 宿泊系（ホテル、旅館、泊まり、温泉）
+  if (/ホテル|旅館|宿泊|泊まり|宿|温泉/.test(updatedMarkdown)) {
+    const link = `https://search.travel.rakuten.co.jp/ds/hotel/search?f_id=1&f_query=${encodeURIComponent('富山県 ' + location)}`;
+    const affiliateText = `\n\n[PR] 🏨 **${location}周辺の宿を探す（楽天トラベル）** → [プランを見る](${link})`;
+
+    // 記事の最後の方（「まとめ」の前など）に挿入
+    if (updatedMarkdown.includes('## まとめ')) {
+      updatedMarkdown = updatedMarkdown.replace('## まとめ', `${affiliateText}\n\n## まとめ`);
+    } else {
+      updatedMarkdown += affiliateText;
+    }
+  }
+
+  // 2. レンタカー・移動・ドライブ
+  if (/レンタカー|ドライブ|車で|アクセス|移動/.test(updatedMarkdown)) {
+    const link = 'https://cars.travel.rakuten.co.jp/';
+    const affiliateText = `\n\n[PR] 🚗 **富山観光にはレンタカーが便利！（楽天トラベル）** → [お得なレンタカーを探す](${link})`;
+    updatedMarkdown += affiliateText;
+  }
+
+  // 3. 高速バス・バスツアー
+  if (/バス|高速バス|ツアー|交通/.test(updatedMarkdown)) {
+    const link = 'https://travel.rakuten.co.jp/bus/';
+    const affiliateText = `\n\n[PR] 🚌 **高速バスで富山へ！（楽天トラベル）** → [バスを検索する](${link})`;
+    updatedMarkdown += affiliateText;
+  }
+
+  // 4. お土産・特産品・グルメ
+  if (/お土産|名産|特産|グルメ|美味しい|食事|ランチ|ディナー/.test(updatedMarkdown)) {
+    const link = `https://search.rakuten.co.jp/search/mall/${encodeURIComponent('富山県 ' + location + ' グルメ')}/`;
+    const affiliateText = `\n\n[PR] 🎁 **${location}の美味しいものをお取り寄せ（楽天市場）** → [富山グルメを見る](${link})`;
+    updatedMarkdown += affiliateText;
+  }
+
+  // 5. 遊び・体験・アクティビティ
+  if (/体験|遊び|アクティビティ|観光|スポット/.test(updatedMarkdown)) {
+    const link = `https://experiences.travel.rakuten.co.jp/`;
+    const affiliateText = `\n\n[PR] 🎡 **富山で遊ぶなら！（楽天トラベル観光体験）** → [アクティビティを探す](${link})`;
+    updatedMarkdown += affiliateText;
+  }
+
+  return updatedMarkdown;
+}
+
+/**
  * Gemini APIで高品質な記事本文を生成
  */
 async function generateArticleWithGemini(video, location, titleKeywords = []) {
@@ -466,7 +516,7 @@ async function generateArticleWithGemini(video, location, titleKeywords = []) {
     ? titleKeywords.map(keyword => `- ${keyword}`).join('\n')
     : '- （タイトルから特定の固有キーワードは抽出できませんでした）';
 
-  const prompt = `あなたは富山県の魅力を伝えるブログ「富山、お好きですか？」のライターです。以下のYouTube動画から、親しみやすく読みやすいブログ記事を作成してください。
+  const prompt = `あなたは富山県の魅力を伝えるブログ「富山、お好きですか？」のライターです。以下のYouTube動画から、読者が実際に現地に行きたくなるような高品質なブログ記事を作成してください。
 
 【動画情報】
 タイトル: ${video.title}
@@ -477,14 +527,21 @@ async function generateArticleWithGemini(video, location, titleKeywords = []) {
 ${keywordSection}
 
 【記事作成ルール】
-1. **文字数**: 1,500〜2,000文字（スマホ読みやすさ最優先）
-2. **構成**: 導入文（2-3行） → H2見出し3つ → まとめ
-3. **H2見出し**: 3つの主要セクション
-4. **H3見出し**: 必須ではなく、文章上どうしても必要な場合のみ使用
-5. **箇条書き**: 積極的に活用（読みやすさ向上）
-6. **数字**: 具体的な情報を提供する際に積極的に使用
-7. **まとめ**: 読者の行動を促す結び
-8. **キーワード反映**: 動画タイトルのキーワードは本文中で必ず取り上げ、関連する具体的な描写や体験談を添えてください。汎用的な地域紹介で終わらせず、動画のテーマにフォーカスしてください。
+1. **文字数**: 制限なし。内容を深く掘り下げ、可能な限り網羅的に記述してください（スカスカな内容はNG）。
+2. **構成**:
+   - **導入**: 読者の興味を惹く書き出し。
+   - **H2見出し**: 動画の要点を3つ以上展開。
+   - **H3見出し**: 「構成上、どうしても必要な場合のみ」使用してください。無理に細分化して内容が薄くならないように注意してください。
+   - **まとめ**: 読者に行動（訪問など）を促す結び。
+3. **必須要素**:
+   - **Googleマップ情報**: 記事の中で紹介したスポットについて、必ず「[[MAP: スポット名/住所]]」という形式で記述してください（後できちんと埋め込みマップに変換します）。例: [[MAP: 富山県美術館]]
+   - **関連リンク**: 公式HP、公式SNS（Instagram/X）、食べログ、じゃらん等の参考情報があれば、「🌐 **関連リンク**: [名称](URL)」の形式でセクションの終わりや記事末尾に記載してください。
+4. **文体**:
+   - 「〜です/〜ます」調で、親しみやすく、かつ信頼感のあるトーン。
+   - 箇条書きを積極的に活用し、読みやすさを確保。
+   - 具体的な数字や固有名称を大切に。
+5. **アフィリエイト・紹介意識**:
+   - 特定の商品に限らず、読者の役に立つ情報は積極的に紹介してください。「宿泊」「移動手段」「近くの観光スポット」など、旅の計画に必要な要素を網羅してください（リンクは後処理で挿入されますが、文脈作りをお願いします）。
 
 【記事タイトル】
 ${video.title.includes('【') ? video.title : `【${location}】${video.title}`}
@@ -494,8 +551,13 @@ ${video.title.includes('【') ? video.title : `【${location}】${video.title}`}
   try {
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
-    return sanitizeMarkdownResponse(text);
+    let text = response.text();
+    text = sanitizeMarkdownResponse(text);
+
+    // ASPリンク等の自動挿入
+    text = injectAffiliateLinks(text, location);
+
+    return text;
   } catch (error) {
     console.error('❌ Gemini API記事生成エラー:', error);
     throw error;
@@ -557,6 +619,25 @@ function markdownToPortableText(markdown) {
 
   for (const line of lines) {
     if (!line.trim()) continue;
+
+    // Google Maps Embed (NEW)
+    const mapMatch = line.match(/^\[\[MAP:\s*(.+?)\]\]$/);
+    if (mapMatch) {
+      const spotName = mapMatch[1];
+      const query = encodeURIComponent(spotName);
+      // iframe src for embedded Google Maps
+      const src = `https://maps.google.com/maps?q=${query}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+      // HTML block that will be rendered by PortableText.tsx (modified to allow this)
+      const html = `<div style="width: 100%; height: 450px; margin: 20px 0;"><iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${src}"></iframe></div>`;
+
+      blocks.push({
+        _type: 'html',
+        _key: `map-${blocks.length}`,
+        html: html
+      });
+      currentBlock = null;
+      continue;
+    }
 
     // H2見出し
     if (line.startsWith('## ')) {

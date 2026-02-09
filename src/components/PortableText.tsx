@@ -10,7 +10,7 @@ import { extractYouTubeId, generateHeadingId } from '@/lib/utils'
 function processTextContent(text: string): string {
   // YouTube iframeを検出して置換
   const youtubeIframeRegex = /<iframe[^>]*src="[^"]*youtube\.com\/embed\/([^"]*)"[^>]*><\/iframe>/gi
-  
+
   if (youtubeIframeRegex.test(text)) {
     return text.replace(youtubeIframeRegex, (match, videoId) => {
       return `[YouTube: ${videoId}]`
@@ -67,8 +67,8 @@ function renderMarkdownish(text: string): React.ReactNode {
       level <= 2
         ? 'text-lg md:text-xl font-semibold text-gray-800 border-l-3 border-blue-500 pl-3 md:pl-4 my-4 md:my-6'
         : level === 3
-        ? 'text-base md:text-lg font-medium text-gray-700 my-3 md:my-4'
-        : 'text-base font-medium text-gray-700 my-2'
+          ? 'text-base md:text-lg font-medium text-gray-700 my-3 md:my-4'
+          : 'text-base font-medium text-gray-700 my-2'
     return <Tag className={classNames}>{content}</Tag>
   }
 
@@ -113,24 +113,12 @@ const components = {
   types: {
     // Googleマップを完全にスキップ（クラウドルール：専用セクションで表示）
     googleMaps: () => null,
-    // HTMLタイプの処理（Googleマップは完全除外）
+    // HTMLタイプの処理（Googleマップはそのままiframe表示）
     html: ({ value }: { value: { html: string } }) => {
       if (!value?.html) return null
-      
-      // Googleマップ関連のHTMLを完全に除外（クラウドルール：専用セクションで表示）
-      const isGoogleMap = value.html.includes('google.com/maps/embed') ||
-                         value.html.includes('maps.google.com') ||
-                         value.html.includes('www.google.com/maps') ||
-                         value.html.toLowerCase().includes('iframe') && 
-                         (value.html.includes('maps') || value.html.includes('embed'))
-      
-      if (isGoogleMap) {
-        console.log('PortableText: Googleマップを検出し、表示をスキップしました', value.html.substring(0, 100))
-        return null
-      }
-      
+
       return (
-        <div 
+        <div
           dangerouslySetInnerHTML={{ __html: value.html }}
           style={{ margin: '1rem 0' }}
         />
@@ -140,9 +128,9 @@ const components = {
       if (!value?.asset?._ref) {
         return null
       }
-      
+
       const imageUrl = urlForImage(value).width(800).height(600).fit('max').auto('format').url()
-      
+
       return (
         <div style={{ margin: '2rem 0' }}>
           <div style={{ position: 'relative', width: '100%', height: '400px' }}>
@@ -173,7 +161,7 @@ const components = {
     youtube: ({ value }: { value: { url: string } }) => {
       const { url } = value
       const videoId = extractYouTubeId(url)
-      
+
       if (!videoId) {
         return (
           <div className="bg-gray-100 p-4 rounded text-center text-gray-500">
@@ -183,7 +171,7 @@ const components = {
       }
 
       return (
-        <div style={{ 
+        <div style={{
           margin: '2rem 0',
           position: 'relative',
           paddingBottom: '56.25%', // 16:9アスペクト比
@@ -211,10 +199,10 @@ const components = {
     youtubeShorts: ({ value }: { value: { url: string } }) => {
       const { url } = value
       const videoId = extractYouTubeId(url)
-      
+
       if (!videoId) {
         return (
-          <div style={{ 
+          <div style={{
             margin: '2rem 0',
             padding: '1rem',
             backgroundColor: '#f0f0f0',
@@ -227,7 +215,7 @@ const components = {
       }
 
       return (
-        <div style={{ 
+        <div style={{
           margin: '2rem 0',
           position: 'relative',
           paddingBottom: '56.25%', // 16:9アスペクト比
@@ -280,23 +268,23 @@ const components = {
         </a>
       )
     },
-    affiliateLink: ({ children, value }: { 
-      children: React.ReactNode; 
-      value: { 
-        href: string; 
+    affiliateLink: ({ children, value }: {
+      children: React.ReactNode;
+      value: {
+        href: string;
         platform?: 'amazon' | 'rakuten' | 'yahoo' | 'generic';
         showIcon?: boolean;
-      } 
+      }
     }) => {
       const { href, platform = 'generic', showIcon = true } = value
-      
+
       const platformStyles = {
         amazon: 'text-orange-600 hover:text-orange-700 border-b-2 border-orange-200 hover:border-orange-300',
         rakuten: 'text-red-600 hover:text-red-700 border-b-2 border-red-200 hover:border-red-300',
         yahoo: 'text-purple-600 hover:text-purple-700 border-b-2 border-purple-200 hover:border-purple-300',
         generic: 'text-blue-600 hover:text-blue-700 border-b-2 border-blue-200 hover:border-blue-300'
       }
-      
+
       return (
         <span style={{ display: 'inline-block' }}>
           <a
@@ -311,14 +299,14 @@ const components = {
               transition: 'all 0.2s ease',
               cursor: 'pointer',
               ...(platform === 'amazon' ? { color: '#ea580c' } :
-                  platform === 'rakuten' ? { color: '#dc2626' } :
+                platform === 'rakuten' ? { color: '#dc2626' } :
                   platform === 'yahoo' ? { color: '#7c3aed' } :
-                  { color: '#2563eb' })
+                    { color: '#2563eb' })
             }}
             onMouseEnter={(e) => {
               const colors = {
                 amazon: '#c2410c',
-                rakuten: '#b91c1c', 
+                rakuten: '#b91c1c',
                 yahoo: '#6d28d9',
                 generic: '#1d4ed8'
               }
@@ -329,7 +317,7 @@ const components = {
               const colors = {
                 amazon: '#ea580c',
                 rakuten: '#dc2626',
-                yahoo: '#7c3aed', 
+                yahoo: '#7c3aed',
                 generic: '#2563eb'
               }
               e.currentTarget.style.color = colors[platform as keyof typeof colors]
@@ -338,8 +326,8 @@ const components = {
           >
             {children}
             {showIcon && (
-              <span style={{ 
-                marginLeft: '4px', 
+              <span style={{
+                marginLeft: '4px',
                 fontSize: '12px',
                 opacity: 0.7
               }}>
@@ -347,12 +335,12 @@ const components = {
               </span>
             )}
           </a>
-          <span 
-            style={{ 
-              fontSize: '12px', 
-              color: '#9ca3af', 
-              marginLeft: '4px' 
-            }} 
+          <span
+            style={{
+              fontSize: '12px',
+              color: '#9ca3af',
+              marginLeft: '4px'
+            }}
             title="アフィリエイトリンク"
           >
             [PR]
@@ -363,9 +351,9 @@ const components = {
   },
   block: {
     h1: ({ children }: { children: React.ReactNode }) => (
-      <h1 style={{ 
-        fontSize: '2.5rem', 
-        fontWeight: 'bold', 
+      <h1 style={{
+        fontSize: '2.5rem',
+        fontWeight: 'bold',
         margin: '2rem 0 1rem 0',
         lineHeight: '1.2'
       }}>
@@ -375,12 +363,12 @@ const components = {
     h2: ({ children, value }: { children: React.ReactNode; value?: { children?: { text: string }[] } }) => {
       const text = value?.children?.map((child) => child.text).join('') || ''
       const id = generateHeadingId(text, 'h2')
-      
+
       return (
-        <h2 
+        <h2
           id={id}
           className="text-lg md:text-xl font-semibold text-gray-800 border-l-3 border-blue-500 pl-3 md:pl-4 my-4 md:my-6"
-          style={{ 
+          style={{
             lineHeight: '1.4',
             scrollMarginTop: '80px'
           }}
@@ -392,12 +380,12 @@ const components = {
     h3: ({ children, value }: { children: React.ReactNode; value?: { children?: { text: string }[] } }) => {
       const text = value?.children?.map((child) => child.text).join('') || ''
       const id = generateHeadingId(text, 'h3')
-      
+
       return (
-        <h3 
+        <h3
           id={id}
           className="text-base md:text-lg font-medium text-gray-700 my-3 md:my-4"
-          style={{ 
+          style={{
             lineHeight: '1.4',
             scrollMarginTop: '80px'
           }}
@@ -442,7 +430,7 @@ const components = {
   },
   list: {
     bullet: ({ children }: { children: React.ReactNode }) => (
-      <ul style={{ 
+      <ul style={{
         margin: '1rem 0',
         paddingLeft: '1.5rem'
       }}>
@@ -450,7 +438,7 @@ const components = {
       </ul>
     ),
     number: ({ children }: { children: React.ReactNode }) => (
-      <ol style={{ 
+      <ol style={{
         margin: '1rem 0',
         paddingLeft: '1.5rem'
       }}>
@@ -467,7 +455,7 @@ const components = {
         return child
       })
       return (
-        <li style={{ 
+        <li style={{
           margin: '0.5rem 0',
           lineHeight: '1.6'
         }}>
@@ -483,7 +471,7 @@ const components = {
         return child
       })
       return (
-        <li style={{ 
+        <li style={{
           margin: '0.5rem 0',
           lineHeight: '1.6'
         }}>
