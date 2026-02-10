@@ -1,9 +1,9 @@
-name: Weekly Content Generation
+name: Daily Content Generation (Catch-up Mode)
 
 on:
   schedule:
-    # JST Saturday 21:00 (UTC 12:00)
-    - cron: '0 12 * * 6'
+    # JST 09:00 (UTC 00:00)
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 concurrency:

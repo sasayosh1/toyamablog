@@ -336,7 +336,7 @@ async function fetchAllYouTubeVideos() {
     // 2. uploads プレイリストから動画一覧をページング取得
     const videos = [];
     let nextPageToken = undefined;
-    const maxItems = 120; // 念のため十分多めに取得
+    const maxItems = 1000; // バックログ解消のため十分に多く取得
 
     do {
       const playlistUrl = new URL('https://www.googleapis.com/youtube/v3/playlistItems');
