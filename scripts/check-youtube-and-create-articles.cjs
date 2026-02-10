@@ -638,79 +638,147 @@ function ensureKeywordCoverage(markdown, titleKeywords = []) {
 function markdownToPortableText(markdown) {
   const lines = markdown.split('\n');
   const blocks = [];
-  let currentBlock = null;
+  let mapBlock = null;
+
+  // Helper to parse inline marks (bold, link)
+  const parseInlineMarkdown = (text, blockKey) => {
+    // Regex for **bold** and [link](url)
+    const regex = /(\*\*[^*]+\*\*|\[.+?\]\(.+?\))/g;
+    const parts = text.split(regex);
+    const children = [];
+    const markDefs = [];
+
+    parts.forEach((part, index) => {
+      if (!part) return;
+
+      // Bold: **text**
+      if (part.startsWith('**') && part.endsWith('**')) {
+        children.push({
+          _type: 'span',
+          _key: `${blockKey}-child-${index}`,
+          text: part.slice(2, -2),
+          marks: ['strong']
+        });
+        return;
+      }
+
+      // Link: [text](url)
+      const linkMatch = part.match(/^\[(.+?)\]\((.+?)\)$/);
+      if (linkMatch) {
+        const linkText = linkMatch[1];
+        const linkUrl = linkMatch[2];
+        const markKey = `link-${blockKey}-${index}`;
+
+        children.push({
+          _type: 'span',
+          _key: `${blockKey}-child-${index}`,
+          text: linkText,
+          marks: [markKey]
+        });
+
+        markDefs.push({
+          _key: markKey,
+          _type: 'link',
+          href: linkUrl
+        });
+        return;
+      }
+
+      // Plain text
+      children.push({
+        _type: 'span',
+        _key: `${blockKey}-child-${index}`,
+        text: part,
+        marks: []
+      });
+    });
+
+    return { children, markDefs };
+  };
 
   for (const line of lines) {
     if (!line.trim()) continue;
 
-    // Google Maps Embed (NEW)
-    const mapMatch = line.match(/^\[\[MAP:\s*(.+?)\]\]$/);
+    // Google Maps Embed (Capture and verify, but push at END)
+    // Relaxed regex to handle potential whitespace or text variations
+    const mapMatch = line.match(/\[\[MAP:\s*(.+?)\]\]/);
     if (mapMatch) {
       const spotName = mapMatch[1];
       const query = encodeURIComponent(spotName);
-      // iframe src for embedded Google Maps
-      const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
-      // Replace iframe with a simple text link to avoid "Content Blocked" errors
-      const html = `<div style="margin: 20px 0;"><a href="${url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 10px 15px; background-color: #f0f0f0; color: #333; text-decoration: none; border-radius: 5px; font-weight: bold;">📍 ${spotName} をGoogleマップで見る</a></div>`;
+      // iframe src for embedded Google Maps (Robust embed)
+      const src = `https://maps.google.com/maps?q=${query}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+      // HTML block with sensitive styling for mobile
+      // Added max-width: 100% and overflow: hidden to prevent horizontal scroll
+      const html = `<div style="width: 100%; max-width: 100%; height: 450px; margin: 20px 0; overflow: hidden;"><iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${src}" style="border:0;"></iframe></div>`;
 
-      blocks.push({
+      mapBlock = {
         _type: 'html',
-        _key: `map-${blocks.length}`,
+        _key: `map-block`,
         html: html
-      });
-      currentBlock = null;
+      };
       continue;
     }
 
     // H2見出し
-    if (line.startsWith('## ')) {
+    if (line.trim().startsWith('## ')) {
+      const key = `h2-${blocks.length}`;
+      const parsed = parseInlineMarkdown(line.replace(/^\s*## /, ''), key);
       blocks.push({
         _type: 'block',
-        _key: `h2-${blocks.length}`,
+        _key: key,
         style: 'h2',
-        children: [{
-          _type: 'span',
-          _key: `span-${blocks.length}`,
-          text: line.replace(/^## /, ''),
-          marks: []
-        }],
-        markDefs: []
+        children: parsed.children,
+        markDefs: parsed.markDefs
       });
-      currentBlock = null;
       continue;
     }
 
     // H3見出し
-    if (line.startsWith('### ')) {
+    if (line.trim().startsWith('### ')) {
+      const key = `h3-${blocks.length}`;
+      const parsed = parseInlineMarkdown(line.replace(/^\s*### /, ''), key);
       blocks.push({
         _type: 'block',
-        _key: `h3-${blocks.length}`,
+        _key: key,
         style: 'h3',
-        children: [{
-          _type: 'span',
-          _key: `span-${blocks.length}`,
-          text: line.replace(/^### /, ''),
-          marks: []
-        }],
-        markDefs: []
+        children: parsed.children,
+        markDefs: parsed.markDefs
       });
-      currentBlock = null;
+      continue;
+    }
+
+    // リスト - Trim check is critical here
+    if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+      const key = `list-${blocks.length}`;
+      const text = line.trim().replace(/^[-*] /, '');
+      const parsed = parseInlineMarkdown(text, key);
+      blocks.push({
+        _type: 'block',
+        _key: key,
+        style: 'normal',
+        listItem: 'bullet',
+        level: 1,
+        children: parsed.children,
+        markDefs: parsed.markDefs
+      });
       continue;
     }
 
     // 通常段落
+    const key = `p-${blocks.length}`;
+    const parsed = parseInlineMarkdown(line, key);
     blocks.push({
       _type: 'block',
-      _key: `p-${blocks.length}`,
+      _key: key,
       style: 'normal',
-      children: [{
-        _type: 'span',
-        _key: `span-${blocks.length}`,
-        text: line,
-        marks: []
-      }],
-      markDefs: []
+      children: parsed.children,
+      markDefs: parsed.markDefs
     });
+  }
+
+  // Push Map Block at the very end
+  if (mapBlock) {
+    blocks.push(mapBlock);
   }
 
   return blocks;
