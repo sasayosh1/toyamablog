@@ -61,6 +61,15 @@ const POLITE_PREFIXES = [
   '了解しました',
   'かしこまりました',
   'はい、承知しました',
+  '富山県の魅力を伝えるブログ',
+  '富山、お好きですか？',
+  'ライターとして',
+  '記事を作成します',
+  'ブログ記事を作成します',
+  '以下のような',
+  '高品質なブログ記事',
+  'インスピレーションを受け',
+  '読者が富山へ行きたくなるような',
 ];
 
 const KEYWORD_SPLIT_REGEX = /[\s、。！？!?,．・「」『』\[\]（）()【】\|\/]+/;
@@ -102,15 +111,20 @@ function shouldRemovePoliteIntro(line) {
 }
 
 function sanitizeMarkdownResponse(markdown = '') {
-  const lines = markdown
-    .split('\n')
-    .map(line => line.replace(/\s+$/u, '')); // trailing spaces除去
+  let text = markdown;
 
+  // Remove polite intros at the beginning
+  const lines = text.split('\n').map(line => line.replace(/\s+$/u, ''));
   while (lines.length && shouldRemovePoliteIntro(lines[0])) {
     lines.shift();
   }
+  text = lines.join('\n').trim();
 
-  return lines.join('\n').trim();
+  // Global removal of specific phrases
+  text = text.replace(/「富山、お好きですか？」/g, '');
+  text = text.replace(/富山、お好きですか？/g, '');
+
+  return text;
 }
 
 const HTML_ENTITY_MAP = {
@@ -542,6 +556,9 @@ ${keywordSection}
    - 具体的な数字や固有名称を大切に。
 5. **アフィリエイト・紹介意識**:
    - 特定の商品に限らず、読者の役に立つ情報は積極的に紹介してください。「宿泊」「移動手段」「近くの観光スポット」など、旅の計画に必要な要素を網羅してください（リンクは後処理で挿入されますが、文脈作りをお願いします）。
+6. **禁止事項**:
+   - 「富山、お好きですか？のライターとして〜」や「以下に記事を作成します」「〜をご紹介します」といった**前置きやメタな発言は一切禁止**です。
+   - いきなり記事の本文（導入部）から書き始めてください。
 
 【記事タイトル】
 ${video.title.includes('【') ? video.title : `【${location}】${video.title}`}
