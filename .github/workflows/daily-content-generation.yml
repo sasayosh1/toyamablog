@@ -1,0 +1,77 @@
+name: Daily Content Generation
+
+on:
+  schedule:
+    # JST 09:00 (UTC 00:00)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: daily-content-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  generate-content:
+    runs-on: ubuntu-latest
+    
+    env:
+      # Budget Defaults
+      GEMINI_BUDGET_JPY: '100'
+      GEMINI_ESTIMATED_COST_JPY_PER_ARTICLE: '0.2'
+      ARTICLES_PER_RUN: '3'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Optional: Analytics Health Check
+      # If this fails, we might want to skip generation to avoid wasting budget on a broken site,
+      # but for now we'll just log it or allow it to fail softly if needed.
+      # Keeping it simple for now, focusing on generation.
+
+      - name: Check Budget
+        id: budget
+        env:
+          GEMINI_BUDGET_JPY: ${{ secrets.GEMINI_BUDGET_JPY || env.GEMINI_BUDGET_JPY }}
+          GEMINI_ESTIMATED_COST_JPY_PER_ARTICLE: ${{ secrets.GEMINI_ESTIMATED_COST_JPY_PER_ARTICLE || env.GEMINI_ESTIMATED_COST_JPY_PER_ARTICLE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/budget-guard.cjs --reserve-articles ${{ env.ARTICLES_PER_RUN }}
+
+      - name: Generate Content from YouTube
+        if: steps.budget.outputs.allowed == 'true'
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID || 'UCxX3Eq8_KMl3AeYdhb5MklA' }}
+          SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ARTICLES_PER_RUN: ${{ env.ARTICLES_PER_RUN }}
+        run: node scripts/check-youtube-and-create-articles.cjs
+
+      - name: Commit Progress
+        if: success() && steps.budget.outputs.allowed == 'true'
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add .last-processed-video.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📝 Update content generation progress [skip ci]"
+            git pull --rebase --autostash origin main
+            git push
+          fi
