@@ -29,8 +29,8 @@ const sanityClient = createClient({
 // Parse args
 const args = process.argv.slice(2);
 const isDryRun = args.includes('--dry-run');
-const limitArg = args.find(a => a.startsWith('--limit='));
-const limit = limitArg ? parseInt(limitArg.split('=')[1], 10) : 1;
+const limitArg = args.find(a => a.startsWith('--limit'));
+const limit = limitArg && limitArg.includes('=') ? parseInt(limitArg.split('=')[1], 10) : (limitArg ? parseInt(args[args.indexOf(limitArg) + 1], 10) : 60);
 const targetIdArg = args.find(a => a.startsWith('--targetId='));
 const targetId = targetIdArg ? targetIdArg.split('=')[1] : null;
 
