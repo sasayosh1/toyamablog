@@ -558,10 +558,13 @@ ${keywordSection}
    - 箇条書きを積極的に活用し、読みやすさを確保。
    - 具体的な数字や固有名称を大切に。
 5. **アフィリエイト・紹介意識**:
-   - 特定の商品に限らず、読者の役に立つ情報は積極的に紹介してください。「宿泊」「移動手段」「近くの観光スポット」など、旅の計画に必要な要素を網羅してください（リンクは後処理で挿入されますが、文脈作りをお願いします）。
+   - 記事本文では「体験」や「魅力」の描写に集中してください。
+   - 「宿の予約」や「レンタカー」などの実用情報は、記事の最後に自動挿入されるため、本文中で過度に宣伝する必要はありません。
+   - ただし、「近くには〇〇という温泉宿もあり〜」といった文脈上自然な言及はOKです。
 6. **禁止事項**:
    - 「富山、お好きですか？のライターとして〜」や「以下に記事を作成します」「〜をご紹介します」といった**前置きやメタな発言は一切禁止**です。
    - いきなり記事の本文（導入部）から書き始めてください。
+   - **記事の最後は必ず「## まとめ」セクションで締めくくってください。** その後に「アクセス情報」などを自己判断で追加しないでください（自動挿入されるため）。
 
 【記事タイトル】
 ${video.title.includes('【') ? video.title : `【${location}】${video.title}`}
@@ -646,9 +649,9 @@ function markdownToPortableText(markdown) {
       const spotName = mapMatch[1];
       const query = encodeURIComponent(spotName);
       // iframe src for embedded Google Maps
-      const src = `https://maps.google.com/maps?q=${query}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-      // HTML block that will be rendered by PortableText.tsx (modified to allow this)
-      const html = `<div style="width: 100%; height: 450px; margin: 20px 0;"><iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${src}"></iframe></div>`;
+      const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+      // Replace iframe with a simple text link to avoid "Content Blocked" errors
+      const html = `<div style="margin: 20px 0;"><a href="${url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 10px 15px; background-color: #f0f0f0; color: #333; text-decoration: none; border-radius: 5px; font-weight: bold;">📍 ${spotName} をGoogleマップで見る</a></div>`;
 
       blocks.push({
         _type: 'html',
