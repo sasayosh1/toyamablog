@@ -477,35 +477,64 @@ function extractLocation(title) {
  * (記事の最後に「富山観光ナビ」セクションとして追加)
  */
 function injectAffiliateLinks(markdown, location) {
+  const rakutenId = process.env.RAKUTEN_AFFILIATE_ID;
+  const amazonId = process.env.AMAZON_AFFILIATE_ID;
+
   let links = [];
 
-  // 1. 宿泊系
+  // Helper to create Rakuten Affiliate Link
+  const createRakutenLink = (targetUrl) => {
+    if (!rakutenId) return targetUrl;
+    return `http://hb.afl.rakuten.co.jp/hgc/${rakutenId}/?pc=${encodeURIComponent(targetUrl)}&m=${encodeURIComponent(targetUrl)}`;
+  };
+
+  // Helper to create Amazon Associate Link
+  const createAmazonLink = (keyword) => {
+    if (!amazonId) return null;
+    return `https://www.amazon.co.jp/s?k=${encodeURIComponent(keyword)}&tag=${amazonId}`;
+  };
+
+  // 1. 宿泊系 (Rakuten Travel)
   if (/ホテル|旅館|宿泊|泊まり|宿|温泉/.test(markdown)) {
-    const link = `https://search.travel.rakuten.co.jp/ds/hotel/search?f_id=1&f_query=${encodeURIComponent('富山県 ' + location)}`;
+    const originalUrl = `https://search.travel.rakuten.co.jp/ds/hotel/search?f_id=1&f_query=${encodeURIComponent('富山県 ' + location)}`;
+    const link = createRakutenLink(originalUrl);
     links.push(`- 🏨 **${location}周辺の宿を探す**: [楽天トラベルでプランを見る](${link})`);
   }
 
-  // 2. レンタカー・移動
+  // 2. レンタカー・移動 (Rakuten Travel)
   if (/レンタカー|ドライブ|車で|アクセス|移動/.test(markdown)) {
-    const link = 'https://cars.travel.rakuten.co.jp/';
+    const originalUrl = 'https://cars.travel.rakuten.co.jp/';
+    const link = createRakutenLink(originalUrl);
     links.push(`- 🚗 **富山観光にはレンタカーが便利**: [楽天トラベルでお得なレンタカーを探す](${link})`);
   }
 
-  // 3. 高速バス
+  // 3. 高速バス (Rakuten Travel)
   if (/バス|高速バス|ツアー|交通/.test(markdown)) {
-    const link = 'https://travel.rakuten.co.jp/bus/';
+    const originalUrl = 'https://travel.rakuten.co.jp/bus/';
+    const link = createRakutenLink(originalUrl);
     links.push(`- 🚌 **高速バスで富山へ**: [楽天トラベルでバスを検索](${link})`);
   }
 
-  // 4. お土産・グルメ
-  if (/お土産|名産|特産|グルメ|美味しい|食事|ランチ|ディナー/.test(markdown)) {
-    const link = `https://search.rakuten.co.jp/search/mall/${encodeURIComponent('富山県 ' + location + ' グルメ')}/`;
-    links.push(`- 🎁 **${location}の美味しいものをお取り寄せ**: [楽天市場で富山グルメを見る](${link})`);
+  // 4. お土産・グルメ (Rakuten Ichiba & Amazon)
+  if (/お土産|名産|特産|グルメ|美味しい|食事|ランチ|ディナー|スイーツ/.test(markdown)) {
+    const keyword = `富山県 ${location} グルメ`;
+
+    // Rakuten
+    const rakutenUrl = `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword)}/`;
+    const rakutenLink = createRakutenLink(rakutenUrl);
+    links.push(`- 🎁 **${location}の美味しいものをお取り寄せ**: [楽天市場で富山グルメを見る](${rakutenLink})`);
+
+    // Amazon (Add if ID exists)
+    const amazonLink = createAmazonLink(keyword);
+    if (amazonLink) {
+      links.push(`- 📦 **Amazonで探す**: [Amazonで富山グルメを見る](${amazonLink})`);
+    }
   }
 
-  // 5. 遊び・体験
+  // 5. 遊び・体験 (Rakuten Travel Experiences)
   if (/体験|遊び|アクティビティ|観光|スポット/.test(markdown)) {
-    const link = `https://experiences.travel.rakuten.co.jp/`;
+    const originalUrl = `https://experiences.travel.rakuten.co.jp/`;
+    const link = createRakutenLink(originalUrl);
     links.push(`- 🎡 **富山で遊ぶなら**: [楽天トラベル観光体験でアクティビティを探す](${link})`);
   }
 
