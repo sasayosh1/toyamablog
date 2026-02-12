@@ -1,0 +1,26 @@
+{
+    "name": "富山、お好きですか？",
+    "short_name": "富山好き",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f8fafc",
+    "theme_color": "#3b82f6",
+    "description": "富山県の観光スポットやグルメ、文化を紹介するYouTube Shorts連携ブログ。",
+    "icons": [
+        {
+            "src": "/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        },
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
