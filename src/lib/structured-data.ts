@@ -61,27 +61,27 @@ export function generateArticleLD(post: Post, slug: string) {
   // YouTube動画IDを抽出
   const getYouTubeVideoId = (url: string): string | null => {
     if (!url) return null
-    
+
     // youtu.be形式
     if (url.includes('youtu.be/')) {
       return url.split('youtu.be/')[1]?.split('?')[0] || null
     }
-    
+
     // youtube.com/watch形式
     if (url.includes('youtube.com/watch?v=')) {
       return url.split('v=')[1]?.split('&')[0] || null
     }
-    
+
     // youtube.com/shorts形式
     if (url.includes('youtube.com/shorts/')) {
       return url.split('shorts/')[1]?.split('?')[0] || null
     }
-    
+
     return null
   }
 
   const videoId = post.youtubeUrl ? getYouTubeVideoId(post.youtubeUrl) : null
-  const thumbnailUrl = videoId 
+  const thumbnailUrl = videoId
     ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
     : post.thumbnail?.asset?.url || 'https://sasakiyoshimasa.com/images/og-image.png'
 
@@ -152,15 +152,20 @@ export function generateArticleLD(post: Post, slug: string) {
       `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
     ]
 
+    // Google推奨: サムネイルは1つのURL、またはImageObject。ここでは最も解像度の高いものを1つ指定
+    const thumbnailUrlStr = thumbnails[0]
+
     structuredData.video = {
       '@type': 'VideoObject',
       name: post.title,
       description: post.excerpt || post.description || `${post.title}の動画です。`,
-      thumbnailUrl: thumbnails,
+      thumbnailUrl: thumbnailUrlStr,
       contentUrl: youtubeWatchUrl,
       embedUrl: `https://www.youtube.com/embed/${videoId}`,
       uploadDate: post.publishedAt ? new Date(post.publishedAt).toISOString() : new Date().toISOString(),
       inLanguage: 'ja',
+      width: 1280, // 推奨プロパティ (アスペクト比計算用)
+      height: 720, // 推奨プロパティ
       publisher: {
         '@type': 'Organization',
         name: '富山、お好きですか？',
@@ -170,10 +175,6 @@ export function generateArticleLD(post: Post, slug: string) {
           width: 1200,
           height: 630
         }
-      },
-      potentialAction: {
-        '@type': 'WatchAction',
-        target: youtubeWatchUrl
       }
     }
   }

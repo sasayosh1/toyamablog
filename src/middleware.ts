@@ -17,6 +17,21 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(url, 308)
     }
 
+    // catパラメータ（WordPressカテゴリID）はトップへ
+    if (url.searchParams.has('cat')) {
+      url.pathname = '/'
+      url.search = ''
+      return NextResponse.redirect(url, 308)
+    }
+
+    // categoryパラメータ（名前指定）はカテゴリページへ
+    if (url.searchParams.has('category')) {
+      const category = url.searchParams.get('category')
+      if (category) {
+        return NextResponse.redirect(new URL(`/category/${encodeURIComponent(category)}`, request.url), 308)
+      }
+    }
+
     // AMP系
     if (url.searchParams.has('amp')) {
       url.searchParams.delete('amp')
@@ -58,8 +73,15 @@ export function middleware(request: NextRequest) {
     if (categoryPaging) {
       return NextResponse.redirect(new URL(`/category/${categoryPaging[1]}`, request.url), 308)
     }
+
     const blogPaging = path.match(/^\/blog\/page\/\d+\/?$/)
     if (blogPaging) {
+      return NextResponse.redirect(new URL('/', request.url), 308)
+    }
+
+    // 日付アーカイブ（/2022/12/ など）はトップページへ
+    // ※ 記事自体のURLは /blog/slug なので、日付パスはアーカイブのみ
+    if (path.match(/^\/\d{4}\/\d{2}\/?$/)) {
       return NextResponse.redirect(new URL('/', request.url), 308)
     }
 

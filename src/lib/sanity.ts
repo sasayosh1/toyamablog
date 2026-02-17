@@ -154,7 +154,7 @@ export async function getAllPosts(): Promise<Post[]> {
     },
     []
   );
-	
+
   return normalizePostCategoryList(posts);
 }
 
@@ -275,7 +275,7 @@ export async function getPost(slug: string): Promise<Post | null> {
     },
     null
   );
-	
+
   return post ? normalizePostCategories(post) : null;
 }
 
@@ -308,6 +308,32 @@ export async function getAllCategories(options?: { forceFresh?: boolean }): Prom
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'ja'));
   } catch (error) {
     console.error('Categories fetch error:', error);
+    return [];
+  }
+}
+
+export async function getAllTags(options?: { forceFresh?: boolean }): Promise<string[]> {
+  try {
+    const fetchOptions = options?.forceFresh
+      ? { next: { revalidate: 0 }, cache: 'no-store' as const }
+      : { next: { tags: ['tags'], revalidate: 300 } };
+
+    const tagDocs = await client.fetch<{ tags?: string[] }[]>(`
+      *[_type == "post" && defined(publishedAt) && defined(tags)]{
+        tags
+      }
+    `, {}, fetchOptions);
+
+    const set = new Set<string>();
+    tagDocs.forEach((doc) => {
+      doc.tags?.forEach((tag) => {
+        if (tag) set.add(tag);
+      });
+    });
+
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'ja'));
+  } catch (error) {
+    console.error('Tags fetch error:', error);
     return [];
   }
 }

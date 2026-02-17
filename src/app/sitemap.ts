@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getAllPosts } from '@/lib/sanity'
+import { getAllPosts, getAllTags } from '@/lib/sanity'
 
 const BASE_URL = 'https://sasakiyoshimasa.com'
 
@@ -51,6 +51,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   categoryMap.forEach((url) => {
     entries.push({
       url,
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    })
+  })
+
+  // タグページ
+  const allTags = await getAllTags()
+  allTags.forEach((tag) => {
+    entries.push({
+      url: `${BASE_URL}/tag/${encodeURIComponent(tag)}`,
       changeFrequency: 'weekly',
       priority: 0.6,
     })
