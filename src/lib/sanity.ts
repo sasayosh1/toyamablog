@@ -298,7 +298,8 @@ export async function getAllCategories(options?: { forceFresh?: boolean }): Prom
       doc.categories?.forEach((value) => {
         if (typeof value === 'string') {
           const trimmed = value.trim();
-          if (trimmed) {
+          // 空文字や「未分類」などの無効なカテゴリを除外
+          if (trimmed && trimmed !== '未分類') {
             set.add(trimmed);
           }
         }
@@ -327,7 +328,10 @@ export async function getAllTags(options?: { forceFresh?: boolean }): Promise<st
     const set = new Set<string>();
     tagDocs.forEach((doc) => {
       doc.tags?.forEach((tag) => {
-        if (tag) set.add(tag);
+        if (typeof tag === 'string') {
+          const trimmed = tag.trim();
+          if (trimmed) set.add(trimmed);
+        }
       });
     });
 
