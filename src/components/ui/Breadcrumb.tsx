@@ -8,9 +8,11 @@ interface BreadcrumbItem {
 
 interface BreadcrumbProps {
   items: BreadcrumbItem[]
+  basePath?: string
+  locale?: 'ja' | 'en'
 }
 
-export default function Breadcrumb({ items }: BreadcrumbProps) {
+export default function Breadcrumb({ items, basePath = '', locale = 'ja' }: BreadcrumbProps) {
   // タイトルを省略する関数
   const truncateTitle = (title: string, isLast: boolean = false) => {
     if (isLast && title.length > 40) {
@@ -22,12 +24,12 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
   }
 
   return (
-    <nav className="mb-6" aria-label="パンくず">
+    <nav className="mb-6" aria-label={locale === 'en' ? 'Breadcrumb' : 'パンくず'}>
       <div className="flex items-center space-x-2 text-sm text-gray-600 overflow-x-auto whitespace-nowrap">
         {items.map((item, index) => {
           const isLast = index === items.length - 1
           const truncatedLabel = truncateTitle(item.label, isLast)
-          
+
           return (
             <div key={index} className="flex items-center flex-shrink-0">
               {index > 0 && (
@@ -36,7 +38,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
                 </svg>
               )}
               {item.href ? (
-                <Link href={item.href} className="hover:text-blue-600 transition-colors flex items-center flex-shrink-0" title={item.label}>
+                <Link href={`${basePath}${item.href === '/' ? '' : item.href}`} className="hover:text-blue-600 transition-colors flex items-center flex-shrink-0" title={item.label}>
                   {item.icon && <span className="mr-1 flex-shrink-0">{item.icon}</span>}
                   <span className="truncate">{truncatedLabel}</span>
                 </Link>

@@ -131,6 +131,7 @@ interface PostCardProps {
   post: {
     _id: string
     title: string
+    titleEn?: string
     slug: { current: string }
     youtubeUrl?: string
     youtubeVideo?: {
@@ -141,6 +142,7 @@ interface PostCardProps {
     }
     categories?: string[]
     excerpt?: string
+    excerptEn?: string
     displayExcerpt?: string
     thumbnail?: {
       asset: {
@@ -151,11 +153,20 @@ interface PostCardProps {
     }
   }
   priority?: boolean
+  basePath?: string
+  locale?: 'ja' | 'en'
 }
 
-export default function PostCard({ post, priority = false }: PostCardProps) {
+export default function PostCard({ post, priority = false, basePath = '', locale = 'ja' }: PostCardProps) {
   // タイトルから#shortsを削除
-  const cleanTitle = post.title.replace(/\s*#shorts\s*/gi, '').trim();
+  const cleanTitleJa = post.title.replace(/\s*#shorts\s*/gi, '').trim();
+  const cleanTitle = locale === 'en' && post.titleEn
+    ? post.titleEn.replace(/\s*#shorts\s*/gi, '').trim()
+    : cleanTitleJa;
+
+  const excerpt = locale === 'en' && post.excerptEn
+    ? post.excerptEn
+    : post.displayExcerpt || post.excerpt;
 
   // 改善されたサムネイル画像取得（信頼性重視）
   const getThumbnailUrls = () => {
@@ -235,7 +246,7 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
 
   return (
     <Link
-      href={`/blog/${post.slug.current}`}
+      href={`${basePath}/blog/${post.slug.current}`}
       className="block h-full"
       data-testid="article-card"
       aria-label={`記事「${cleanTitle}」を読む`}
@@ -263,14 +274,14 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
             {cleanTitle}
           </h3>
 
-          {(post.displayExcerpt || post.excerpt) && (
+          {excerpt && (
             <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed mb-4 flex-grow">
-              {post.displayExcerpt || post.excerpt}
+              {excerpt}
             </p>
           )}
 
           <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
-            <span>記事を読む</span>
+            <span>{locale === 'en' ? 'Read Article' : '記事を読む'}</span>
             <span className="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-toyama-blue">
               →
             </span>

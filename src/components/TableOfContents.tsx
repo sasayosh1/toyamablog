@@ -17,9 +17,10 @@ type TocItem = {
 
 type Props = {
   content: Block[] | unknown
+  locale?: 'ja' | 'en'
 }
 
-export default function TableOfContents({ content }: Props) {
+export default function TableOfContents({ content, locale = 'ja' }: Props) {
   const [isMounted, setIsMounted] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -33,7 +34,7 @@ export default function TableOfContents({ content }: Props) {
       .filter(b => b?.style === 'h2' || b?.style === 'h3')
       .map((b) => {
         const raw = (b?.children?.map(c => c.text).join('') || '').trim()
-        const text = raw || '（無題の見出し）'
+        const text = raw || (locale === 'en' ? '(Untitled Section)' : '（無題の見出し）')
         const id = generateHeadingId(text, b.style || 'h2')
         return {
           id,
@@ -46,14 +47,14 @@ export default function TableOfContents({ content }: Props) {
 
   // SSR/ハイドレーション安全性のため、マウント後のみ表示
   if (!isMounted) return null
-  
+
   // 見出しが無い場合は非表示
   if (items.length === 0) return null
 
   return (
     <section
       className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-4 md:p-5 mb-6 md:mb-8 shadow-sm"
-      aria-label="ページの目次"
+      aria-label={locale === 'en' ? 'Table of Contents' : 'ページの目次'}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center">
@@ -62,7 +63,9 @@ export default function TableOfContents({ content }: Props) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
             </svg>
           </div>
-          <h3 className="text-base md:text-lg font-semibold text-gray-800">もくじ</h3>
+          <h3 className="text-base md:text-lg font-semibold text-gray-800">
+            {locale === 'en' ? 'Table of Contents' : 'もくじ'}
+          </h3>
         </div>
         <button
           type="button"
@@ -70,7 +73,9 @@ export default function TableOfContents({ content }: Props) {
           onClick={() => setIsExpanded(v => !v)}
           className="py-2 px-3 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
         >
-          {isExpanded ? '閉じる' : 'もくじを表示'}
+          {locale === 'en'
+            ? (isExpanded ? 'Close' : 'Show')
+            : (isExpanded ? '閉じる' : 'もくじを表示')}
         </button>
       </div>
 

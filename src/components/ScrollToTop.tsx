@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react'
 
-export default function ScrollToTop() {
+interface ScrollToTopProps {
+  locale?: 'ja' | 'en'
+}
+
+export default function ScrollToTop({ locale = 'ja' }: ScrollToTopProps) {
   const [isVisible, setIsVisible] = useState(false)
 
   // スクロール位置を監視
@@ -39,8 +43,8 @@ export default function ScrollToTop() {
     <button
       onClick={scrollToTop}
       className="fixed bottom-8 right-8 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-w-[56px] min-h-[56px] flex items-center justify-center"
-      aria-label="ページトップに戻る"
-      title="ページトップに戻る"
+      aria-label={locale === 'en' ? 'Back to top' : 'ページトップに戻る'}
+      title={locale === 'en' ? 'Back to top' : 'ページトップに戻る'}
     >
       <svg
         className="w-6 h-6"

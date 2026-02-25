@@ -5,20 +5,22 @@ interface CategoryCardProps {
   count: number
   href: string
   variant?: 'default' | 'compact'
+  locale?: 'ja' | 'en'
 }
 
-export default function CategoryCard({ 
-  name, 
-  count, 
-  href, 
-  variant = 'default' 
+export default function CategoryCard({
+  name,
+  count,
+  href,
+  variant = 'default',
+  locale = 'ja'
 }: CategoryCardProps) {
   if (variant === 'compact') {
     return (
       <Link
         href={href}
         className="group block p-4 bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-blue-50 transition-all border border-gray-100 hover:border-blue-200"
-        aria-label={`${name}カテゴリー（${count}件の記事）を表示`}
+        aria-label={locale === 'en' ? `Show ${name} category (${count} posts)` : `${name}カテゴリー（${count}件の記事）を表示`}
       >
         <div className="flex items-center justify-between">
           <span className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-1">
@@ -33,7 +35,7 @@ export default function CategoryCard({
   }
 
   return (
-    <Link href={href} className="group" aria-label={`${name}カテゴリー（${count}件の記事）を表示`}>
+    <Link href={href} className="group" aria-label={locale === 'en' ? `Show ${name} category (${count} posts)` : `${name}カテゴリー（${count}件の記事）を表示`}>
       <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg hover:bg-green-50 transition-all duration-200 border border-gray-200 group-hover:border-green-300 h-full">
         <div className="flex items-center justify-between mb-4">
           <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
@@ -42,20 +44,20 @@ export default function CategoryCard({
             </svg>
           </div>
           <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium group-hover:bg-green-200">
-            {count}記事
+            {locale === 'en' ? `${count} posts` : `${count}記事`}
           </span>
         </div>
-        
+
         <h3 className="text-lg font-semibold text-gray-800 group-hover:text-green-700 transition-colors mb-3 line-clamp-2">
           {name}
         </h3>
-        
+
         <div className="flex items-center text-green-600 group-hover:text-green-700 transition-colors">
-          <span className="text-sm font-medium">記事を見る</span>
-          <svg 
-            className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" 
-            fill="none" 
-            stroke="currentColor" 
+          <span className="text-sm font-medium">{locale === 'en' ? 'View Posts' : '記事を見る'}</span>
+          <svg
+            className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
