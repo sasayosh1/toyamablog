@@ -56,6 +56,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       title: '富山、お好きですか？ - AMAZING TOYAMA',
       description: '富山県の観光スポット、グルメ情報、文化を紹介',
     },
+    robots: currentPage > 1 ? { index: false, follow: true } : undefined,
   }
 }
 

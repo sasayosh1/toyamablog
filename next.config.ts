@@ -26,18 +26,18 @@ const nextConfig: NextConfig = {
     }
     return config
   },
-  
-  
+
+
   // コンパイル最適化
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  
-  
+
+
   // パフォーマンス最適化
   poweredByHeader: false,
   compress: true,
-  
+
   // リダイレクト設定
   async redirects() {
     return [
@@ -310,7 +310,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: https: blob: https://cdn.sanity.io https://i.ytimg.com https://img.youtube.com https://*.sanity.io",
               "font-src 'self' https://fonts.gstatic.com https://cdn.sanity.io https://*.sanity.io",
               "connect-src 'self' https://www.google-analytics.com https://vitals.vercel-analytics.com https://*.supabase.co wss://*.supabase.co https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://stats.g.doubleclick.net https://cdn.sanity.io https://*.sanity.io",
-              "frame-src 'self' https://www.youtube.com https://youtube.com https://www.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://tpc.googlesyndication.com",
+              "frame-src 'self' https://www.youtube.com https://youtube.com https://www.google.com https://maps.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://tpc.googlesyndication.com",
               "media-src 'self' https:",
               "object-src 'none'",
               "base-uri 'self'",
