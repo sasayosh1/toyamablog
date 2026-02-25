@@ -8,6 +8,7 @@ import CategoryCard from '@/components/ui/CategoryCard'
 import StructuredData from '@/components/StructuredData'
 import { generateCategoryLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 
 // ISR: 1時間ごとに再検証
 export const revalidate = 3600
@@ -28,7 +29,18 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
   const { category } = await params
-  const decodedCategory = decodeURIComponent(category)
+
+  let decodedCategory = ''
+  try {
+    decodedCategory = decodeURIComponent(category)
+  } catch (error) {
+    return {
+      title: '不正なURL - 富山、お好きですか？',
+      description: '指定されたURLは不正な形式です。',
+      robots: { index: false, follow: false }
+    }
+  }
+
   const canonical = `https://sasakiyoshimasa.com/category/${encodeURIComponent(decodedCategory)}`
   const postCountQuery =
     `count(*[_type == "post" && defined(publishedAt) && (category == $cat || $cat in categories[]->title)])` as const
@@ -51,7 +63,13 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
 
 export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
   const { category } = await params
-  const decodedCategory = decodeURIComponent(category)
+
+  let decodedCategory = ''
+  try {
+    decodedCategory = decodeURIComponent(category)
+  } catch (error) {
+    notFound()
+  }
 
   // 全記事と全カテゴリーを取得（カテゴリーは最新データを強制取得）
   const [allPosts, categories] = await Promise.all([

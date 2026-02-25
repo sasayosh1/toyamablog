@@ -27,6 +27,9 @@ const nextConfig: NextConfig = {
     return config
   },
 
+  // turbopack対応
+  turbopack: {},
+
 
   // コンパイル最適化
   compiler: {
