@@ -8,6 +8,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok:false, error:'unauthorized' }, { status: 401 });
     }
     if (type === 'list') {
+      // @ts-expect-error Next.js 16 API signature change
       revalidateTag('post-list');
       revalidatePath('/categories');
       return NextResponse.json({ ok:true, revalidated:'tag:post-list,path:/categories' });

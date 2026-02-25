@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Security Headers Regression Tests', () => {
-  
+
   test('Root path should have X-Frame-Options: DENY and CSP for AdSense', async ({ request }) => {
     const response = await request.get('/');
     const headers = response.headers();
@@ -20,6 +20,9 @@ test.describe('Security Headers Regression Tests', () => {
     // AdSense domains should be allowed
     expect(csp).toContain('pagead2.googlesyndication.com');
     expect(csp).toContain('googletagmanager.com');
+
+    // Google Maps domain should be allowed in frame-src
+    expect(csp).toContain('maps.google.com');
   });
 
   test('Non-studio paths should have X-Frame-Options: DENY and CSP for AdSense', async ({ request }) => {
@@ -37,16 +40,19 @@ test.describe('Security Headers Regression Tests', () => {
 
       // AdSense domains should be allowed
       expect(csp, `Path ${path} should allow AdSense domains`).toContain('pagead2.googlesyndication.com');
+
+      // Google Maps domain should be allowed in frame-src
+      expect(csp, `Path ${path} should allow Google Maps domain`).toContain('maps.google.com');
     }
   });
 
   test('Studio path should NOT have X-Frame-Options but should have CSP with frame-ancestors', async ({ request }) => {
     const response = await request.get('/studio');
     const headers = response.headers();
-    
+
     // X-Frame-Options should not be set (allowing iframe embedding)
     expect(headers['x-frame-options']).toBeUndefined();
-    
+
     // Content-Security-Policy should be set with frame-ancestors
     const csp = headers['content-security-policy'];
     expect(csp).toBeDefined();
@@ -57,13 +63,13 @@ test.describe('Security Headers Regression Tests', () => {
 
   test('Studio subpaths should have correct CSP configuration', async ({ request }) => {
     const studioSubpaths = ['/studio/structure', '/studio/vision'];
-    
+
     for (const path of studioSubpaths) {
       const response = await request.get(path);
       const headers = response.headers();
-      
+
       expect(headers['x-frame-options'], `${path} should not have X-Frame-Options`).toBeUndefined();
-      
+
       const csp = headers['content-security-policy'];
       expect(csp, `${path} should have CSP`).toBeDefined();
       expect(csp, `${path} should allow Sanity domains in frame-ancestors`).toContain('https://*.sanity.io');
@@ -86,11 +92,11 @@ test.describe('Security Headers Regression Tests', () => {
 
   test('All paths should have common security headers', async ({ request }) => {
     const testPaths = ['/', '/studio', '/about', '/blog'];
-    
+
     for (const path of testPaths) {
       const response = await request.get(path);
       const headers = response.headers();
-      
+
       expect(headers['x-content-type-options'], `${path} should have X-Content-Type-Options`).toBe('nosniff');
       expect(headers['referrer-policy'], `${path} should have Referrer-Policy`).toBe('strict-origin-when-cross-origin');
     }
@@ -100,7 +106,7 @@ test.describe('Security Headers Regression Tests', () => {
     // This test ensures vercel.json regex pattern excludes studio paths
     const response = await request.get('/studio');
     const headers = response.headers();
-    
+
     // If X-Frame-Options is present, it means vercel.json is overriding Next.js config
     expect(headers['x-frame-options']).toBeUndefined();
   });
