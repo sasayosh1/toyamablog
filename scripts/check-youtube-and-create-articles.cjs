@@ -813,7 +813,36 @@ function markdownToPortableText(markdown) {
   return blocks;
 }
 
-// ===== 記事作成 =====
+// ===== 記事作成・翻訳 =====
+
+/**
+ * 日本語テキストをSEOフレンドリーな英語へ翻訳
+ */
+async function translateToEnglish(text, type = 'markdown text') {
+  if (!text) return '';
+  const prompt = `You are a professional travel writer and translator. Translate the following Japanese ${type} into natural, highly engaging, and SEO-friendly English.
+
+RULES:
+1. Keep the exact same formatting, paragraphs, and Markdown syntax.
+2. DO NOT output any conversational filler like "Here is the translation". Output ONLY the translated text.
+3. For [[MAP: ...]] tags, keep them exactly as they are without translating the inside content. Example: [[MAP: 富山県美術館]] must remain [[MAP: 富山県美術館]].
+4. Feel free to adapt cultural nuances so they sound natural to Western tourists, rather than a rigid literal translation.
+
+Text to translate:
+${text}`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    let translated = result.response.text().trim();
+    if (translated.startsWith('\`\`\`')) {
+      translated = translated.replace(/^\`\`\`[a-z]*\n/, '').replace(/\n\`\`\`$/, '');
+    }
+    return translated;
+  } catch (error) {
+    console.error(`❌ Gemini翻訳エラー (${type}):`, error);
+    return ''; // エラー時は空文字にして処理は継続
+  }
+}
 
 /**
  * Sanityに新しい記事を作成
@@ -886,10 +915,18 @@ async function createArticle(video, location) {
       : `${location}の魅力的なスポットをご紹介します。`;
     const metaDescription = excerpt.slice(0, 160);
 
+    // ✅ 英語版の自動翻訳を生成
+    console.log('🌍 英語への翻訳を自動実行中...');
+    const titleEn = await translateToEnglish(articleTitle, 'title string');
+    const excerptEn = await translateToEnglish(excerpt, 'short excerpt');
+    const bodyEnMarkdown = await translateToEnglish(ensuredMarkdown, 'long markdown article');
+    const bodyEnBlocks = markdownToPortableText(bodyEnMarkdown);
+
     // 記事オブジェクト
     const article = {
       _type: 'post',
       title: articleTitle,
+      titleEn: titleEn || articleTitle, // フォールバック
       slug: {
         _type: 'slug',
         current: slug
@@ -902,7 +939,9 @@ async function createArticle(video, location) {
       },
       youtubeUrl: video.url, // PostCardコンポーネント用（サムネイル表示に必要）
       body: bodyBlocks,
+      bodyEn: bodyEnBlocks,
       excerpt: excerpt,
+      excerptEn: excerptEn,
       metaDescription,
       tags: tags,
       categories: categoryRef ? [categoryRef] : [],

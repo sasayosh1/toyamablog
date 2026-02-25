@@ -47,6 +47,7 @@ export interface Author {
 export interface Post {
   _id: string;
   title: string;
+  titleEn?: string;
   slug: {
     current: string;
   };
@@ -56,9 +57,11 @@ export interface Post {
   categories?: string[];
   publishedAt: string;
   body?: unknown;
+  bodyEn?: unknown;
   youtubeUrl?: string;
   author?: Author;
   excerpt?: string;
+  excerptEn?: string;
   displayExcerpt?: string;
   thumbnail?: {
     asset: {
@@ -128,9 +131,11 @@ export async function getAllPosts(): Promise<Post[]> {
     *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) {
       _id,
       title,
+      titleEn,
       slug,
       description,
       excerpt,
+      excerptEn,
       category,
       publishedAt,
       youtubeUrl,
@@ -172,9 +177,11 @@ export async function getPostsPaginated(page: number = 1, limit: number = 51): P
       *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [${offset}...${offset + limit}] {
         _id,
         title,
+        titleEn,
         slug,
         description,
         excerpt,
+        excerptEn,
         category,
         publishedAt,
         youtubeUrl,
@@ -226,12 +233,14 @@ export async function getPost(slug: string): Promise<Post | null> {
     *[_type == "post" && slug.current == $slug][0] {
       _id,
       title,
+      titleEn,
       slug,
       description,
       tags,
       category,
       publishedAt,
       body,
+      bodyEn,
       youtubeUrl,
       "categoryRefs": categories[]->title,
       thumbnail {
@@ -252,6 +261,7 @@ export async function getPost(slug: string): Promise<Post | null> {
         alt
       },
       excerpt,
+      excerptEn,
       author->{
         _id,
         name,
@@ -357,6 +367,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
       )] | order(publishedAt desc) [0...20] {
         _id,
         title,
+        titleEn,
         slug,
         description,
         tags,
@@ -383,6 +394,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
           }
         },
         excerpt,
+        excerptEn,
         "categoryRefs": categories[]->title,
         "displayExcerpt": coalesce(excerpt, description)
       }
@@ -405,6 +417,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
         *[_type == "post" && defined(publishedAt)] | order(publishedAt desc) [0...50] {
           _id,
           title,
+          titleEn,
           slug,
           description,
           tags,
@@ -431,6 +444,7 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
           }
         },
         excerpt,
+        excerptEn,
         "categoryRefs": categories[]->title,
         "displayExcerpt": coalesce(excerpt, description)
       }
@@ -466,9 +480,11 @@ export async function getRelatedPosts(currentPostId: string, category?: string, 
       *[_type == "post" && _id != $currentPostId && defined(publishedAt)] | order(publishedAt desc) [0...${limit * 2}] {
         _id,
         title,
+        titleEn,
         slug,
         description,
         excerpt,
+        excerptEn,
         category,
         publishedAt,
         youtubeUrl,
@@ -514,14 +530,17 @@ export async function getAllPostsForAnalysis(): Promise<Post[]> {
       *[_type == "post"] | order(publishedAt desc) {
         _id,
         title,
+        titleEn,
         slug,
         description,
         tags,
         category,
         publishedAt,
         body,
+        bodyEn,
         youtubeUrl,
         excerpt,
+        excerptEn,
         thumbnail {
           asset -> {
             _ref,

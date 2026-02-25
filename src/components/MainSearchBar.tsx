@@ -8,9 +8,11 @@ import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
 
 interface MainSearchBarProps {
   posts: Post[]
+  locale?: 'ja' | 'en'
+  basePath?: string
 }
 
-export default function MainSearchBar({ posts }: MainSearchBarProps) {
+export default function MainSearchBar({ posts, locale = 'ja', basePath = '' }: MainSearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([])
@@ -31,10 +33,10 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
     }
 
     setIsLoading(true)
-    
+
     try {
       // クライアントサイドフィルタリング
-      const clientFiltered = posts.filter(post => 
+      const clientFiltered = posts.filter(post =>
         post.title.toLowerCase().includes(query.toLowerCase()) ||
         post.description?.toLowerCase().includes(query.toLowerCase()) ||
         post.categories?.some(cat => cat.toLowerCase().includes(query.toLowerCase())) ||
@@ -44,7 +46,7 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
       setFilteredPosts(clientFiltered)
       setIsSearchOpen(true)
       setSelectedIndex(-1)
-      
+
     } catch (error) {
       console.error('Search error:', error)
     } finally {
@@ -83,7 +85,7 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
-        setSelectedIndex(prev => 
+        setSelectedIndex(prev =>
           prev < filteredPosts.length - 1 ? prev + 1 : prev
         )
         break
@@ -98,7 +100,7 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
           console.log('Navigating via Enter key to:', selectedPost.slug.current)
           setIsSearchOpen(false)
           setSelectedIndex(-1)
-          window.location.href = `/blog/${selectedPost.slug.current}`
+          window.location.href = `${basePath}/blog/${selectedPost.slug.current}`
         }
         break
       case 'Escape':
@@ -131,7 +133,7 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
               ref={inputRef}
               type="text"
               name="search"
-              placeholder="記事を検索..."
+              placeholder={locale === 'en' ? 'Search articles...' : '記事を検索...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -142,7 +144,7 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
               }}
               className="w-full px-6 py-4 text-lg text-gray-900 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500 transition-all shadow-sm"
               data-testid="main-search-input"
-              aria-label="記事を検索"
+              aria-label={locale === 'en' ? 'Search articles' : '記事を検索'}
               aria-describedby="main-search-instructions"
               aria-autocomplete="list"
               role="combobox"
@@ -162,12 +164,12 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
           </div>
 
           <div id="main-search-instructions" className="sr-only">
-            矢印キーで選択、Enterで決定、Escapeで閉じる
+            {locale === 'en' ? 'Use arrow keys to select, Enter to navigate, Escape to close' : '矢印キーで選択、Enterで決定、Escapeで閉じる'}
           </div>
 
           {/* 検索結果ドロップダウン */}
           {isSearchOpen && searchQuery.trim() && filteredPosts.length > 0 && (
-            <div 
+            <div
               id="search-results"
               ref={resultsRef}
               className="absolute top-full left-0 right-0 mt-3 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto"
@@ -176,16 +178,15 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
               aria-label={`${filteredPosts.length}件の検索結果`}
             >
               {filteredPosts.map((post, index) => (
-                <Link
+                <div
                   key={post._id}
-                  href={`/blog/${post.slug.current}`}
-                  className={`block px-6 py-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors ${
-                    index === selectedIndex ? 'bg-blue-50' : ''
-                  }`}
+                  className={`block px-6 py-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors cursor-pointer ${index === selectedIndex ? 'bg-blue-50' : ''
+                    }`}
                   data-testid="main-search-result-item"
                   onClick={() => {
                     setIsSearchOpen(false)
                     setSelectedIndex(-1)
+                    window.location.href = `${basePath}/blog/${post.slug.current}`
                   }}
                 >
                   <div className="flex items-start gap-4">
@@ -202,7 +203,7 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
                     )}
                     <div className="flex-1 min-w-0">
                       <h3 className="text-base font-semibold text-gray-900 line-clamp-2 leading-tight mb-2">
-                        {highlightText(post.title, searchQuery)}
+                        {highlightText(locale === 'en' && post.titleEn ? post.titleEn : post.title, searchQuery)}
                       </h3>
                       {post.description && (
                         <p className="text-sm text-gray-600 line-clamp-2 mb-2">
@@ -223,12 +224,14 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
                       )}
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
-              
+
               {filteredPosts.length >= 10 && (
                 <div className="px-6 py-3 text-center text-sm text-gray-500 bg-gray-50">
-                  {searchQuery.length >= 2 ? 'さらに詳細な検索が可能です' : 'より詳細に検索するには文字を追加してください'}
+                  {locale === 'en'
+                    ? (searchQuery.length >= 2 ? 'More detailed searches are possible' : 'Add more characters for a detailed search')
+                    : (searchQuery.length >= 2 ? 'さらに詳細な検索が可能です' : 'より詳細に検索するには文字を追加してください')}
                 </div>
               )}
             </div>
@@ -236,7 +239,7 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
 
           {isSearchOpen && filteredPosts.length === 0 && searchQuery.trim() && !isLoading && (
             <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 p-6 text-center text-gray-500" data-testid="main-search-no-results">
-              「{searchQuery}」に関する記事が見つかりませんでした
+              {locale === 'en' ? `No articles found for "${searchQuery}"` : `「${searchQuery}」に関する記事が見つかりませんでした`}
             </div>
           )}
         </div>
@@ -248,10 +251,10 @@ export default function MainSearchBar({ posts }: MainSearchBarProps) {
 // テキストハイライト関数
 function highlightText(text: string, query: string): React.ReactNode {
   if (!query.trim()) return text
-  
+
   const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')})`, 'gi')
   const parts = text.split(regex)
-  
+
   return parts.map((part, index) =>
     regex.test(part) ? (
       <mark key={index} className="bg-yellow-200 text-yellow-900 px-1 rounded">

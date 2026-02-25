@@ -2,7 +2,11 @@
 
 import Link from 'next/link'
 
-export default function ProfileSection() {
+interface ProfileSectionProps {
+    locale?: 'ja' | 'en'
+}
+
+export default function ProfileSection({ locale = 'ja' }: ProfileSectionProps) {
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8 my-12">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -25,10 +29,18 @@ export default function ProfileSection() {
                         <span className="text-sm font-normal text-gray-500 ml-2">@sasayoshi_tym</span>
                     </h3>
                     <p className="text-gray-600 mb-4 leading-relaxed">
-                        富山県在住のYouTuber・ブロガー。
-                        <br />
-                        「富山、お好きですか？」を合言葉に、富山の知られざる魅力を発信しています。
-                        美味しいグルメ、絶景スポット、そして温かい人々との出会いを大切にしています。
+                        {locale === 'en' ? (
+                            <>
+                                YouTuber and Blogger living in Toyama.<br />
+                                Sharing the hidden charms of Toyama with the catchphrase "Do you like Toyama?". Valuing encounters with delicious food, superb views, and warm people.
+                            </>
+                        ) : (
+                            <>
+                                富山県在住のYouTuber・ブロガー。<br />
+                                「富山、お好きですか？」を合言葉に、富山の知られざる魅力を発信しています。
+                                美味しいグルメ、絶景スポット、そして温かい人々との出会いを大切にしています。
+                            </>
+                        )}
                     </p>
                     <div className="flex flex-wrap justify-center md:justify-start gap-3">
                         <a
