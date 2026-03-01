@@ -77,10 +77,42 @@ export function generateArticleLD(post: Post, slug: string) {
       return url.split('shorts/')[1]?.split('?')[0] || null
     }
 
+    // youtube.com/embed形式
+    if (url.includes('youtube.com/embed/')) {
+      return url.split('embed/')[1]?.split('?')[0] || null
+    }
+
     return null
   }
 
-  const videoId = post.youtubeUrl ? getYouTubeVideoId(post.youtubeUrl) : null
+  // 本文(Portable Text)から動画IDを探す
+  let bodyVideoId: string | null = null
+  if (Array.isArray(post.body)) {
+    for (const block of post.body) {
+      if (typeof block === 'object' && block !== null) {
+        // @ts-ignore
+        const type = block._type
+        // @ts-ignore
+        const url = block.url || (block.html?.includes('youtube.com') ? block.html : null)
+
+        if ((type === 'youtube' || type === 'youtubeShorts') && url) {
+          bodyVideoId = getYouTubeVideoId(url)
+          if (bodyVideoId) break
+        }
+
+        // HTMLブロック内のiframeから抽出を試みる
+        if (type === 'html' && typeof url === 'string') {
+          const match = url.match(/youtube\.com\/embed\/([^"?\s]+)/)
+          if (match) {
+            bodyVideoId = match[1]
+            break
+          }
+        }
+      }
+    }
+  }
+
+  const videoId = (post.youtubeUrl ? getYouTubeVideoId(post.youtubeUrl) : null) || bodyVideoId
   const thumbnailUrl = videoId
     ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
     : post.thumbnail?.asset?.url || 'https://sasakiyoshimasa.com/images/og-image.png'
@@ -141,39 +173,32 @@ export function generateArticleLD(post: Post, slug: string) {
   }
 
   // YouTube動画がある場合はVideoObject追加
-  if (post.youtubeUrl && videoId) {
-    const youtubeWatchUrl = post.youtubeUrl.startsWith('http')
-      ? post.youtubeUrl
-      : `https://www.youtube.com/watch?v=${videoId}`
-
-    const thumbnails = [
-      `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-      `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-      `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
-    ]
-
-    // Google推奨: サムネイルは1つのURL、またはImageObject。ここでは最も解像度の高いものを1つ指定
-    const thumbnailUrlStr = thumbnails[0]
+  if (videoId) {
+    const youtubeWatchUrl = `https://www.youtube.com/watch?v=${videoId}`
 
     structuredData.video = {
       '@type': 'VideoObject',
       name: post.title,
       description: post.excerpt || post.description || `${post.title}の動画です。`,
-      thumbnailUrl: thumbnailUrlStr,
+      thumbnailUrl: [
+        `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+        `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+        `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+      ],
       contentUrl: youtubeWatchUrl,
       embedUrl: `https://www.youtube.com/embed/${videoId}`,
       uploadDate: post.publishedAt ? new Date(post.publishedAt).toISOString() : new Date().toISOString(),
       inLanguage: 'ja',
-      width: 1280, // 推奨プロパティ (アスペクト比計算用)
-      height: 720, // 推奨プロパティ
+      width: 1280,
+      height: 720,
       publisher: {
         '@type': 'Organization',
         name: '富山、お好きですか？',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://sasakiyoshimasa.com/images/og-image.png',
-          width: 1200,
-          height: 630
+          url: 'https://sasakiyoshimasa.com/images/logo.png',
+          width: 400,
+          height: 400
         }
       }
     }
