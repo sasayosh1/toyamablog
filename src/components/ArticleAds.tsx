@@ -8,6 +8,7 @@ interface ArticleAdsProps {
 
 const AD_SLOTS = {
   top: process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP || '',
+  bottom: process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOTTOM || '',
   sidebar: process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR || '',
   infeed: process.env.NEXT_PUBLIC_ADSENSE_SLOT_INFEED || '',
 }
@@ -66,3 +67,21 @@ export function InFeedAd({ className }: ArticleAdsProps) {
     </div>
   )
 }
+
+// 記事下部広告（レスポンシブ）
+export function BottomArticleAd({ className }: ArticleAdsProps) {
+  const slot = getSlot(AD_SLOTS.bottom || AD_SLOTS.top) // Fallback to top if bottom is not set
+  if (!slot) return null
+  return (
+    <div className={`mt-12 mb-8 ${className}`}>
+      <div className="text-xs text-gray-500 mb-2 text-center">スポンサードリンク</div>
+      <AdUnit
+        slot={slot}
+        format="auto"
+        responsive={true}
+        className="w-full"
+      />
+    </div>
+  )
+}
+

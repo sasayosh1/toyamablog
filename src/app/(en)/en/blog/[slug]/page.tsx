@@ -6,7 +6,7 @@ import GlobalHeader from '@/components/GlobalHeader'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import ReadingTime from '@/components/ui/ReadingTime'
 import TableOfContents from '@/components/TableOfContents'
-import { TopArticleAd } from '@/components/ArticleAds'
+import { TopArticleAd, BottomArticleAd, SidebarAd } from '@/components/ArticleAds'
 import { generateArticleLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import ArticleErrorBoundary from '@/components/ui/ArticleErrorBoundary'
 import RelatedPosts from '@/components/RelatedPosts'
@@ -147,234 +147,246 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <div className="min-h-screen bg-gray-50 blog-page">
         <GlobalHeader posts={posts} categories={categories} locale="en" basePath="/en" />
 
-        <div className="max-w-4xl mx-auto px-4 py-8 pt-24">
-          <Breadcrumb
-            locale="en"
-            basePath="/en"
-            items={[
-              {
-                label: 'Home',
-                href: '/',
-                icon: (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                )
-              },
-              ...(post.category ? [{
-                label: post.category,
-                href: `/category/${encodeURIComponent(post.category)}`
-              }] : []),
-              {
-                label: cleanTitle
-              }
-            ]}
-          />
-
-          <ArticleErrorBoundary articleTitle={cleanTitle}>
-            <article className="bg-white rounded-xl shadow-sm p-8 md:p-12">
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-gray-900 leading-tight">
-                {cleanTitle}
-              </h1>
-
-              {!!(post.bodyEn || post.body) && Array.isArray((post.bodyEn || post.body)) && ((post.bodyEn || post.body) as Array<unknown>).length > 0 && (
-                <ReadingTime content={post.bodyEn || post.body} locale="en" />
-              )}
-
-              {post.youtubeUrl && (
-                <div className="mb-8">
-                  <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden shadow-md">
-                    <iframe
-                      src={(() => {
-                        // YouTube URL を embed形式に変換
-                        const embedUrl = post.youtubeUrl;
-
-                        // youtu.be形式の変換
-                        if (embedUrl.includes('youtu.be/')) {
-                          const videoId = embedUrl.split('youtu.be/')[1]?.split('?')[0];
-                          return `https://www.youtube.com/embed/${videoId}`;
-                        }
-
-                        // youtube.com/watch形式の変換
-                        if (embedUrl.includes('youtube.com/watch?v=')) {
-                          const videoId = embedUrl.split('v=')[1]?.split('&')[0];
-                          return `https://www.youtube.com/embed/${videoId}`;
-                        }
-
-                        // youtube.com/shorts形式の変換
-                        if (embedUrl.includes('youtube.com/shorts/')) {
-                          const videoId = embedUrl.split('shorts/')[1]?.split('?')[0];
-                          return `https://www.youtube.com/embed/${videoId}`;
-                        }
-
-                        // 既にembed形式の場合はそのまま
-                        if (embedUrl.includes('youtube.com/embed/')) {
-                          return embedUrl;
-                        }
-
-                        // その他の場合はそのまま返す
-                        return embedUrl;
-                      })()}
-                      title={cleanTitle}
-                      width="560"
-                      height="315"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full h-full"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {post.category && (
-                <div className="mb-6">
-                  <Link
-                    href={`/en/category/${encodeURIComponent(post.category)}`}
-                    className="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-md hover:bg-green-200 transition-colors"
-                  >
-                    {post.category}
-                  </Link>
-                </div>
-              )}
-
-              {/* 記事上部広告 */}
-              <TopArticleAd />
-
-              {(post.bodyEn || post.body) && Array.isArray((post.bodyEn || post.body)) ? (
-                <>
-                  <TableOfContents content={post.bodyEn || post.body} locale="en" />
-                  <div className="prose prose-lg max-w-none mb-12 blog-content">
-                    <PortableText value={post.bodyEn || post.body} />
-                  </div>
-                </>
-              ) : null}
-
-              <>
-
-                {/* Googleマップセクション（クラウドルール：記事本文の後、タグより上に配置） */}
-                {post.body && Array.isArray(post.body) && (() => {
-                  // 最初に見つかったマップブロック1つのみを表示（重複防止）
-                  const firstMapBlock = post.body
-                    .filter((block: unknown) => {
-                      if (typeof block !== 'object' || block === null || !('_type' in block)) return false;
-                      const blockType = (block as { _type: string })._type;
-
-                      // googleMapsタイプの場合
-                      if (blockType === 'googleMaps') {
-                        return !!(block as { iframe?: string }).iframe;
-                      }
-
-                      // htmlタイプでGoogleマップの場合
-                      if (blockType === 'html') {
-                        const html = (block as { html?: string }).html;
-                        return html?.includes('google.com/maps/embed') || false;
-                      }
-
-                      return false;
-                    })
-                    .slice(0, 1)[0]; // 最初の1つのみを取得
-
-                  if (!firstMapBlock) return null;
-
-                  const block = firstMapBlock as { _type: string; iframe?: string; html?: string; description?: string };
-
-                  let processedIframe = '';
-
-                  // googleMapsタイプの場合
-                  if (block._type === 'googleMaps' && block.iframe) {
-                    processedIframe = block.iframe
-                      .replace(/width="[^"]*"/g, 'width="100%"')
-                      .replace(/height="[^"]*"/g, 'height="300"')
-                      .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
-                  }
-
-                  // htmlタイプの場合
-                  if (block._type === 'html' && block.html) {
-                    processedIframe = block.html
-                      .replace(/width="[^"]*"/g, 'width="100%"')
-                      .replace(/height="[^"]*"/g, 'height="300"')
-                      .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
-                  }
-
-                  if (!processedIframe) return null;
-
-                  return (
-                    <div className="mb-8">
-                      <div style={{ margin: '2rem 0', textAlign: 'center' }}>
-                        <div dangerouslySetInnerHTML={{ __html: processedIframe }} />
-                        {block.description && (
-                          <p style={{
-                            marginTop: '0.5rem',
-                            fontSize: '0.875rem',
-                            color: '#666',
-                            fontStyle: 'italic'
-                          }}>
-                            {block.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {/* SNSシェアボタン */}
-                <SocialShareButtons
-                  url={`https://sasakiyoshimasa.com/blog/${slug}`}
-                  title={cleanTitle}
-                  twitterAccount="sasayoshi_tym"
-                />
-
-                {post.tags && post.tags.length > 0 && (
-                  <div className="border-t border-gray-200 pt-8 mb-8">
-                    <div className="flex flex-wrap gap-2">
-                      {post.tags.map((tag) => (
-                        <Link
-                          key={tag}
-                          href={`/en/tag/${encodeURIComponent(tag)}`}
-                          className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
-                        >
-                          {tag}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* ナビゲーションボタン */}
-                <div className="border-t border-gray-200 pt-8 mb-8">
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    {post.category && (
-                      <Link
-                        href={`/en/category/${encodeURIComponent(post.category)}`}
-                        className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm"
-                      >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
-                        More posts in {post.category}
-                      </Link>
-                    )}
-                    <Link
-                      href="/en/"
-                      className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
-                    >
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="max-w-7xl mx-auto px-4 py-8 pt-24">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-8">
+              <Breadcrumb
+                locale="en"
+                basePath="/en"
+                items={[
+                  {
+                    label: 'Home',
+                    href: '/',
+                    icon: (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                       </svg>
-                      Back to Home
-                    </Link>
-                  </div>
-                </div>
-              </>
-            </article>
-          </ArticleErrorBoundary>
+                    )
+                  },
+                  ...(post.category ? [{
+                    label: post.category,
+                    href: `/category/${encodeURIComponent(post.category)}`
+                  }] : []),
+                  {
+                    label: cleanTitle
+                  }
+                ]}
+              />
 
-          {/* プロフィールセクション */}
-          <ProfileSection locale="en" />
+              <ArticleErrorBoundary articleTitle={cleanTitle}>
+                <article className="bg-white rounded-xl shadow-sm p-8 md:p-12">
+                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-gray-900 leading-tight">
+                    {cleanTitle}
+                  </h1>
 
-          {/* 関連記事セクション */}
-          <RelatedPosts currentPostId={post._id} category={post.category} limit={6} locale="en" basePath="/en" />
+                  {!!(post.bodyEn || post.body) && Array.isArray((post.bodyEn || post.body)) && ((post.bodyEn || post.body) as Array<unknown>).length > 0 && (
+                    <ReadingTime content={post.bodyEn || post.body} locale="en" />
+                  )}
+
+                  {post.youtubeUrl && (
+                    <div className="mb-8">
+                      <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden shadow-md">
+                        <iframe
+                          src={(() => {
+                            // YouTube URL を embed形式に変換
+                            const embedUrl = post.youtubeUrl;
+
+                            // youtu.be形式の変換
+                            if (embedUrl.includes('youtu.be/')) {
+                              const videoId = embedUrl.split('youtu.be/')[1]?.split('?')[0];
+                              return `https://www.youtube.com/embed/${videoId}`;
+                            }
+
+                            // youtube.com/watch形式の変換
+                            if (embedUrl.includes('youtube.com/watch?v=')) {
+                              const videoId = embedUrl.split('v=')[1]?.split('&')[0];
+                              return `https://www.youtube.com/embed/${videoId}`;
+                            }
+
+                            // youtube.com/shorts形式の変換
+                            if (embedUrl.includes('youtube.com/shorts/')) {
+                              const videoId = embedUrl.split('shorts/')[1]?.split('?')[0];
+                              return `https://www.youtube.com/embed/${videoId}`;
+                            }
+
+                            // 既にembed形式の場合はそのまま
+                            if (embedUrl.includes('youtube.com/embed/')) {
+                              return embedUrl;
+                            }
+
+                            // その他の場合はそのまま返す
+                            return embedUrl;
+                          })()}
+                          title={cleanTitle}
+                          width="560"
+                          height="315"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="w-full h-full"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {post.category && (
+                    <div className="mb-6">
+                      <Link
+                        href={`/en/category/${encodeURIComponent(post.category)}`}
+                        className="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-md hover:bg-green-200 transition-colors"
+                      >
+                        {post.category}
+                      </Link>
+                    </div>
+                  )}
+
+                  {/* 記事上部広告 */}
+                  <TopArticleAd />
+
+                  {(post.bodyEn || post.body) && Array.isArray((post.bodyEn || post.body)) ? (
+                    <>
+                      <TableOfContents content={post.bodyEn || post.body} locale="en" />
+                      <div className="prose prose-lg max-w-none mb-12 blog-content">
+                        <PortableText value={post.bodyEn || post.body} />
+                      </div>
+                      {/* Bottom Article Ad */}
+                      <BottomArticleAd />
+                    </>
+                  ) : null}
+
+                  <>
+
+                    {/* Googleマップセクション（クラウドルール：記事本文の後、タグより上に配置） */}
+                    {post.body && Array.isArray(post.body) && (() => {
+                      // 最初に見つかったマップブロック1つのみを表示（重複防止）
+                      const firstMapBlock = post.body
+                        .filter((block: unknown) => {
+                          if (typeof block !== 'object' || block === null || !('_type' in block)) return false;
+                          const blockType = (block as { _type: string })._type;
+
+                          // googleMapsタイプの場合
+                          if (blockType === 'googleMaps') {
+                            return !!(block as { iframe?: string }).iframe;
+                          }
+
+                          // htmlタイプでGoogleマップの場合
+                          if (blockType === 'html') {
+                            const html = (block as { html?: string }).html;
+                            return html?.includes('google.com/maps/embed') || false;
+                          }
+
+                          return false;
+                        })
+                        .slice(0, 1)[0]; // 最初の1つのみを取得
+
+                      if (!firstMapBlock) return null;
+
+                      const block = firstMapBlock as { _type: string; iframe?: string; html?: string; description?: string };
+
+                      let processedIframe = '';
+
+                      // googleMapsタイプの場合
+                      if (block._type === 'googleMaps' && block.iframe) {
+                        processedIframe = block.iframe
+                          .replace(/width="[^"]*"/g, 'width="100%"')
+                          .replace(/height="[^"]*"/g, 'height="300"')
+                          .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
+                      }
+
+                      // htmlタイプの場合
+                      if (block._type === 'html' && block.html) {
+                        processedIframe = block.html
+                          .replace(/width="[^"]*"/g, 'width="100%"')
+                          .replace(/height="[^"]*"/g, 'height="300"')
+                          .replace(/style="[^"]*"/g, 'style="border:0; border-radius: 8px;"');
+                      }
+
+                      if (!processedIframe) return null;
+
+                      return (
+                        <div className="mb-8">
+                          <div style={{ margin: '2rem 0', textAlign: 'center' }}>
+                            <div dangerouslySetInnerHTML={{ __html: processedIframe }} />
+                            {block.description && (
+                              <p style={{
+                                marginTop: '0.5rem',
+                                fontSize: '0.875rem',
+                                color: '#666',
+                                fontStyle: 'italic'
+                              }}>
+                                {block.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* SNSシェアボタン */}
+                    <SocialShareButtons
+                      url={`https://sasakiyoshimasa.com/blog/${slug}`}
+                      title={cleanTitle}
+                      twitterAccount="sasayoshi_tym"
+                    />
+
+                    {post.tags && post.tags.length > 0 && (
+                      <div className="border-t border-gray-200 pt-8 mb-8">
+                        <div className="flex flex-wrap gap-2">
+                          {post.tags.map((tag) => (
+                            <Link
+                              key={tag}
+                              href={`/en/tag/${encodeURIComponent(tag)}`}
+                              className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
+                            >
+                              {tag}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ナビゲーションボタン */}
+                    <div className="border-t border-gray-200 pt-8 mb-8">
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        {post.category && (
+                          <Link
+                            href={`/en/category/${encodeURIComponent(post.category)}`}
+                            className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm"
+                          >
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            More posts in {post.category}
+                          </Link>
+                        )}
+                        <Link
+                          href="/en/"
+                          className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+                        >
+                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                          </svg>
+                          Back to Home
+                        </Link>
+                      </div>
+                    </div>
+                  </>
+                </article>
+              </ArticleErrorBoundary>
+
+              {/* 関連記事セクション */}
+              <RelatedPosts currentPostId={post._id} category={post.category} limit={6} locale="en" basePath="/en" />
+            </div>
+
+            {/* Sidebar (Desktop Only) */}
+            <aside className="hidden lg:block lg:col-span-4 space-y-8">
+              <div className="sticky top-24">
+                <SidebarAd />
+                <ProfileSection locale="en" />
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </>
