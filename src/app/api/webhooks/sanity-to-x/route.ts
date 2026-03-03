@@ -20,17 +20,8 @@ export async function POST(req: Request) {
         const body: SanityWebhookPayload = await req.json();
         console.log('[Sanity to X Webhook] Received payload:', body._id);
 
-        // 3. Filter Conditions
-        if (body._type !== 'post') {
-            return NextResponse.json({ ok: true, message: 'Ignored: Not a post' });
-        }
-
-        if (!body.titleEn) {
-            return NextResponse.json({ ok: true, message: 'Ignored: No English title (titleEn)' });
-        }
-
-        if (!body.slug?.current) {
-            return NextResponse.json({ ok: true, message: 'Ignored: No slug' });
+        if (!body.titleEn || !body.slug?.current) {
+            return NextResponse.json({ ok: true, message: 'Ignored: Missing fields' });
         }
 
         // 4. Initialize Twitter API Client
@@ -41,16 +32,11 @@ export async function POST(req: Request) {
             TWITTER_ACCESS_SECRET
         } = process.env;
 
-        if (!TWITTER_API_KEY || !TWITTER_API_SECRET || !TWITTER_ACCESS_TOKEN || !TWITTER_ACCESS_SECRET) {
-            console.error('[Sanity to X Webhook] Missing Twitter API credentials');
-            return NextResponse.json({ ok: false, error: 'Twitter credentials not configured' }, { status: 500 });
-        }
-
         const twitterClient = new TwitterApi({
-            appKey: TWITTER_API_KEY,
-            appSecret: TWITTER_API_SECRET,
-            accessToken: TWITTER_ACCESS_TOKEN,
-            accessSecret: TWITTER_ACCESS_SECRET,
+            appKey: TWITTER_API_KEY!,
+            appSecret: TWITTER_API_SECRET!,
+            accessToken: TWITTER_ACCESS_TOKEN!,
+            accessSecret: TWITTER_ACCESS_SECRET!,
         });
 
         const rwClient = twitterClient.readWrite;
@@ -63,29 +49,22 @@ export async function POST(req: Request) {
 
         // 6. Post to X
         try {
-            await rwClient.v2.tweet(tweetText);
-            console.log(`[Sanity to X Webhook] Successfully tweeted for: ${body.slug.current}`);
-            return NextResponse.json({
-                ok: true,
-                message: 'Successfully posted to X',
-                tweet_content: tweetText
-            });
+            const res = await rwClient.v2.tweet(tweetText);
+            return NextResponse.json({ ok: true, message: 'Successfully posted to X', data: res });
         } catch (twitterError: any) {
-            // RETURN THE ERROR IN JSON RESPONSE FOR DEBUGGING
-            let errorMessage = twitterError.message || String(twitterError);
-            let errorData = twitterError.data || null;
-
             return NextResponse.json({
                 ok: false,
                 error: 'Twitter API Error captured in catch block',
-                detail: errorMessage,
-                data: errorData
+                message: twitterError.message || String(twitterError),
+                name: twitterError.name,
+                code: twitterError.code,
+                rateLimit: twitterError.rateLimit,
+                data: twitterError.data,
+                type: twitterError.type
             }, { status: 500 });
         }
 
-    } catch (error: unknown) {
-        console.error('[Sanity to X Webhook] General Error:', error);
-        const message = error instanceof Error ? error.message : String(error);
-        return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    } catch (error: any) {
+        return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 }
