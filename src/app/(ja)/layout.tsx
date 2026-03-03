@@ -37,6 +37,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://sasakiyoshimasa.com'),
   alternates: {
     canonical: 'https://sasakiyoshimasa.com',
+    languages: {
+      'ja': 'https://sasakiyoshimasa.com',
+      'en': 'https://sasakiyoshimasa.com/en',
+    },
   },
   openGraph: {
     title: "富山、お好きですか？ - AMAZING TOYAMA",
