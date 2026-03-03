@@ -62,18 +62,24 @@ export async function POST(req: Request) {
         const tweetText = `[New Entry: ${body.titleEn}]\n\nCheck out this spot in Toyama, Japan! 🗻✨\n${postUrl}\n\n#Toyama #JapanTravel #HiddenJapan`;
 
         // 6. Post to X
-        await rwClient.v2.tweet(tweetText);
-
-        console.log(`[Sanity to X Webhook] Successfully tweeted for: ${body.slug.current}`);
-
-        return NextResponse.json({
-            ok: true,
-            message: 'Successfully posted to X',
-            tweet_content: tweetText
-        });
+        try {
+            await rwClient.v2.tweet(tweetText);
+            console.log(`[Sanity to X Webhook] Successfully tweeted for: ${body.slug.current}`);
+            return NextResponse.json({
+                ok: true,
+                message: 'Successfully posted to X',
+                tweet_content: tweetText
+            });
+        } catch (twitterError: any) {
+            console.error('[Sanity to X Webhook] Twitter API Error Detail:', JSON.stringify(twitterError, null, 2));
+            if (twitterError.data) {
+                console.error('[Sanity to X Webhook] Twitter API Error Data:', JSON.stringify(twitterError.data, null, 2));
+            }
+            return NextResponse.json({ ok: false, error: 'Twitter API Error', detail: twitterError.message || twitterError.data || String(twitterError) }, { status: 500 });
+        }
 
     } catch (error: unknown) {
-        console.error('[Sanity to X Webhook] Error:', error);
+        console.error('[Sanity to X Webhook] General Error:', error);
         const message = error instanceof Error ? error.message : String(error);
         return NextResponse.json({ ok: false, error: message }, { status: 500 });
     }
