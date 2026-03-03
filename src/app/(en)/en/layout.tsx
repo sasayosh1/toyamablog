@@ -26,6 +26,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://sasakiyoshimasa.com'),
   alternates: {
     canonical: 'https://sasakiyoshimasa.com/en',
+    languages: {
+      'ja': 'https://sasakiyoshimasa.com',
+      'en': 'https://sasakiyoshimasa.com/en',
+    },
   },
   openGraph: {
     title: "Do you like Toyama? - AMAZING TOYAMA",
