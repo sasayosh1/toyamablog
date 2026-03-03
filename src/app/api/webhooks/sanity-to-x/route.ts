@@ -71,11 +71,16 @@ export async function POST(req: Request) {
                 tweet_content: tweetText
             });
         } catch (twitterError: any) {
-            console.error('[Sanity to X Webhook] Twitter API Error Detail:', JSON.stringify(twitterError, null, 2));
-            if (twitterError.data) {
-                console.error('[Sanity to X Webhook] Twitter API Error Data:', JSON.stringify(twitterError.data, null, 2));
-            }
-            return NextResponse.json({ ok: false, error: 'Twitter API Error', detail: twitterError.message || twitterError.data || String(twitterError) }, { status: 500 });
+            // RETURN THE ERROR IN JSON RESPONSE FOR DEBUGGING
+            let errorMessage = twitterError.message || String(twitterError);
+            let errorData = twitterError.data || null;
+
+            return NextResponse.json({
+                ok: false,
+                error: 'Twitter API Error captured in catch block',
+                detail: errorMessage,
+                data: errorData
+            }, { status: 500 });
         }
 
     } catch (error: unknown) {
