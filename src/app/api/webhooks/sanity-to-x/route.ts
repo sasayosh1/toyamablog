@@ -12,15 +12,22 @@ interface SanityWebhookPayload {
     thumbnailUrl?: string;
 }
 
+// Force Node.js runtime because twitter-api-v2 needs Node built-ins
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
+    console.log('[Sanity to X Webhook] Function entered');
     try {
         console.log('[Sanity to X Webhook] Triggered (Secret bypassed for testing)');
 
         // 2. Parse Body
         const body: SanityWebhookPayload = await req.json();
-        console.log('[Sanity to X Webhook] Received payload:', body._id);
+        console.log('[Sanity to X Webhook] Received payload for ID:', body._id);
+        console.log(`[Sanity to X Webhook] title: ${body.title}, titleEn: ${body.titleEn}, slug: ${body.slug?.current}`);
 
         if (!body.titleEn || !body.slug?.current) {
+            console.log('[Sanity to X Webhook] Ignored: Missing titleEn or slug.current');
             return NextResponse.json({ ok: true, message: 'Ignored: Missing fields' });
         }
 
@@ -49,9 +56,12 @@ export async function POST(req: Request) {
 
         // 6. Post to X
         try {
+            console.log('[Sanity to X Webhook] Attempting to tweet:', tweetText);
             const res = await rwClient.v2.tweet(tweetText);
+            console.log('[Sanity to X Webhook] Successfully posted to X. Tweet ID:', res.data.id);
             return NextResponse.json({ ok: true, message: 'Successfully posted to X', data: res });
         } catch (twitterError: any) {
+            console.error('[Sanity to X Webhook] Failed to post to X:', twitterError);
             return NextResponse.json({
                 ok: false,
                 error: 'Twitter API Error captured in catch block',

@@ -158,6 +158,6 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // app router pages
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|icon.svg|apple-touch-icon.png).*)',
+    '/((?!_next/static|_next/image|api/webhooks|favicon.ico|robots.txt|sitemap.xml|manifest.json|icon.svg|apple-touch-icon.png).*)',
   ],
 }
