@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
-    "@google/generative-ai": "^0.19.0",
+    "@google/generative-ai": "^0.24.1",
     "@heroicons/react": "^2.2.0",
     "@portabletext/react": "^6.0.2",
     "@sanity/client": "^7.15.0",
