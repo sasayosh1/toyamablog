@@ -141,3 +141,4 @@ transcribe.lock
 
 # Processed Audio
 02_音声/processed/
+.env*.local

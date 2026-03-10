@@ -1,7 +1,10 @@
 User-agent: *
 Allow: /
+Allow: /_next/static/
 Disallow: /410
 Disallow: /_next/
 Disallow: /api/
+Disallow: /studio
+Disallow: /studio-access.html
 
 Sitemap: https://sasakiyoshimasa.com/sitemap.xml

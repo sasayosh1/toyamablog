@@ -3,146 +3,103 @@ import { NextRequest, NextResponse } from 'next/server'
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
-  // --- Legacy URL cleanup (WordPress/old pagination/etc) ---
-  // GSC の 404 が大量に出やすいパターンを、404にせず正規URLへ寄せる。
-  // ※ next.config.ts の redirects では query 条件が扱いづらい/ループしやすいので middleware で処理。
+  // --- Redirect Logic Consolidation ---
+  // SNS共有・トラッキング系クエリの除去、および旧URLのクリーンアップを一括で行う。
+  // 多重リダイレクトを避けるため、一度の状態変更で最終的な宛先を決定する。
   if (request.method === 'GET' || request.method === 'HEAD') {
     const url = new URL(request.url)
+    let changed = false
+    let finalPathname = url.pathname
 
-    // WordPress 由来のクエリ（/?p=123 など）
-    if (url.searchParams.has('p')) {
-      // 旧記事IDからslugへの復元はできないのでトップへ誘導（404回避/UX優先）
-      url.pathname = '/'
-      url.search = ''
-      return NextResponse.redirect(url, 308)
-    }
+    // 1. トラッキングクエリの除去
+    const trackingKeys = [
+      'share', 'nb', 'fbclid', 'gclid', 'utm_source', 'utm_medium', 'utm_campaign',
+      'utm_content', 'utm_term', 'utm_id', 'utm_name', 'utm_source_platform',
+      'utm_creative_format', 'utm_marketing_tactic',
+    ]
+    trackingKeys.forEach((key) => {
+      if (url.searchParams.has(key)) {
+        url.searchParams.delete(key)
+        changed = true
+      }
+    })
 
-    // catパラメータ（WordPressカテゴリID）はトップへ
-    if (url.searchParams.has('cat')) {
-      url.pathname = '/'
-      url.search = ''
-      return NextResponse.redirect(url, 308)
+    // 2. 旧URLクリーンアップ (Legacy URL cleanup)
+    // WordPress 由来のクエリ（/?p=123 など） -> トップへ
+    if (url.searchParams.has('p') || url.searchParams.has('cat')) {
+      finalPathname = '/'
+      url.search = '' // クエリ全削除
+      changed = true
     }
 
     // categoryパラメータ（名前指定）はカテゴリページへ
     if (url.searchParams.has('category')) {
       const category = url.searchParams.get('category')
       if (category) {
-        return NextResponse.redirect(new URL(`/category/${encodeURIComponent(category)}`, request.url), 308)
+        finalPathname = `/category/${encodeURIComponent(category)}`
+        url.search = ''
+        changed = true
       }
     }
 
-    // AMP系
+    // AMP系クエリ除去
     if (url.searchParams.has('amp')) {
       url.searchParams.delete('amp')
-      if ([...url.searchParams.keys()].length === 0) url.search = ''
-      return NextResponse.redirect(url, 308)
+      changed = true
     }
 
-    // /feed /rss /atom など
+    // パスベースのクリーンアップ
+    // /feed /rss /atom など -> トップ
     if (
-      path === '/feed' ||
-      path === '/rss' ||
-      path === '/rss.xml' ||
-      path === '/atom.xml' ||
-      path.endsWith('/feed') ||
-      path.endsWith('/feed/')
+      finalPathname === '/feed' ||
+      finalPathname === '/rss' ||
+      finalPathname === '/rss.xml' ||
+      finalPathname === '/atom.xml' ||
+      finalPathname.endsWith('/feed') ||
+      finalPathname.endsWith('/feed/')
     ) {
-      return NextResponse.redirect(new URL('/', request.url), 308)
+      finalPathname = '/'
+      changed = true
     }
 
-    // WP 管理/資産系（クロールされやすいがサイトには存在しない）
+    // WP 管理/資産系 -> トップ (Soft 404 回避のため、本来は 410 等が望ましいが現状の挙動を維持)
     if (
-      path === '/xmlrpc.php' ||
-      path.startsWith('/wp-admin') ||
-      path.startsWith('/wp-login') ||
-      path.startsWith('/wp-json') ||
-      path.startsWith('/wp-content') ||
-      path.startsWith('/wp-includes') ||
-      path.startsWith('/wp-')
+      finalPathname === '/xmlrpc.php' ||
+      finalPathname.startsWith('/wp-admin') ||
+      finalPathname.startsWith('/wp-login') ||
+      finalPathname.startsWith('/wp-json') ||
+      finalPathname.startsWith('/wp-content') ||
+      finalPathname.startsWith('/wp-includes') ||
+      finalPathname.startsWith('/wp-')
     ) {
-      return NextResponse.redirect(new URL('/', request.url), 308)
+      finalPathname = '/'
+      changed = true
     }
 
-    // 旧ページネーション
-    const tagPaging = path.match(/^\/tag\/([^/]+)\/page\/\d+\/?$/)
-    if (tagPaging) {
-      return NextResponse.redirect(new URL(`/tag/${tagPaging[1]}`, request.url), 308)
-    }
-    const categoryPaging = path.match(/^\/category\/([^/]+)\/page\/\d+\/?$/)
-    if (categoryPaging) {
-      return NextResponse.redirect(new URL(`/category/${categoryPaging[1]}`, request.url), 308)
-    }
-
-    const blogPaging = path.match(/^\/blog\/page\/\d+\/?$/)
-    if (blogPaging) {
-      return NextResponse.redirect(new URL('/', request.url), 308)
-    }
-
-    // 日付アーカイブ（/2022/12/ など）はトップページへ
-    // ※ 記事自体のURLは /blog/slug なので、日付パスはアーカイブのみ
-    if (path.match(/^\/\d{4}\/\d{2}\/?$/)) {
-      return NextResponse.redirect(new URL('/', request.url), 308)
-    }
-
-    // Google Search Console verification files should be served as-is.
-    if (path === '/google613d0403c01cf012.html') {
-      return NextResponse.next()
-    }
-
-    // 拡張子付きの旧URL（.php/.html など）をトップへ
-    if (/\.(php|html?)$/i.test(path)) {
-      return NextResponse.redirect(new URL('/', request.url), 308)
+    // 拡張子付きの旧URL -> トップ
+    if (/\.(php|html?)$/i.test(finalPathname) && finalPathname !== '/studio-access.html' && finalPathname !== '/google613d0403c01cf012.html') {
+      finalPathname = '/'
+      changed = true
     }
 
     // 日本語タイトル系の旧URL（【...】...）はカテゴリ一覧へ
-    // （Next.js ルーティング側では正規表現マッチが不安定なので、ここで確実に吸収）
-    if (path.includes('【') || path.includes('】') || request.url.includes('%E3%80%90')) {
-      return NextResponse.redirect(new URL('/categories', request.url), 308)
+    if (finalPathname.includes('【') || finalPathname.includes('】') || request.url.includes('%E3%80%90')) {
+      finalPathname = '/categories'
+      changed = true
     }
-  }
 
-  // SNS共有・トラッキング系クエリはインデックス/集計を汚すので除去して正規URLへ
-  // next.config.ts の redirects ではクエリ削除ができずループしやすいため、middlewareで処理する
-  if (request.method === 'GET' || request.method === 'HEAD') {
-    const trackingKeys = [
-      'share',
-      'nb',
-      'fbclid',
-      'gclid',
-      'utm_source',
-      'utm_medium',
-      'utm_campaign',
-      'utm_content',
-      'utm_term',
-      'utm_id',
-      'utm_name',
-      'utm_source_platform',
-      'utm_creative_format',
-      'utm_marketing_tactic',
-    ]
-
-    let changed = false
-    const cleaned = new URL(request.url)
-    trackingKeys.forEach((key) => {
-      if (cleaned.searchParams.has(key)) {
-        cleaned.searchParams.delete(key)
-        changed = true
-      }
-    })
-
-    // 余計な ? を消す
-    if (changed) {
-      if ([...cleaned.searchParams.keys()].length === 0) {
-        cleaned.search = ''
-      }
-      return NextResponse.redirect(cleaned, 308)
+    // /structure 配下はすべて categories に統一
+    if (finalPathname.startsWith('/structure/')) {
+      finalPathname = '/categories'
+      changed = true
     }
-  }
 
-  // /structure 配下はすべて categories に統一（リダイレクト）
-  if (path.startsWith('/structure/')) {
-    return NextResponse.redirect(new URL('/categories', request.url), 308)
+    // 変更があった場合のみ一度だけリダイレクト
+    if (changed || finalPathname !== url.pathname) {
+      url.pathname = finalPathname
+      if ([...url.searchParams.keys()].length === 0) url.search = ''
+      return NextResponse.redirect(url, 308)
+    }
   }
 
   const response = NextResponse.next()
