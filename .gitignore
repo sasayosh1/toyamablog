@@ -142,3 +142,6 @@ transcribe.lock
 # Processed Audio
 02_音声/processed/
 .env*.local
+.env.vercel
+.env.prod
+test-twitter.js
