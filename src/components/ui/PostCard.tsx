@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { getYouTubeThumbnailWithFallback } from '@/lib/youtube'
+import { getMunicipalityEnName } from '@/components/municipalities_data'
 
 
 // フォールバック対応サムネイル画像コンポーネント
@@ -263,7 +264,7 @@ export default function PostCard({ post, priority = false, basePath = '', locale
               <CategoryTag
                 className="px-3 py-1 bg-white/90 backdrop-blur-sm text-toyama-blue-dark text-xs font-bold rounded-full shadow-sm"
               >
-                {post.categories[0]}
+                {locale === 'en' ? getMunicipalityEnName(post.categories[0]) : post.categories[0]}
               </CategoryTag>
             </div>
           )}

@@ -137,7 +137,7 @@ export default async function Home({ searchParams }: PageProps) {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Search by Area</h2>
               <p className="text-gray-600">Toyama Prefecture is broadly divided into 4 areas.<br className="hidden sm:block" />Click on a region to discover its charm.</p>
             </div>
-            <ToyamaMap />
+            <ToyamaMap locale="en" basePath="/en" />
             {/* Map Section End */}
           </div>
         </section>

@@ -9,6 +9,7 @@ import StructuredData from '@/components/StructuredData'
 import { generateCategoryLD, generateBreadcrumbLD } from '@/lib/structured-data'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getMunicipalityEnName } from '@/components/municipalities_data'
 
 // ISR: 1時間ごとに再検証
 export const revalidate = 3600
@@ -88,7 +89,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   const breadcrumbLD = generateBreadcrumbLD([
     { name: 'Home', url: 'https://sasakiyoshimasa.com/en/' },
     { name: 'Categories', url: 'https://sasakiyoshimasa.com/en/categories' },
-    { name: decodedCategory }
+    { name: getMunicipalityEnName(decodedCategory) }
   ])
 
   return (
@@ -116,15 +117,15 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                 href: '/categories'
               },
               {
-                label: decodedCategory
+                label: getMunicipalityEnName(decodedCategory)
               }
             ]}
           />
 
           <CategoryHero
-            title={decodedCategory}
+            title={getMunicipalityEnName(decodedCategory)}
             subtitle={`${categoryPosts.length} posts available`}
-            description={`List of articles regarding ${decodedCategory} in Toyama Prefecture.`}
+            description={`List of articles regarding ${getMunicipalityEnName(decodedCategory)} in Toyama Prefecture.`}
           />
 
           {/* 記事一覧 */}
@@ -229,7 +230,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                       return count > 0 && (
                         <CategoryCard
                           key={otherCategory}
-                          name={otherCategory}
+                          name={getMunicipalityEnName(otherCategory)}
                           count={count}
                           href={`/en/category/${encodeURIComponent(otherCategory)}`}
                           variant="compact"

@@ -79,7 +79,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="32x32" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
@@ -95,11 +95,11 @@ export default function RootLayout({
         className={`antialiased`}
       >
         <ErrorBoundary>
+          {children}
           <Suspense fallback={null}>
             <GAProvider />
             <AdSense />
           </Suspense>
-          {children}
           <Footer locale="en" basePath="/en" />
           <ScrollToTop locale="en" />
         </ErrorBoundary>

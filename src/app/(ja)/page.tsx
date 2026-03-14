@@ -137,7 +137,7 @@ export default async function Home({ searchParams }: PageProps) {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">エリアから探す</h2>
               <p className="text-gray-600">富山県は大きく4つのエリアに分かれています。<br className="hidden sm:block" />気になる地域をクリックして、その場所の魅力を発見しましょう。</p>
             </div>
-            <ToyamaMap />
+            <ToyamaMap locale="ja" basePath="" />
             {/* Map Section End */}
           </div>
         </section>

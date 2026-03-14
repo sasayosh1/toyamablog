@@ -38,7 +38,7 @@ export default function Breadcrumb({ items, basePath = '', locale = 'ja' }: Brea
                 </svg>
               )}
               {item.href ? (
-                <Link href={`${basePath}${item.href === '/' ? '' : item.href}`} className="hover:text-blue-600 transition-colors flex items-center flex-shrink-0" title={item.label}>
+                <Link href={item.href === '/' ? (basePath || '/') : `${basePath}${item.href}`} className="hover:text-blue-600 transition-colors flex items-center flex-shrink-0" title={item.label}>
                   {item.icon && <span className="mr-1 flex-shrink-0">{item.icon}</span>}
                   <span className="truncate">{truncatedLabel}</span>
                 </Link>

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import GlobalHeader from '@/components/GlobalHeader'
 import CategoryCard from '@/components/ui/CategoryCard'
 import PageHeader from '@/components/ui/PageHeader'
+import { getMunicipalityEnName } from '@/components/municipalities_data'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -54,10 +55,10 @@ export default async function CategoriesPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 categories-page">
+    <>
       <GlobalHeader posts={posts} categories={categories} locale="en" basePath="/en" />
-
-      <div className="max-w-7xl mx-auto py-8 md:py-12 px-4 pt-24">
+      <div className="min-h-screen bg-gray-50 categories-page" suppressHydrationWarning>
+        <div className="max-w-7xl mx-auto py-8 md:py-12 px-4 pt-24">
         <PageHeader
           title="Search by Region"
           subtitle="Find articles from regions you are interested in"
@@ -86,7 +87,7 @@ export default async function CategoriesPage() {
               {categoriesWithCounts.map((category) => (
                 <CategoryCard
                   key={category.name}
-                  name={category.name}
+                  name={getMunicipalityEnName(category.name)}
                   count={category.count}
                   href={`/en/category/${encodeURIComponent(category.name)}`}
                   locale="en"
@@ -108,7 +109,8 @@ export default async function CategoriesPage() {
             Back to Home
           </Link>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
